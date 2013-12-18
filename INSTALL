@@ -1,0 +1,22 @@
+makeapp installation
+====================
+
+
+Python ``setuptools`` package is required to install makeapp.
+
+
+Use the following command line to install makeapp from sources directory:
+
+    easy_install .
+
+or
+
+    python setup.py install
+
+
+Alternatively you can install an up-to-date version of makeapp from PyPI:
+
+    easy_install makeapp
+
+
+Note: `easy_install` is bundled with ``setuptools``.
