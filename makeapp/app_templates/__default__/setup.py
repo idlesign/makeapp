@@ -13,6 +13,7 @@ setup(
 
     description='{{ description }}',
     long_description=README,
+    license='{{ license_title }}',
 
     author='{{ author }}',
     author_email='{{ author_email }}',
@@ -28,5 +29,6 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: {{ python_version_major }}',
         'Programming Language :: Python :: {{ python_version }}',
+        'License :: {{ license_title_pypi }}'
     ],
 )

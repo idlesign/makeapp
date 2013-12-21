@@ -25,7 +25,6 @@ import requests
 
 #TODO tests
 #TODO docs
-#TODO setup.py license (field + classifiers)
 #TODO revise default runtests (exec tests.py?)
 #TODO django reusable app template
 #TODO ? github support
@@ -71,16 +70,23 @@ class AppMaker(object):
     module_dir_marker = '__module_name__'
 
     license_templates_path = os.path.join(os.path.dirname(__file__), 'license_templates')
+    LICENSE_NO = 'no'
+    LICENSE_MIT = 'mit'
+    LICENSE_APACHE = 'apache2'
+    LICENSE_GPL2 = 'gpl2'
+    LICENSE_GPL3 = 'gpl3'
+    LICENSE_BSD2CL = 'bsd2cl'
+    LICENSE_BSD3CL = 'bsd3cl'
     LICENSES = OrderedDict((
-        ('no', 'No License'),
-        ('mit', 'MIT License'),
-        ('apache2', 'Apache v2 License'),
-        ('gpl2', 'GPL v2 License'),
-        ('gpl3', 'GPL v3 License'),
-        ('bsd2cl', 'BSD 2-Clause License'),
-        ('bsd3cl', 'BSD 3-Clause License'),
+        (LICENSE_NO, ('No License', 'Other/Proprietary License')),
+        (LICENSE_MIT, ('MIT License', 'OSI Approved :: MIT License')),
+        (LICENSE_APACHE, ('Apache v2 License', 'OSI Approved :: Apache Software License')),
+        (LICENSE_GPL2, ('GPL v2 License', 'OSI Approved :: GNU General Public License v2 (GPLv2)')),
+        (LICENSE_GPL3, ('GPL v3 License', 'OSI Approved :: GNU General Public License v3 (GPLv3)')),
+        (LICENSE_BSD2CL, ('BSD 2-Clause License', 'OSI Approved :: BSD License')),
+        (LICENSE_BSD3CL, ('BSD 3-Clause License', 'OSI Approved :: BSD License')),
     ))
-    default_license = 'bsd3cl'
+    default_license = LICENSE_BSD3CL
 
     VCS_GIT = 'git'
     VCS_HG = 'hg'
@@ -103,6 +109,8 @@ class AppMaker(object):
         ('year', str(date.today().year)),
         ('module_name', None),
         ('license', default_license),
+        ('license_title', LICENSES[default_license][1]),
+        ('license_title_pypi', LICENSES[default_license][1]),
         ('vcs', default_vcs),
         ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
         ('python_version_major', str(PYTHON_VERSION[0])),
@@ -325,7 +333,7 @@ class AppMaker(object):
     def print_settings(self):
         """Print out settings dict, using logging mechanics."""
         self.logger.info('Settings: \n%s' % '\n'.join(['    %s: %s' % (k, v) for k, v in self.settings.items()]))
-        self.logger.info('Chosen license: %s' % self.LICENSES[self.settings['license']])
+        self.logger.info('Chosen license: %s' % self.LICENSES[self.settings['license']][0])
         self.logger.info('Chosen VCS: %s' % self.VCS[self.settings['vcs']])
 
     def _get_license_data(self):
@@ -425,6 +433,7 @@ class AppMaker(object):
             self.settings[name] = self._replace_settings_markers(val)
 
         self._validate_setting('license', self.LICENSES.keys())
+        self.settings['license_title'], self.settings['license_title_pypi'] = self.LICENSES[self.settings['license']]
         self._validate_setting('vcs', self.VCS.keys())
 
 
