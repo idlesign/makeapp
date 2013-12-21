@@ -44,6 +44,11 @@ could be::
     ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -d "My application."
 
 
+.. note::
+
+    You can also define different (and even your own settings) that are used in skeleton templates.
+
+
 
 User defined application layouts
 --------------------------------
