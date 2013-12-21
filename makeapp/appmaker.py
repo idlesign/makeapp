@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 """
-makeapp simplifies Python application rollout by providing its basic structure.
+makeapp
 
-makeapp can function both as a Python module and in command line mode
-Type `makeapp --help` for information on available options.
+Simplifies Python application rollout by providing its basic structure.
+
+Can function both as a Python module and in command line mode
+use `makeapp --help` command for information on available options.
 
 """
 import os
@@ -27,13 +29,11 @@ import requests
 #TODO docs
 #TODO revise default runtests (exec tests.py?)
 #TODO django reusable app template
-#TODO ? github support
-#TODO ? pypi support
-#TODO ? search ~.makeapp/ for templates
 
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 PYTHON_VERSION = sys.version_info
+BASE_PATH = os.path.dirname(__file__)
 
 
 @contextmanager
@@ -64,12 +64,15 @@ class AppMaker(object):
 
     """
 
-    default_settings_config = os.path.join(os.path.expanduser('~'), '.makeapp', 'makeapp.conf')
-    default_templates_path = os.path.join(os.path.dirname(__file__), 'app_templates')
+    user_data_path = os.path.join(os.path.expanduser('~'), '.makeapp')
+    user_templates_path = os.path.join(user_data_path, 'app_templates')
+    user_settings_config = os.path.join(user_data_path, 'makeapp.conf')
+
+    default_templates_path = os.path.join(BASE_PATH, 'app_templates')
     default_template = '__default__'
     module_dir_marker = '__module_name__'
 
-    license_templates_path = os.path.join(os.path.dirname(__file__), 'license_templates')
+    license_templates_path = os.path.join(BASE_PATH, 'license_templates')
     LICENSE_NO = 'no'
     LICENSE_MIT = 'mit'
     LICENSE_APACHE = 'apache2'
@@ -129,7 +132,10 @@ class AppMaker(object):
         self.configure_logging(log_level)
 
         if templates_path is None:
-            templates_path = self.default_templates_path
+            if os.path.exists(self.user_templates_path):
+                templates_path = self.user_templates_path
+            else:
+                templates_path = self.default_templates_path
 
         if not os.path.exists(templates_path):
             raise AppMakerException('Templates path doesn\'t exist: %s' % templates_path)
@@ -374,7 +380,7 @@ class AppMaker(object):
         """
         config_path = path
         if path is None:
-            config_path = self.default_settings_config
+            config_path = self.user_settings_config
 
         if not os.path.exists(config_path) and path is not None:
             # Do not raise it for default config file.
@@ -475,7 +481,7 @@ if __name__ == '__main__':
         app_maker_kwargs['templates_path'] = parsed.templates_source_path
 
     if parsed.templates_to_use is not None:
-        app_maker_kwargs['templates_to_use'] = parsed.templates_to_use
+        app_maker_kwargs['templates_to_use'] = parsed.templates_to_use.split(',')
 
     log_level = None
     if parsed.debug:
