@@ -7,6 +7,7 @@ Type `makeapp --help` for information on available options.
 
 """
 import os
+import re
 import sys
 import logging
 import argparse
@@ -26,7 +27,6 @@ import requests
 #TODO docs
 #TODO rst headers underlines length
 #TODO autodoc generation example to rst guide
-#TODO delete empty markers
 #TODO setup.py license (field + classifiers)
 #TODO setup.py List current python version in classifiers
 #TODO revise default runtests (exec tests.py?)
@@ -34,6 +34,9 @@ import requests
 #TODO ? github support
 #TODO ? pypi support
 #TODO ? search ~.makeapp/ for templates
+
+
+RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 
 
 @contextmanager
@@ -166,10 +169,11 @@ class AppMaker(object):
         self.logger.error('Unable to find application template. Searched \n%s' % '\n  '.join(supposed_paths))
         raise AppMakerException('Unable to find application template: %s' % name_or_path)
 
-    def _replace_settings_markers(self, target):
+    def _replace_settings_markers(self, target, strip_unknown=False):
         """Replaces settings markers in `target` with current settings values
 
         :param target:
+        :param strip_unknown: Strip unknown markers from the target.
         :return: string
 
         """
@@ -177,6 +181,8 @@ class AppMaker(object):
             for name, val in self.settings.items():
                 if val is not None:
                     target = target.replace('{{ %s }}' % name, val)
+        if strip_unknown:
+            target = re.sub(RE_UNKNOWN_MARKER, '', target)
         return target
 
     def check_app_name_is_available(self):
@@ -290,7 +296,7 @@ class AppMaker(object):
         :param contents:
 
         """
-        contents = self._replace_settings_markers(contents)
+        contents = self._replace_settings_markers(contents, True)
         with open(path, 'w') as f:
             f.write(contents)
 
