@@ -16,7 +16,7 @@ Here will be an introductory description.
 Requirements
 ------------
 
-1. Python <version_numbers>
+1. Python {{ python_version }}+
 
 
 

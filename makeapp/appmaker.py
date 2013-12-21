@@ -26,7 +26,6 @@ import requests
 #TODO tests
 #TODO docs
 #TODO setup.py license (field + classifiers)
-#TODO setup.py List current python version in classifiers
 #TODO revise default runtests (exec tests.py?)
 #TODO django reusable app template
 #TODO ? github support
@@ -35,6 +34,7 @@ import requests
 
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
+PYTHON_VERSION = sys.version_info
 
 
 @contextmanager
@@ -104,6 +104,8 @@ class AppMaker(object):
         ('module_name', None),
         ('license', default_license),
         ('vcs', default_vcs),
+        ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
+        ('python_version_major', str(PYTHON_VERSION[0])),
     ))
 
     def __init__(self, app_name, templates_to_use=None, templates_path=None, log_level=None):
