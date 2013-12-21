@@ -25,8 +25,6 @@ import requests
 
 #TODO tests
 #TODO docs
-#TODO rst headers underlines length
-#TODO autodoc generation example to rst guide
 #TODO setup.py license (field + classifiers)
 #TODO setup.py List current python version in classifiers
 #TODO revise default runtests (exec tests.py?)

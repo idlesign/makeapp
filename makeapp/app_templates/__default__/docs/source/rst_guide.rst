@@ -78,3 +78,15 @@ Links
 Inline URLs are converted to links automatically: http://github.com/idlesign/makeapp/
 
 
+
+Automation
+----------
+
+http://sphinx-doc.org/ext/autodoc.html
+
+.. automodule:: my_module
+   :members:
+
+.. autoclass:: my_module.MyClass
+    :members: do_this, do_that
+    :inherited-members:
