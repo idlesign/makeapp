@@ -26,7 +26,6 @@ from collections import OrderedDict
 import requests
 
 #TODO tests
-#TODO revise default runtests (exec tests.py?)
 #TODO django reusable app template
 
 
