@@ -13,6 +13,13 @@ Description
 *Simplifies Python application rollout by providing its basic structure.*
 
 
+* Make a skeleton for your new application with one console command.
+* Automatically create a VCS repository for your application.
+* Automatically check whether the chosen application name is not already in use.
+* Customize new application layouts with `skeleton templates`.
+* Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
+
+
 Make new application skeleton using interactive mode (`-i`)::
 
     ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -i -d "My application." --author "idle sign"
@@ -29,7 +36,7 @@ Get some help on command line switches::
 Note: This software can function both as a command line tool and as a Python module.
 
 
-You can put some default settings into a config (not to mess with command line switches anymore):
+Put some default settings into a config not to mess with command line switches anymore:
 
 1. Create ``.makeapp`` (dot is required) directory in your HOME directory;
 2. In ``.makeapp`` directory create ``makeapp.conf`` configuration file with a similar contents::
@@ -40,6 +47,7 @@ You can put some default settings into a config (not to mess with command line s
     license = bsd3cl
     url = https://github.com/idlesign/{{ app_name }}
     vcs=git
+
 
 
 Documentation
