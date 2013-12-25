@@ -4,7 +4,7 @@ Quickstart
 
 Make new application skeleton using interactive mode (`-i`)::
 
-    ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -i -d "My application." --author "idle sign"
+    ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
 
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.

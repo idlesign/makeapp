@@ -37,7 +37,7 @@ This is simply a configuration file::
 
 Such configuration simplifies application rollouts by making redundant command lines switches joggling, so::
 
-    ./makeapp.py my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "Igor `idle sign` Starikov" --year "2010-2013"
+    ./makeapp.py my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "The Librarian" --year "2010-2013"
 
 could be::
 
