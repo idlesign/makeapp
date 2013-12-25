@@ -24,9 +24,9 @@ Put some default settings into a config (not to mess with command line switches 
 2. In ``.makeapp`` directory create ``makeapp.conf`` configuration file with a similar contents::
 
     [settings]
-    author = Igor `idle sign` Starikov
-    author_email = idlesign@yandex.ru
+    author = The Librarian
+    author_email = librarian@discworld.wrld
     license = bsd3cl
-    url = https://github.com/idlesign/{{ app_name }}
+    url = https://github.discworld.wrld/librarian/{{ app_name }}
     vcs=git
 

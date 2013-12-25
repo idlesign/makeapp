@@ -3,7 +3,7 @@ User defined configuration
 
 User defined configuration should be stored in ``.makeapp`` (dot is required) directory under user's HOME directory::
 
-    /home/idle/.makeapp/
+    /home/librarian/.makeapp/
 
 
 Thus user can configure:
@@ -27,21 +27,21 @@ Settings are read by `makeapp` from ``makeapp.conf`` file.
 This is simply a configuration file::
 
     [settings]
-    author = Igor `idle sign` Starikov
-    author_email = idlesign@yandex.ru
-    year = 2010-2013
+    author = The Librarian
+    author_email = librarian@discworld.wrld
     license = bsd3cl
-    url = https://github.com/idlesign/{{ app_name }}
+    url = https://github.discworld.wrld/librarian/{{ app_name }}
     vcs=git
+    year = 2010-2013
 
 
 Such configuration simplifies application rollouts by making redundant command lines switches joggling, so::
 
-    ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -d "My application." --author "Igor `idle sign` Starikov" --year "2010-2013"
+    ./makeapp.py my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "Igor `idle sign` Starikov" --year "2010-2013"
 
 could be::
 
-    ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -d "My application."
+    ./makeapp.py my_new_app /home/librarian/dev/my_new_app_env/ -d "My application."
 
 
 .. note::
@@ -59,16 +59,16 @@ Let's create a skeleton template named ``cool``:
 
 1. Create ``cool`` directory::
 
-  /home/idle/.makeapp/app_templates/cool/
+  /home/librarian/.makeapp/app_templates/cool/
 
 2. In ``cool`` directory create ``COOL.txt`` file with desired contents::
 
-  echo "You'd better be cool." > /home/idle/.makeapp/app_templates/cool/COOL.txt
+  echo "You'd better be cool." > /home/librarian/.makeapp/app_templates/cool/COOL.txt
 
 
 Now you can use this skeleton template to rollout your application (`-t`)::
 
-    ./makeapp.py my_new_app /home/idle/dev/my_new_app_env/ -d "My application." -t cool
+    ./makeapp.py my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." -t cool
 
 After such a call you'll have an application default structure provided by `makeapp` extended with files
 from ``cool``.
