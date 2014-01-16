@@ -22,7 +22,7 @@ Description
 
 Make new application skeleton using interactive mode (`-i`)::
 
-    ./makeapp.py my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
+    makeapp my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
 
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.
@@ -30,7 +30,7 @@ This will create a decent application skeleton (setup.py, docs, tests, etc.) and
 
 Get some help on command line switches::
 
-    ./makeapp.py --help
+    makeapp --help
 
 
 Note: This software can function both as a command line tool and as a Python module.

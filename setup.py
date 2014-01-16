@@ -22,9 +22,8 @@ setup(
     include_package_data=True,
     zip_safe=False,
 
-    install_requires=[
-      'requests',
-    ],
+    install_requires=['requests'],
+    scripts=['bin/makeapp'],
 
     classifiers=[
         # As in https://pypi.python.org/pypi?:action=list_classifiers

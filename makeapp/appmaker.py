@@ -441,7 +441,7 @@ class AppMaker(object):
         self._validate_setting('vcs', self.VCS.keys())
 
 
-if __name__ == '__main__':
+def main():
 
     argparser = argparse.ArgumentParser(prog='makeapp',
                                         description='Simplifies Python application rollout by providing its basic structure.')
@@ -540,3 +540,8 @@ if __name__ == '__main__':
         app_maker.rollout(parsed.target_path, overwrite=parsed.overwrite_on_conflict, init_repository=init_repo)
     else:
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
+
