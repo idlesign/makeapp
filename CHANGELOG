@@ -1,6 +1,13 @@
 makeapp changelog
 =================
 
+
+v0.2.0
+------
++ Added console app skeleton layout.
++ Now can be aliased as /usr/local/bin/makeapp.
+
+
 v0.1.0
 ------
 + Basic functionality.
