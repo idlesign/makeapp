@@ -43,3 +43,4 @@ setup(
         'License :: {{ license_title_pypi }}'
     ],
 )
+
