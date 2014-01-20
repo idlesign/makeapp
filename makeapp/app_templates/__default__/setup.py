@@ -2,7 +2,15 @@ import os
 from setuptools import setup
 from {{ module_name }} import VERSION
 
-f = open(os.path.join(os.path.dirname(__file__), 'README.rst'))
+
+PATH_BASE = os.path.dirname(__file__)
+PATH_BIN = os.path.join(PATH_BASE, 'bin')
+
+SCRIPTS = None
+if os.path.exists(PATH_BIN):
+    SCRIPTS = [os.path.join('bin', f) for f in os.listdir(PATH_BIN) if os.path.isfile(f)]
+
+f = open(os.path.join(PATH_BASE, 'README.rst'))
 README = f.read()
 f.close()
 
@@ -21,6 +29,9 @@ setup(
     packages=['{{ module_name }}'],
     include_package_data=True,
     zip_safe=False,
+
+    install_requires=['requests'],
+    scripts=SCRIPTS,
 
     classifiers=[
         # As in https://pypi.python.org/pypi?:action=list_classifiers
