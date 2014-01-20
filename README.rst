@@ -20,6 +20,12 @@ Description
 * Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
 
 
+Bundled layout skeletons:
+
+1. Python module (simple application);
+2. Console application.
+
+
 Make new application skeleton using interactive mode (`-i`)::
 
     makeapp my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
