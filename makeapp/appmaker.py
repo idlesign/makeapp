@@ -266,6 +266,11 @@ class AppMaker(object):
         """
         self.logger.info('Application target path: %s' % dest)
 
+        try:
+            os.makedirs(dest)
+        except OSError:
+            pass
+
         if os.path.exists(dest) and overwrite:
             self.logger.warning('Target path already exists: %s. Conflict files will be overwritten.' % dest)
 
