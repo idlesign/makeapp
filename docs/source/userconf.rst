@@ -76,6 +76,6 @@ from ``cool``.
 
 .. note::
 
-    You can provide more application layout flavors by combination of templates.
+    You can provide more application layout flavors by a combination of templates.
 
-    * `-t` switch allows several comma-separated template names.
+    `-t` switch allows several comma-separated template names. Order matters.

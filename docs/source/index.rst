@@ -37,6 +37,7 @@ Table of Contents
 
     quickstart
     userconf
+    skeletons
 
 
 

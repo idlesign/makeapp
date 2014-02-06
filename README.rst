@@ -24,6 +24,7 @@ Bundled layout skeletons:
 
 1. Python module (simple application);
 2. Console application.
+3. Django application.
 
 
 Make new application skeleton using interactive mode (`-i`)::
