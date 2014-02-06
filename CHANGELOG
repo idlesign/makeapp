@@ -2,6 +2,13 @@ makeapp changelog
 =================
 
 
+v0.3.0
+------
++ Added Django reusable app skeleton layout.
++ Now automatically creates a target dir hierarchy.
++ BSD 3 Clause license template is updated.
+
+
 v0.2.0
 ------
 + Added console app skeleton layout.
