@@ -2,6 +2,14 @@ makeapp changelog
 =================
 
 
+v0.3.1
+------
++ Added views.py into Django app template.
+* Fixed interactive mode for py2.
+* Fixed files discovery in bin/ (console apps).
+* Removed bogus requests dependency from setup.py template.
+
+
 v0.3.0
 ------
 + Added Django reusable app skeleton layout.
