@@ -18,6 +18,11 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 from contextlib import contextmanager
 from subprocess import Popen
 from datetime import date
@@ -26,7 +31,6 @@ from collections import OrderedDict
 import requests
 
 #TODO tests
-#TODO django reusable app template
 
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
