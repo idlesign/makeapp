@@ -8,7 +8,7 @@ PATH_BIN = os.path.join(PATH_BASE, 'bin')
 
 SCRIPTS = None
 if os.path.exists(PATH_BIN):
-    SCRIPTS = [os.path.join('bin', f) for f in os.listdir(PATH_BIN) if os.path.isfile(f)]
+    SCRIPTS = [os.path.join('bin', f) for f in os.listdir(PATH_BIN) if os.path.join(PATH_BIN, f)]
 
 f = open(os.path.join(PATH_BASE, 'README.rst'))
 README = f.read()
