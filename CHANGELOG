@@ -2,6 +2,12 @@ makeapp changelog
 =================
 
 
+v0.3.2
+------
+* `python_version_major` is now deduced from `python_version`
+* From django app skeleton removed empty migrations dir.
+
+
 v0.3.1
 ------
 + Added views.py into Django app template.
