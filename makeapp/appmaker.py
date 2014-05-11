@@ -447,6 +447,7 @@ class AppMaker(object):
 
         self._validate_setting('license', self.LICENSES.keys())
         self.settings['license_title'], self.settings['license_title_pypi'] = self.LICENSES[self.settings['license']]
+        self.settings['python_version_major'] = self.settings['python_version'].split('.')[0]
         self._validate_setting('vcs', self.VCS.keys())
 
 
