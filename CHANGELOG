@@ -1,6 +1,11 @@
 makeapp changelog
 =================
 
+v0.4.0
+------
++ Console application template updated.
++ ModuleMock boilerplate is added to docs' conf.py (can be used for http://readthedocs.org/)
+
 
 v0.3.2
 ------

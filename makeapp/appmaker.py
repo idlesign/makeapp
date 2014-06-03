@@ -461,6 +461,7 @@ def main():
 
     argparser.add_argument('--debug', help='Show debug messages while processing', action='store_true')
 
+    # todo licenses dict behaves inappropriate
     flatten = lambda d: '; '.join(['%s - %s' % (k, v) for k, v in d.items()])  # Flattens a dictionary
 
     workflow_args_group = argparser.add_argument_group('Workflow options', 'These can be adjusted to customize the default makeapp behaviour')
