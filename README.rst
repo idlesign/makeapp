@@ -2,6 +2,8 @@ makeapp
 =======
 https://github.com/idlesign/makeapp
 
+.. image:: https://badge.fury.io/py/django-makeapp.png
+    :target: http://badge.fury.io/py/django-makeapp
 
 .. image:: https://pypip.in/d/makeapp/badge.png
         :target: https://crate.io/packages/makeapp
@@ -61,7 +63,3 @@ Documentation
 -------------
 
 http://makeapp.readthedocs.org/
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/idlesign/makeapp/trend.png
-        :target: https://bitdeli.com/free

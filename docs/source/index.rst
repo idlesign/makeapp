@@ -5,7 +5,7 @@ https://github.com/idlesign/makeapp
 
 
 Description
-------------
+-----------
 
 *Simplifies Python application rollout by providing its basic structure.*
 
