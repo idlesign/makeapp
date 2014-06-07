@@ -2,8 +2,8 @@ makeapp
 =======
 https://github.com/idlesign/makeapp
 
-.. image:: https://badge.fury.io/py/django-makeapp.png
-    :target: http://badge.fury.io/py/django-makeapp
+.. image:: https://badge.fury.io/py/makeapp.png
+    :target: http://badge.fury.io/py/makeapp
 
 .. image:: https://pypip.in/d/makeapp/badge.png
         :target: https://crate.io/packages/makeapp
