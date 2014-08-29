@@ -1,6 +1,13 @@
 makeapp changelog
 =================
 
+v0.5.0
+------
++ Default README updated with PyPI badge.
+* Updated Django tox rules for Py3.
+* Updated rst guide.
+
+
 v0.4.0
 ------
 + Console application template updated.
@@ -37,4 +44,3 @@ v0.2.0
 v0.1.0
 ------
 + Basic functionality.
-
