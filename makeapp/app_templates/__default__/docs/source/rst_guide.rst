@@ -78,6 +78,11 @@ Links
 Inline URLs are converted to links automatically: http://github.com/idlesign/makeapp/
 
 
+Images
+------
+
+.. image:: path_to_image/image.png
+
 
 Automation
 ----------
