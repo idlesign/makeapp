@@ -8,7 +8,7 @@ from django.conf import settings, global_settings
 def main():
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-    app_name = '{{ module_name }}'
+    app_name = os.path.dirname(__file__)
 
     if not settings.configured:
         settings.configure(
