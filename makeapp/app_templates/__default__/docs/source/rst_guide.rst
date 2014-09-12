@@ -95,3 +95,7 @@ http://sphinx-doc.org/ext/autodoc.html
 .. autoclass:: my_module.MyClass
     :members: do_this, do_that
     :inherited-members:
+    :undoc-members:
+    :private-members:
+    :special-members:
+    :inherited-members:
