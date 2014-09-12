@@ -65,6 +65,9 @@ if MODULES_TO_MOCK:
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc']
 
+# Instruct autoclass directive to document both class and __init__ docstrings.
+autoclass_content = 'both'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
