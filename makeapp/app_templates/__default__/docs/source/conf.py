@@ -26,29 +26,34 @@ from {{ module_name }} import VERSION
 MODULES_TO_MOCK = []
 
 
-class ModuleMock(object):
+if MODULES_TO_MOCK:
 
-    __all__ = []
+    class ModuleMock(object):
 
-    def __init__(self, *args, **kwargs):
-        pass
+        __all__ = []
 
-    def __call__(self, *args, **kwargs):
-        return ModuleMock()
+        def __init__(self, *args, **kwargs):
+            pass
 
-    @classmethod
-    def __getattr__(cls, name):
-        if name in ('__file__', '__path__'):
-            return '/dev/null'
-        elif name[0] == name[0].upper():
-            MockType = type(name, (), {})
-            MockType.__module__ = __name__
-            return MockType
-        else:
+        def __call__(self, *args, **kwargs):
             return ModuleMock()
 
-for mod_name in MODULES_TO_MOCK:
-    sys.modules[mod_name] = ModuleMock()
+        def __iter__(self):
+            return iter([])
+
+        @classmethod
+        def __getattr__(cls, name):
+            if name in ('__file__', '__path__'):
+                return '/dev/null'
+            elif name.upper() != name and name[0] == name[0].upper():
+                # Mock classes.
+                MockType = type(name, (ModuleMock,), {})
+                MockType.__module__ = __name__
+                return MockType
+            return ModuleMock()
+
+    for mod_name in MODULES_TO_MOCK:
+        sys.modules[mod_name] = ModuleMock()
 
 
 # -- General configuration -----------------------------------------------------
@@ -97,7 +102,7 @@ release = '.'.join(map(str, VERSION))
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['rst_guide.rst']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
