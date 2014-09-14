@@ -1,9 +1,9 @@
-import unittest
+# from django.test import TestCase, RequestFactory
 
 # from .models import MyModel
 
 
-# class MyModelTest(unittest.TestCase):
+# class MyModelTest(TestCase):
 #
 #     def test_some(self):
 #         title = 'test_title'
