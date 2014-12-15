@@ -1,0 +1,3 @@
+[run]
+include = {{ module_name }}/*
+omit = {{ module_name }}/migrations/*, {{ module_name }}/south_migrations/*, {{ module_name }}/runtests.py, {{ module_name }}/tests.py
