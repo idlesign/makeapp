@@ -1,6 +1,14 @@
 makeapp changelog
 =================
 
+v0.6.0
+------
++ Django app template updated for Django 1.7.
++ Added coveragerc files for default and Django templates
++ Added Travis CI config into Django app template.
+* Improved mocking mechanism in Sphinx configuration.
+
+
 v0.5.0
 ------
 + Default README updated with PyPI badge.
