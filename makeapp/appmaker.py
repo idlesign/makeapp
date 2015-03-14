@@ -142,7 +142,7 @@ class AppMaker(object):
         if not os.path.exists(templates_path):
             raise AppMakerException('Templates path doesn\'t exist: %s' % templates_path)
         self.templates_path = templates_path
-        self.logger.debug('Templates path: %s' % self.templates_path)
+        self.logger.debug('Templates path: %s', self.templates_path)
 
         if templates_to_use is None:
             templates_to_use = []
@@ -154,10 +154,10 @@ class AppMaker(object):
         for template in templates_to_use:
             name, path = self._find_template(template)
             self.use_templates[name] = path
-        self.logger.debug('Templates to use: %s' % self.use_templates)
+        self.logger.debug('Templates to use: %s', self.use_templates)
 
         self.settings = OrderedDict(self.BASE_SETTINGS)
-        self.logger.debug('Initial settings: %s' % self.settings)
+        self.logger.debug('Initial settings: %s', self.settings)
 
         self.update_settings({
             'app_name': app_name,
@@ -182,7 +182,7 @@ class AppMaker(object):
                 path = os.path.abspath(supposed_path)
                 return path.split('/')[-1], path
 
-        self.logger.error('Unable to find application template. Searched \n%s' % '\n  '.join(supposed_paths))
+        self.logger.error('Unable to find application template. Searched \n%s', '\n  '.join(supposed_paths))
         raise AppMakerException('Unable to find application template: %s' % name_or_path)
 
     def _replace_settings_markers(self, target, strip_unknown=False):
@@ -207,7 +207,7 @@ class AppMaker(object):
         :return: boolean
 
         """
-        self.logger.info('Checking `%s` name is available ...' % self.settings['app_name'])
+        self.logger.info('Checking `%s` name is available ...', self.settings['app_name'])
 
         sites_registry = OrderedDict((
             ('Crate', 'https://crate.io/packages/{{ app_name }}/'),
@@ -221,12 +221,16 @@ class AppMaker(object):
             url = self._replace_settings_markers(url)
             response = requests.get(url)
             if response.status_code == 200:
-                self.logger.warning('Application name seems to be in use: %s - %s' % (label, url))
+                self.logger.warning('Application name seems to be in use: %s - %s', label, url)
                 name_available = False
                 break
 
         if name_available:
-            self.logger.info('Application name `%s` seems to be available (no mention found at: %s)' % (self.settings['app_name'], ', '.join(sites_registry.keys())))
+            self.logger.info(
+                'Application name `%s` seems to be available (no mention found at: %s)',
+                self.settings['app_name'],
+                ', '.join(sites_registry.keys())
+            )
 
         return name_available
 
@@ -250,14 +254,18 @@ class AppMaker(object):
 
         """
         template_files = {}
-        for name, templates_path in self.use_templates.items():
-            for path, dirs, files in os.walk(templates_path):
+        for _, templates_path in self.use_templates.items():
+            for path, _, files in os.walk(templates_path):
                 for fname in files:
                     full_path = os.path.join(path, fname)
-                    rel_path = full_path.replace(self.module_dir_marker, self.settings['module_name']).replace(templates_path, '').lstrip('/')
+                    rel_path = full_path.replace(
+                        self.module_dir_marker, self.settings['module_name']
+                    ).replace(
+                        templates_path, ''
+                    ).lstrip('/')
                     template_files[rel_path] = full_path
 
-        self.logger.debug('Template files: %s' % template_files.keys())
+        self.logger.debug('Template files: %s', template_files.keys())
         return template_files
 
     def rollout(self, dest, overwrite=False, init_repository=False):
@@ -268,7 +276,7 @@ class AppMaker(object):
         :param init_repository: boolean
 
         """
-        self.logger.info('Application target path: %s' % dest)
+        self.logger.info('Application target path: %s', dest)
 
         try:
             os.makedirs(dest)
@@ -276,13 +284,13 @@ class AppMaker(object):
             pass
 
         if os.path.exists(dest) and overwrite:
-            self.logger.warning('Target path already exists: %s. Conflict files will be overwritten.' % dest)
+            self.logger.warning('Target path already exists: %s. Conflict files will be overwritten.', dest)
 
-        license, license_src = self._get_license_data()
+        license_txt, license_src = self._get_license_data()
         license_src = self._comment_out(license_src)
         license_dest = os.path.join(dest, 'LICENSE')
         if not os.path.exists(license_dest) or overwrite:
-            self._create_file(license_dest, license)
+            self._create_file(license_dest, license_txt)
 
         files = self._get_template_files()
         for target, src in files.items():
@@ -330,7 +338,7 @@ class AppMaker(object):
         :param prepend_data: data to prepend to dest file contents
 
         """
-        self.logger.info('Creating %s ...' % dest)
+        self.logger.info('Creating %s ...', dest)
 
         dirname = os.path.dirname(dest)
         if not os.path.exists(dirname):
@@ -345,9 +353,9 @@ class AppMaker(object):
 
     def print_settings(self):
         """Print out settings dict, using logging mechanics."""
-        self.logger.info('Settings: \n%s' % '\n'.join(['    %s: %s' % (k, v) for k, v in self.settings.items()]))
-        self.logger.info('Chosen license: %s' % self.LICENSES[self.settings['license']][0])
-        self.logger.info('Chosen VCS: %s' % self.VCS[self.settings['vcs']])
+        self.logger.info('Settings: \n%s', '\n'.join(['    %s: %s' % (k, v) for k, v in self.settings.items()]))
+        self.logger.info('Chosen license: %s', self.LICENSES[self.settings['license']][0])
+        self.logger.info('Chosen VCS: %s', self.VCS[self.settings['vcs']])
 
     def _get_license_data(self):
         """Returns license data: text, and boilerplate text
@@ -407,7 +415,7 @@ class AppMaker(object):
         :param command:
         :return: bool Status
         """
-        self.logger.debug('Executing shell command: %s' % command)
+        self.logger.debug('Executing shell command: %s', command)
         return not bool(Popen(command, shell=True).wait())
 
     def _vcs_init(self, dest, add_files=False):
@@ -419,7 +427,7 @@ class AppMaker(object):
         :return:
         """
         vcs = self.settings['vcs']
-        self.logger.info('Initializing %s repository ...' % self.VCS[vcs])
+        self.logger.info('Initializing %s repository ...', self.VCS[vcs])
 
         with chdir(dest):
             success = self._run_shell_command(self.VCS_COMMANDS[vcs][0])
@@ -430,7 +438,9 @@ class AppMaker(object):
         """Ensures that the given setting value is one from the given variants."""
         val = self.settings[setting]
         if val not in variants:
-            raise AppMakerException('Unsupported value `%s` for `%s`. Acceptable variants [%s]' % (val, setting, variants))
+            raise AppMakerException(
+                'Unsupported value `%s` for `%s`. Acceptable variants [%s]' % (val, setting, variants)
+            )
 
     def update_settings(self, settings, verbose=False):
         """Updates current settings dictionary with values from a given
@@ -453,8 +463,8 @@ class AppMaker(object):
 
 def main():
 
-    argparser = argparse.ArgumentParser(prog='makeapp',
-                                        description='Simplifies Python application rollout by providing its basic structure.')
+    argparser = argparse.ArgumentParser(
+        prog='makeapp', description='Simplifies Python application rollout by providing its basic structure.')
 
     argparser.add_argument('app_name', help='Application name')
     argparser.add_argument('target_path', help='Path to create an application in')
@@ -464,17 +474,39 @@ def main():
     # todo licenses dict behaves inappropriate
     flatten = lambda d: '; '.join(['%s - %s' % (k, v) for k, v in d.items()])  # Flattens a dictionary
 
-    workflow_args_group = argparser.add_argument_group('Workflow options', 'These can be adjusted to customize the default makeapp behaviour')
-    workflow_args_group.add_argument('-l', '--license', help='License to use: %s. [ Default: %s ]' % (flatten(AppMaker.LICENSES), AppMaker.default_license), choices=AppMaker.LICENSES.keys())
-    workflow_args_group.add_argument('-vcs', '--vcs', help='VCS type to initialize a repo: %s. [ Default: %s ]' % (flatten(AppMaker.VCS), AppMaker.default_vcs), choices=AppMaker.VCS.keys())
-    workflow_args_group.add_argument('-d', '--description', help='Short application description')
-    workflow_args_group.add_argument('-f', '--configuration_file', help='Path to configuration file containing settings to read from')
-    workflow_args_group.add_argument('-s', '--templates_source_path', help='Path containing application structure templates')
-    workflow_args_group.add_argument('-t', '--templates_to_use', help='Accepts comma separated list of application structures templates names or paths')
-    workflow_args_group.add_argument('-o', '--overwrite_on_conflict', help='Overwrite files on conflict', action='store_true')
-    workflow_args_group.add_argument('-i', '--interactive', help='Ask for user input when decision is required', action='store_true')
+    workflow_args_group = argparser.add_argument_group(
+        'Workflow options', 'These can be adjusted to customize the default makeapp behaviour')
+    workflow_args_group.add_argument(
+        '-l', '--license',
+        help='License to use: %s. [ Default: %s ]' % (flatten(AppMaker.LICENSES), AppMaker.default_license),
+        choices=AppMaker.LICENSES.keys())
+    workflow_args_group.add_argument(
+        '-vcs', '--vcs',
+        help='VCS type to initialize a repo: %s. [ Default: %s ]' % (flatten(AppMaker.VCS), AppMaker.default_vcs),
+        choices=AppMaker.VCS.keys())
+    workflow_args_group.add_argument(
+        '-d', '--description',
+        help='Short application description')
+    workflow_args_group.add_argument(
+        '-f', '--configuration_file',
+        help='Path to configuration file containing settings to read from')
+    workflow_args_group.add_argument(
+        '-s', '--templates_source_path',
+        help='Path containing application structure templates')
+    workflow_args_group.add_argument(
+        '-t', '--templates_to_use',
+        help='Accepts comma separated list of application structures templates names or paths')
+    workflow_args_group.add_argument(
+        '-o', '--overwrite_on_conflict',
+        help='Overwrite files on conflict', action='store_true')
+    workflow_args_group.add_argument(
+        '-i', '--interactive',
+        help='Ask for user input when decision is required', action='store_true')
 
-    settings_args_group = argparser.add_argument_group('Customization', 'These basic settings can be adjusted to appropriate values one wants to see in application skeleton files')
+    settings_args_group = argparser.add_argument_group(
+        'Customization',
+        'These basic settings can be adjusted to appropriate values one wants to see in application skeleton files'
+    )
     base_settings_keys = AppMaker.BASE_SETTINGS.keys()
     for key in base_settings_keys:
         if key != 'app_name':
@@ -555,4 +587,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

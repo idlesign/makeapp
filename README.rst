@@ -8,6 +8,9 @@ https://github.com/idlesign/makeapp
 .. image:: https://pypip.in/d/makeapp/badge.png
         :target: https://crate.io/packages/makeapp
 
+.. image:: https://landscape.io/github/idlesign/makeapp/master/landscape.svg?style=plastic
+   :target: https://landscape.io/github/idlesign/makeapp/master
+
 
 Description
 ------------
