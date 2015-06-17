@@ -2,14 +2,15 @@ makeapp
 =======
 https://github.com/idlesign/makeapp
 
-.. image:: https://badge.fury.io/py/makeapp.png
-    :target: http://badge.fury.io/py/makeapp
 
-.. image:: https://pypip.in/d/makeapp/badge.png
-        :target: https://crate.io/packages/makeapp
+.. image:: https://img.shields.io/pypi/v/makeapp.svg
+    :target: https://pypi.python.org/pypi/makeapp
 
-.. image:: https://landscape.io/github/idlesign/makeapp/master/landscape.svg?style=plastic
-   :target: https://landscape.io/github/idlesign/makeapp/master
+.. image:: https://img.shields.io/pypi/dm/makeapp.svg
+    :target: https://pypi.python.org/pypi/makeapp
+
+.. image:: https://img.shields.io/pypi/l/makeapp.svg
+    :target: https://pypi.python.org/pypi/makeapp
 
 
 Description
