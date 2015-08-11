@@ -12,7 +12,7 @@ def main():
 
     if not settings.configured:
         settings.configure(
-            INSTALLED_APPS=('django.contrib.auth', 'django.contrib.contenttypes', app_name),
+            INSTALLED_APPS=('django.contrib.auth', 'django.contrib.contenttypes', app_name, '%s.tests' % app_name),
             DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3'}},
             MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,  # Prevents Django 1.7 warning.
         )
