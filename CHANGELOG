@@ -1,6 +1,14 @@
 makeapp changelog
 =================
 
+v0.7.0
+------
+* Django app template updated with tests layout compatible with Django 1.7+
+* Crate.io removed from search registry.
+* Fixed exception when run w/o a user-defined config.
+* Fixed --help message.
+
+
 v0.6.0
 ------
 + Django app template updated for Django 1.7.
