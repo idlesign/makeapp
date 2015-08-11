@@ -396,8 +396,12 @@ class AppMaker(object):
         if path is None:
             config_path = self.user_settings_config
 
-        if not os.path.exists(config_path) and path is not None:
-            # Do not raise it for default config file.
+        config_exists = os.path.exists(config_path)
+        if path is None and not config_exists:
+            # There could be no default config file.
+            return
+
+        if not config_exists and path is not None:
             raise AppMakerException('Unable to find settings file: %s' % config_path)
 
         cfg = configparser.ConfigParser()
