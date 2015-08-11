@@ -471,42 +471,48 @@ def main():
 
     argparser.add_argument('--debug', help='Show debug messages while processing', action='store_true')
 
-    # todo licenses dict behaves inappropriate
-    flatten = lambda d: '; '.join(['%s - %s' % (k, v) for k, v in d.items()])  # Flattens a dictionary
-
     workflow_args_group = argparser.add_argument_group(
         'Workflow options', 'These can be adjusted to customize the default makeapp behaviour')
+
     workflow_args_group.add_argument(
         '-l', '--license',
-        help='License to use: %s. [ Default: %s ]' % (flatten(AppMaker.LICENSES), AppMaker.default_license),
+        help='License to use: %s. [ Default: %s ]' % (
+            '; '.join(['%s - %s' % (k, v[0]) for k, v in AppMaker.LICENSES.items()]), AppMaker.default_license
+        ),
         choices=AppMaker.LICENSES.keys())
+
     workflow_args_group.add_argument(
         '-vcs', '--vcs',
-        help='VCS type to initialize a repo: %s. [ Default: %s ]' % (flatten(AppMaker.VCS), AppMaker.default_vcs),
+        help='VCS type to initialize a repo: %s. [ Default: %s ]' % (
+            '; '.join(['%s - %s' % (k, v) for k, v in AppMaker.VCS.items()]), AppMaker.default_vcs
+        ),
         choices=AppMaker.VCS.keys())
+
     workflow_args_group.add_argument(
         '-d', '--description',
         help='Short application description')
+
     workflow_args_group.add_argument(
         '-f', '--configuration_file',
         help='Path to configuration file containing settings to read from')
+
     workflow_args_group.add_argument(
         '-s', '--templates_source_path',
         help='Path containing application structure templates')
+
     workflow_args_group.add_argument(
         '-t', '--templates_to_use',
         help='Accepts comma separated list of application structures templates names or paths')
+
     workflow_args_group.add_argument(
         '-o', '--overwrite_on_conflict',
         help='Overwrite files on conflict', action='store_true')
+
     workflow_args_group.add_argument(
         '-i', '--interactive',
         help='Ask for user input when decision is required', action='store_true')
 
-    settings_args_group = argparser.add_argument_group(
-        'Customization',
-        'These basic settings can be adjusted to appropriate values one wants to see in application skeleton files'
-    )
+    settings_args_group = argparser.add_argument_group('Customization')
     base_settings_keys = AppMaker.BASE_SETTINGS.keys()
     for key in base_settings_keys:
         if key != 'app_name':
