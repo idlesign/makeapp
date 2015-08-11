@@ -303,7 +303,7 @@ class AppMaker(object):
                 self._copy_file(src, target, prepend)
 
         if init_repository:
-            self._vcs_init(dest, files.keys())
+            self._vcs_init(dest, bool(files.keys()))
 
     @staticmethod
     def _comment_out(text):
