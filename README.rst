@@ -59,7 +59,7 @@ Put some default settings into a config not to mess with command line switches a
     author_email = librarian@discworld.wrld
     license = bsd3cl
     url = https://github.discworld.wrld/librarian/{{ app_name }}
-    vcs=git
+    vcs = git
 
 
 
