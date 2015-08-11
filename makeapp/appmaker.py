@@ -210,7 +210,6 @@ class AppMaker(object):
         self.logger.info('Checking `%s` name is available ...', self.settings['app_name'])
 
         sites_registry = OrderedDict((
-            ('Crate', 'https://crate.io/packages/{{ app_name }}/'),
             ('PyPI', 'https://pypi.python.org/pypi/{{ app_name }}'),
             ('Google Code', 'http://code.google.com/p/{{ app_name }}/')
         ))
