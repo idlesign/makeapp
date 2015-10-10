@@ -98,4 +98,4 @@ http://sphinx-doc.org/ext/autodoc.html
     :undoc-members:
     :private-members:
     :special-members:
-    :inherited-members:
+    :show-inheritance:
