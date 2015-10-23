@@ -1,2 +1,2 @@
 [run]
-include = {{ module_name }}/*
+source = {{ module_name }}/
