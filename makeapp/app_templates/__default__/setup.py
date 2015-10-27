@@ -1,5 +1,7 @@
 import os
+import io
 from setuptools import setup
+
 from {{ module_name }} import VERSION
 
 
@@ -10,9 +12,12 @@ SCRIPTS = None
 if os.path.exists(PATH_BIN):
     SCRIPTS = [os.path.join('bin', f) for f in os.listdir(PATH_BIN) if os.path.join(PATH_BIN, f)]
 
-f = open(os.path.join(PATH_BASE, 'README.rst'))
-README = f.read()
-f.close()
+
+def get_readme():
+    # This will return README (including those with Unicode symbols).
+    with io.open(os.path.join(PATH_BASE, 'README.rst')) as f:
+        return f.read()
+
 
 setup(
     name='{{ app_name }}',
@@ -20,7 +25,7 @@ setup(
     url='{{ url }}',
 
     description='{{ description }}',
-    long_description=README,
+    long_description=get_readme(),
     license='{{ license_title }}',
 
     author='{{ author }}',
