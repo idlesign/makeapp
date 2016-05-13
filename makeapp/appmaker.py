@@ -159,9 +159,12 @@ class AppMaker(object):
         self.settings = OrderedDict(self.BASE_SETTINGS)
         self.logger.debug('Initial settings: %s', self.settings)
 
+        module_name = app_name.split('-', 1)[-1].replace('-', '_')
+
         self.update_settings({
             'app_name': app_name,
-            'module_name': app_name.split('-', 1)[-1].replace('-', '_')
+            'module_name': module_name,
+            'module_name_capital': module_name.capitalize(),
         })
 
     def _find_template(self, name_or_path):

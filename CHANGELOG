@@ -1,10 +1,12 @@
 makeapp changelog
 =================
 
+
 Unreleased
 ----------
 + Tests now can be run using `python setup.py test`.
 + Default setup.py now handles readme with Unicode symbols.
++ Django app template now includes config.py.
 
 
 v0.7.0
