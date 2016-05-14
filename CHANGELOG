@@ -8,6 +8,7 @@ Unreleased
 + Default setup.py now handles readme with Unicode symbols.
 + Django app template now includes config.py.
 + Default app template now contains setup.cfg. `release` for setup.py command is now available.
++ Added `pytest` template switching test suite from `unittest` to `pytest`.
 * Tox configs simplified.
 
 
