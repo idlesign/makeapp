@@ -23,6 +23,11 @@ Bundled application templates
   reusable application skeleton.
 
 
+* **pytest support template**
+
+  Template alias: ``pytest``. Use `-t pytest` command switch to rollout Python
+  application which will use ``pytest`` instead of ``unittest`` for tests.
+
 
 .. note::
 
