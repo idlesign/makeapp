@@ -9,6 +9,7 @@ Unreleased
 + Django app template now includes config.py.
 + Default app template now contains setup.cfg. `release` for setup.py command is now available.
 + Added `pytest` template switching test suite from `unittest` to `pytest`.
+* Update INSTALL instructions with pip examples (closes #1).
 * Tox configs simplified.
 
 
