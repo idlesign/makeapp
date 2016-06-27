@@ -2,21 +2,29 @@
 ================================================
 
 
-Python ``setuptools`` package is required to install {{ app_name }}.
+Python ``pip`` package is required to install ``{{ app_name }}``.
 
 
-Use the following command line to install {{ app_name }} from sources directory (containing setup.py):
+From sources
+------------
 
-    easy_install .
+Use the following command line to install ``{{ app_name }}`` from sources directory (containing setup.py):
+
+    pip install .
 
 or
 
     python setup.py install
 
 
-Alternatively you can install an up-to-date version of {{ app_name }} from PyPI:
+From PyPI
+---------
 
-    easy_install {{ app_name }}
+Alternatively you can install ``{{ app_name }}`` from PyPI:
+
+    pip install {{ app_name }}
 
 
-Note: `easy_install` is bundled with ``setuptools``.
+Use `-U` flag for upgrade:
+
+    pip install -U {{ app_name }}
