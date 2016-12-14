@@ -5,14 +5,14 @@ include LICENSE
 include README.rst
 
 include docs/Makefile
-recursive-include docs .rst
-recursive-include docs .py
+recursive-include docs *.rst
+recursive-include docs *.py
 
 recursive-include {{ module_name }}/locale *
-recursive-include {{ module_name }}/migrations .py
-recursive-include {{ module_name }}/templates .html
-recursive-include {{ module_name }}/templatetags .py
-recursive-include {{ module_name }}/management .py
+recursive-include {{ module_name }}/migrations *.py
+recursive-include {{ module_name }}/templates *.html
+recursive-include {{ module_name }}/templatetags *.py
+recursive-include {{ module_name }}/management *.py
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
