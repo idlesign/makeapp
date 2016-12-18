@@ -30,7 +30,7 @@ from collections import OrderedDict
 
 import requests
 
-#TODO tests
+from .exceptions import AppMakerException
 
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
@@ -49,10 +49,6 @@ def chdir(path):
     os.chdir(path)
     yield
     os.chdir(prev_wd)
-
-
-class AppMakerException(BaseException):
-    """AppMaker exception."""
 
 
 class AppMaker(object):
