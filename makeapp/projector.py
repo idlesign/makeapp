@@ -7,7 +7,24 @@ from contextlib import contextmanager
 
 from setuptools import find_packages
 
-from .exceptions import ProjectorExeption, NoChanges, CommandError
+class MakeappException(Exception):
+    """Base makeapp exception."""
+
+
+class AppMakerException(MakeappException):
+    """Basic AppMaker related exception."""
+
+
+class ProjectorExeption(MakeappException):
+    """Basic Projector related exception."""
+
+
+class CommandError(MakeappException):
+    """Raised when projector detects external process invocation error."""
+
+
+class NoChanges(ProjectorExeption):
+    """Raised when a release attepted with no changes registered."""
 
 
 LOG = logging.getLogger(__name__)
@@ -59,7 +76,7 @@ class GitHelper(object):
     def check(cls):
         """Performs basic vcs check."""
         data = cls.run_command('branch')
-        if data[0] != '* master':
+        if '* master' not in ''.join(data):
             raise ProjectorExeption('VCS needs to be initialized and branch set to `master`')
 
     @classmethod
@@ -473,7 +490,7 @@ class Project(object):
         self.info_package = InfoPackage.gather(main_package)
         self.info_changelog = InfoChangelog.gather()
 
-    def release(self, increment=None, changelog_entry=None, upload=False):
+    def release(self, increment=None, changelog_entry=None, upload=True):
         """Makes package release.
 
         * Bumps version number
@@ -489,8 +506,8 @@ class Project(object):
 
         :param bool upload: Upload to repository and PyPI
         """
-
-        VCS_HELPER.pull()
+        with self.chdir():
+            VCS_HELPER.pull()
 
         package = self.info_package
         changelog = self.info_changelog
