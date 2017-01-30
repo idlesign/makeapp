@@ -23,7 +23,9 @@ setup(
     zip_safe=False,
 
     install_requires=['requests'],
-    scripts=['bin/makeapp'],
+    entry_points={
+        'console_scripts': ['makeapp = makeapp.cli:main'],
+    },
 
     classifiers=[
         # As in https://pypi.python.org/pypi?:action=list_classifiers
