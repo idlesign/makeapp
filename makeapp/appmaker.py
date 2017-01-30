@@ -238,6 +238,10 @@ class AppMaker(object):
         for _, templates_path in self.use_templates.items():
             for path, _, files in os.walk(templates_path):
                 for fname in files:
+
+                    if fname == '__pycache__' or os.path.splitext(fname)[-1] == '.pyc':
+                        continue
+
                     full_path = os.path.join(path, fname)
                     rel_path = full_path.replace(
                         self.module_dir_marker, self.settings['module_name']

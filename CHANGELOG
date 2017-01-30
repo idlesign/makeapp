@@ -10,6 +10,7 @@ Unreleased
 + Default app template now contains setup.cfg. `release` for setup.py command is now available.
 + Added `pytest` template switching test suite from `unittest` to `pytest`.
 + `makeapp` command now available on Windows.
+* Bytecode files from templates aren't copied anymore.
 * Update INSTALL instructions with pip examples (closes #1).
 * `project` word is removed from BSD 3 LICENSE
 * Tox configs simplified.
