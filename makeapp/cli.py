@@ -80,7 +80,8 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     app_maker.rollout(
         target_path,
         overwrite=overwrite_on_conflict,
-        init_repository=click.confirm('Do you want to initialize a VCS repository in the application directory?'))
+        init_repository=click.confirm(
+            'Do you want to initialize a VCS repository in the application directory?', default=True))
 
     click.secho('Done', fg='green')
 
