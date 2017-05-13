@@ -280,7 +280,7 @@ class ChangelogData(DataContainer):
 class Project(object):
     """Encapsulates application (project) related logic."""
 
-    def __init__(self, project_path=None, dry_run=False):
+    def __init__(self, project_path=None):
         """
         :param str|unicode project_path: Application root (containing setup.py) path.
         :param bool dry_run: Do not commit changes to filesystem.
@@ -289,7 +289,6 @@ class Project(object):
         self.package = None  # type: PackageData
         self.changelog = None  # type: ChangelogData
         self.vcs = VcsHelper.get(project_path)
-        self.dry = dry_run
 
         with chdir():
             self._gather_data()
@@ -312,9 +311,6 @@ class Project(object):
 
     def pull(self):
         """Pulls changes from a remote repository"""
-        if self.dry:
-            return
-
         with chdir():
             self.vcs.pull()
 
@@ -346,9 +342,6 @@ class Project(object):
         """
         vcs = self.vcs
 
-        if self.dry:
-            return
-
         with chdir():
 
             for info in (self.package, self.changelog):
@@ -371,18 +364,14 @@ class Project(object):
             changelog = self.changelog
             changelog.add_change(description)
 
-            if not self.dry:
-                changelog.write()
+            changelog.write()
 
-                self.vcs.add(changelog.filepath)
-                self.vcs.commit('%s updated' % changelog.FILENAME_CHANGELOG)
+            self.vcs.add(changelog.filepath)
+            self.vcs.commit('%s updated' % changelog.FILENAME_CHANGELOG)
 
     def publish(self):
         """Uploads project data to remote VCS and Python Package Index server."""
         LOG.info('Publishing application ...')
-
-        if self.dry:
-            return
 
         with chdir():
             self.vcs.push()

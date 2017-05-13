@@ -7,15 +7,17 @@ Unreleased
 * IMPORTANT: `click` package in now required.
 * IMPORTANT: `makeapp` CLI now uses `new` command for skeleton rollouts.
 * IMPORTANT: CLI now is interactive only.
++ CLI is now cross-platform.
++ New `apptools` module.
++ CLI: new `release` command.
 + Tests in projects now can be run using `python setup.py test`.
 + Default setup.py now handles readme with Unicode symbols.
 + Django app template now includes `config.py`.
 + Default app template now contains `setup.cfg`.
-+ `release` for `setup.py` command is now available.
++ New `release` command for `setup.py` is now available.
 + Added `pytest` template switching test suite from `unittest` to `pytest`.
-+ `makeapp` CLI now available on Windows.
 * Bytecode files from templates aren't copied anymore.
-* `project` word is removed from BSD 3 LICENSE
+* Word `project` is removed from BSD 3 LICENSE
 * Tox configs simplified.
 
 

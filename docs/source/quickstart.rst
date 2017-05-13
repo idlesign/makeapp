@@ -2,17 +2,32 @@ Quickstart
 ==========
 
 
-Make new application skeleton::
+Application scaffolding
+-----------------------
 
-    makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
+Bundled layout skeletons:
+
+1. Python module (simple application);
+2. Console application.
+3. Django application.
+4. Pytest support template.
+
+
+Scaffold a new application:
+
+.. code-block:: bash
+
+    $ makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "The Librarian"
 
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.
 
 
-Get some help on command line switches::
+Get some help on command line switches:
 
-    makeapp --help
+.. code-block:: bash
+
+    $ makeapp --help
 
 
 Note: This software can function both as a command line tool and as a Python module.
@@ -30,3 +45,20 @@ Put some default settings into a config (not to mess with command line switches 
     url = https://github.discworld.wrld/librarian/{{ app_name }}
     vcs=git
 
+
+Application publishing
+----------------------
+
+When you're ready to publish issue the following command while in project directory (containing setup.py):
+
+.. code-block:: bash
+
+    $ makeapp release
+
+
+This will automatically:
+
+    * bump up application version number
+    * tag version in VCS
+    * push sources to remote repository
+    * upload application package to PyPI

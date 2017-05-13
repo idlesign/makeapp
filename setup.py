@@ -12,7 +12,7 @@ setup(
     url='https://github.com/idlesign/makeapp',
     license='BSD',
 
-    description='Simplifies Python application rollout by providing its basic structure.',
+    description='Simplifies Python application rollout and publishing.',
     long_description=README,
 
     author='Igor `idle sign` Starikov',

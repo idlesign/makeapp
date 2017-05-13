@@ -16,7 +16,7 @@ https://github.com/idlesign/makeapp
 Description
 ------------
 
-*Simplifies Python application rollout by providing its basic structure.*
+*Simplifies Python application rollout and publishing.*
 
 
 * Make a skeleton for your new application with one console command.
@@ -24,44 +24,38 @@ Description
 * Automatically check whether the chosen application name is not already in use.
 * Customize new application layouts with `skeleton templates`.
 * Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
+* Publish your application to remotes (VCS, PyPI) with single command.
 
 
-Bundled layout skeletons:
+Application scaffolding
+-----------------------
 
-1. Python module (simple application);
-2. Console application.
-3. Django application.
-4. Pytest support template.
+Scaffold a new application:
 
+.. code-block:: bash
 
-Make new application skeleton::
-
-    makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
+    $ makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "The Librarian"
 
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.
 
 
-Get some help on command line switches::
+Application publishing
+----------------------
 
-    makeapp --help
+When you're ready to publish issue the following command while in project directory (containing setup.py):
+
+.. code-block:: bash
+
+    $ makeapp release
 
 
-Note: This software can function both as a command line tool and as a Python module.
+This will automatically:
 
-
-Put some default settings into a config not to mess with command line switches anymore:
-
-1. Create ``.makeapp`` (dot is required) directory in your HOME directory;
-2. In ``.makeapp`` directory create ``makeapp.conf`` configuration file with a similar contents::
-
-    [settings]
-    author = The Librarian
-    author_email = librarian@discworld.wrld
-    license = bsd3cl
-    url = https://github.discworld.wrld/librarian/{{ app_name }}
-    vcs = git
-
+    * bump up application version number
+    * tag version in VCS
+    * push sources to remote repository
+    * upload application package to PyPI
 
 
 Documentation

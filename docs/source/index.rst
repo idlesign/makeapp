@@ -7,7 +7,7 @@ https://github.com/idlesign/makeapp
 Description
 -----------
 
-*Simplifies Python application rollout by providing its basic structure.*
+*Simplifies Python application rollout and publishing.*
 
 
 This software can function both as a command line tool and as a Python module.
@@ -18,7 +18,7 @@ This software can function both as a command line tool and as a Python module.
 * Automatically check whether the chosen application name is not already in use.
 * Customize new application layouts with `skeleton templates`.
 * Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
-
+* Publish your application to remotes (VCS, PyPI) with single command.
 
 
 Requirements
