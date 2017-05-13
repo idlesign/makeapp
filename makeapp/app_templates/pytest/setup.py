@@ -1,7 +1,7 @@
 import os
 import io
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
 from {{ module_name }} import VERSION
 
@@ -34,7 +34,7 @@ setup(
     author='{{ author }}',
     author_email='{{ author_email }}',
 
-    packages=['{{ module_name }}'],
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
 
