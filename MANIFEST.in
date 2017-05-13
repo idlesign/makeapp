@@ -8,9 +8,8 @@ include docs/Makefile
 recursive-include docs *.rst
 recursive-include docs *.py
 
-include bin/makeapp
-
 recursive-include tests *
+recursive-include makeapp/helpers *
 recursive-include makeapp/app_templates *
 recursive-include makeapp/license_templates *
 
