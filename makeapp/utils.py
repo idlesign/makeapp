@@ -10,13 +10,13 @@ LOG = logging.getLogger(__name__)
 
 
 @contextmanager
-def chdir(self):
+def chdir(target_path):
     """Context manager. 
     Temporarily changes current working directory.
     
     """
     curr_dir = os.getcwd()
-    os.chdir(self.project_path)
+    os.chdir(target_path)
     try:
         yield
 

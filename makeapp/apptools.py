@@ -285,17 +285,17 @@ class Project(object):
         :param str|unicode project_path: Application root (containing setup.py) path.
         :param bool dry_run: Do not commit changes to filesystem.
         """
-        self._project_path = project_path or os.getcwd()
+        self.project_path = project_path or os.getcwd()
         self.package = None  # type: PackageData
         self.changelog = None  # type: ChangelogData
         self.vcs = VcsHelper.get(project_path)
 
-        with chdir():
+        with chdir(self.project_path):
             self._gather_data()
 
     def _gather_data(self):
         """Gathers data relevant for project related functions."""
-        project_dirname = self._project_path
+        project_dirname = self.project_path
         LOG.debug('Gathering info from `%s` directory ...', project_dirname)
 
         if not os.path.isfile('setup.py'):
@@ -311,7 +311,7 @@ class Project(object):
 
     def pull(self):
         """Pulls changes from a remote repository"""
-        with chdir():
+        with chdir(self.project_path):
             self.vcs.pull()
 
     def get_release_info(self, increment=None):
@@ -342,7 +342,7 @@ class Project(object):
         """
         vcs = self.vcs
 
-        with chdir():
+        with chdir(self.project_path):
 
             for info in (self.package, self.changelog):
                 info.write()
@@ -360,7 +360,7 @@ class Project(object):
         """
         LOG.debug('Adding change ...')  # todo commit all staged?
 
-        with chdir():
+        with chdir(self.project_path):
             changelog = self.changelog
             changelog.add_change(description)
 
@@ -373,6 +373,6 @@ class Project(object):
         """Uploads project data to remote VCS and Python Package Index server."""
         LOG.info('Publishing application ...')
 
-        with chdir():
+        with chdir(self.project_path):
             self.vcs.push()
             DistHelper.upload()
