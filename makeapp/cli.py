@@ -82,7 +82,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
         init_repository=click.confirm('Do you want to initialize a VCS repository in the application directory?'))
 
 
-def attach_template_vars():
+def attach_template_vars_to_new():
     """Attaches command line options handlers to `new` command."""
     global new
 
@@ -93,7 +93,7 @@ def attach_template_vars():
 
 
 def main():
-    attach_template_vars()
+    attach_template_vars_to_new()
     entry_point(obj={})
 
 
