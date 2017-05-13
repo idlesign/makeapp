@@ -13,6 +13,7 @@ from collections import OrderedDict
 
 import requests
 
+from .helpers.vcs import VcsHelper
 from .exceptions import AppMakerException
 
 
@@ -78,7 +79,7 @@ class AppMaker(object):
         (VCS_GIT, 'Git'),
         (VCS_HG, 'Mercurial'),
     ))
-    VCS_COMMANDS = {
+    VCS_COMMANDS = {  # todo switch to VcsHelper
         VCS_GIT: ('git init -q', 'git add -A .'),
         VCS_HG: ('hg init', 'hg add'),
     }
@@ -252,13 +253,13 @@ class AppMaker(object):
         self.logger.debug('Template files: %s', template_files.keys())
         return template_files
 
-    def rollout(self, dest, overwrite=False, init_repository=False):
+    def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None):
         """Rolls out the application skeleton into `dest` path.
 
-        :param dest: app skeleton destination
-        :param overwrite: boolean
-        :param init_repository: boolean
-
+        :param str|unicode dest: app skeleton destination
+        :param bool overwrite:
+        :param bool init_repository:
+        :param str|unicode remote_address:
         """
         self.logger.info('Application target path: %s', dest)
 
@@ -287,7 +288,7 @@ class AppMaker(object):
                 self._copy_file(src, target, prepend)
 
         if init_repository:
-            self._vcs_init(dest, bool(files.keys()))
+            self._vcs_init(dest, bool(files.keys()), remote_address=remote_address)
 
     @staticmethod
     def _comment_out(text):
@@ -411,13 +412,13 @@ class AppMaker(object):
         self.logger.debug('Executing shell command: %s', command)
         return not bool(Popen(command, shell=True).wait())
 
-    def _vcs_init(self, dest, add_files=False):
+    def _vcs_init(self, dest, add_files=False, remote_address=None):
         """Initializes an appropriate VCS repository in the given path.
         Optionally adds the given files.
 
-        :param dest:
-        :param add_files: boolean
-        :return:
+        :param str|unicode dest:
+        :param bool add_files:
+        :param str|unicode remote_address:
         """
         vcs = self.settings['vcs']
         self.logger.info('Initializing %s repository ...', self.VCS[vcs])
@@ -426,6 +427,14 @@ class AppMaker(object):
             success = self._run_shell_command(self.VCS_COMMANDS[vcs][0])
             if success and add_files is not None:
                 self._run_shell_command(self.VCS_COMMANDS[vcs][1])
+
+        # Linking to a remote.
+        if remote_address:
+            # todo HG compatibility
+            helper = VcsHelper.get(dest)
+            helper.commit('The beginning')  # todo commit all?
+            helper.add_remote(remote_address)
+            helper.push(upstream=True if vcs == self.VCS_GIT else remote_address)
 
     def _validate_setting(self, setting, variants):
         """Ensures that the given setting value is one from the given variants."""

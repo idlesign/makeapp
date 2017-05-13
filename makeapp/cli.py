@@ -77,11 +77,12 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
 
     click.confirm('Ready to rollout application skeleton. Proceed?', abort=True)
 
+    init_repo = click.confirm('Do you want to initialize a VCS repository in the application directory?', default=True)
+
+    repo_address = click.prompt('Remote repository address to link to (leave blank to skip)') if init_repo else ''
+
     app_maker.rollout(
-        target_path,
-        overwrite=overwrite_on_conflict,
-        init_repository=click.confirm(
-            'Do you want to initialize a VCS repository in the application directory?', default=True))
+        target_path, overwrite=overwrite_on_conflict, init_repository=init_repo, remote_address=repo_address)
 
     click.secho('Done', fg='green')
 

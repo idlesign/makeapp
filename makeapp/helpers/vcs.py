@@ -8,6 +8,7 @@ class VcsHelper(object):
     """Base helper for VCS related actions."""
 
     MASTER = 'master'
+    UPSTREAM = 'origin'
     COMMAND = None
 
     @classmethod
@@ -65,9 +66,26 @@ class VcsHelper(object):
         """Pulls updates from remotes."""
         self.run_command('pull')
 
-    def push(self):
-        """Pushes local changes and tags to remote."""
-        self.run_command('push')
+    def add_remote(self, address, alias='origin'):
+        """Adds a remote repository.
+        
+        :param str|unicode address: 
+        :param str|unicode alias: 
+        """
+
+    def push(self, upstream=None):
+        """Pushes local changes and tags to remote.
+        
+        :param str|unicode|bool upstream: Upstream alias. If True, default name is used. 
+        """
+        if upstream:
+            if upstream is True:
+                upstream = self.UPSTREAM
+            self.run_command('push -u %s %s' % (upstream, self.MASTER))
+
+        else:
+            self.run_command('push')
+
         self.run_command('push --tags')
 
 
@@ -75,6 +93,14 @@ class GitHelper(VcsHelper):
     """Encapsulates Git related commands."""
 
     COMMAND = 'git'
+
+    def add_remote(self, address, alias='origin'):
+        """Adds a remote repository.
+
+        :param str|unicode address: 
+        :param str|unicode alias: 
+        """
+        self.run_command('remote add %s %s' % (alias, address))
 
 
 class MercurialHelper(VcsHelper):
