@@ -11,5 +11,5 @@ class DistHelper(object):
 
     @classmethod
     def upload(cls):
-        """Builds a _package and uploads it to PyPI."""
+        """Builds a package and uploads it to PyPI."""
         cls.run_command('clean --all sdist bdist_wheel upload')

@@ -7,10 +7,14 @@ from setuptools import find_packages
 from .helpers.vcs import VcsHelper
 from .helpers.files import FileHelper
 from .helpers.dist import DistHelper
-from .exceptions import ProjectorExeption, NoChanges
+from .exceptions import ProjectorExeption
 from .utils import chdir
 
+
 LOG = logging.getLogger(__name__)
+
+
+VERSION_NUMBER_CHUNKS = ('major', 'minor', 'patch')
 
 
 class DataContainer(object):
@@ -36,7 +40,7 @@ class DataContainer(object):
 
 
 class PackageData(DataContainer):
-    """Information gathered from application _package."""
+    """Information gathered from application package."""
 
     VERSION_STR = 'VERSION'
 
@@ -46,17 +50,18 @@ class PackageData(DataContainer):
         :param tuple version: Version number tuple
         """
         super(PackageData, self).__init__(file_helper)
-        self.version = version
+        self.version_current = version
+        self.version_next = None
         self.version_increment = 'patch'
 
     @classmethod
     def get(cls, package_name):
-        """Gathers information from a _package,
+        """Gathers information from a package,
 
         :param str|unicode package_name:
         :rtype: PackageData
         """
-        LOG.debug('Getting version from `%s` _package ...', package_name)
+        LOG.debug('Getting version from `%s` package ...', package_name)
 
         filepath = os.path.join(package_name, '__init__.py')
 
@@ -82,7 +87,7 @@ class PackageData(DataContainer):
         if not isinstance(version, tuple):
             raise ProjectorExeption('Unsupported version format: %s', version)
 
-        LOG.info('Current version from _package: `%s`', version)
+        LOG.info('Current version from package: `%s`', version)
 
         result = PackageData(
             version=version,
@@ -101,38 +106,40 @@ class PackageData(DataContainer):
         """
         increment = self.version_increment
 
-        chunks = ('major', 'minor', 'patch')
-        if increment not in chunks:
+        if increment not in VERSION_NUMBER_CHUNKS:
             raise ProjectorExeption(
-                'Unsupported version chunk to increment: `%s`. Should be one of: %s' % (increment, chunks))
+                'Unsupported version chunk to increment: `%s`. Should be one of: %s' % (increment, VERSION_NUMBER_CHUNKS))
 
-        version_old = self.version
-        version_new = []
+        version_old = self.version_current
+        version_next = []
 
-        chunk_idx = chunks.index(increment)
+        chunk_idx = VERSION_NUMBER_CHUNKS.index(increment)
         for idx, val in enumerate(version_old):
             if idx == chunk_idx:
                 val += 1
             elif idx > chunk_idx:
                 val = 0
-            version_new.append(val)
+            version_next.append(val)
 
-        return tuple(version_new)
+        version_next = tuple(version_next)
+
+        self.version_next = version_next
+
+        return version_next
 
     def version_bump(self, increment='patch'):
         """Bumps version number.
         Returns new version number tuple.
 
-        :param str|unicode increment: Increment part (major, minor, patch)
+        :param str|unicode increment: Version number chunk to increment  (major, minor, patch)
         :rtype: tuple
         """
         self.version_increment = increment
 
-        version_old = self.version
+        version_current = self.version_current
         version_new = self.get_next_version()
-        self.version = version_new
 
-        LOG.info('Version `%s` bumped to `%s`', version_old, version_new)
+        LOG.info('Version `%s` bumped to `%s`', version_current, version_new)
 
         self.file_helper.line_replace('%s = (%s)' % (self.VERSION_STR, ', '.join(map(str, version_new))))
 
@@ -140,20 +147,20 @@ class PackageData(DataContainer):
 
 
 class ChangelogData(DataContainer):
-    """Information gathered from _changelog file."""
+    """Information gathered from changelog file."""
 
     FILENAME_CHANGELOG = 'CHANGELOG'
     UNRELEASED_STR = 'Unreleased'
 
     @classmethod
     def get(cls):
-        """Gathers information from a _changelog.
+        """Gathers information from a changelog.
 
         :rtype: ChangelogData
         """
         filepath = cls.FILENAME_CHANGELOG
 
-        LOG.debug('Getting _changelog from `%s` ...', os.path.basename(filepath))
+        LOG.debug('Getting changelog from `%s` ...', os.path.basename(filepath))
 
         if not os.path.isfile(filepath):
             raise ProjectorExeption('Changelog file not found')
@@ -161,7 +168,7 @@ class ChangelogData(DataContainer):
         changelog = FileHelper.read_file(filepath)
 
         if not changelog[1].startswith('=='):
-            raise ProjectorExeption('Unexpected _changelog file format')
+            raise ProjectorExeption('Unexpected changelog file format')
 
         unreleased_str = cls.UNRELEASED_STR
         unreleased_entry_exists = False
@@ -171,11 +178,11 @@ class ChangelogData(DataContainer):
             unreleased_entry_exists = line == unreleased_str
             if unreleased_entry_exists or line.startswith('v'):
                 version_line_idx = supposed_line_idx
-                LOG.info('Current version from _changelog: `%s`', line)
+                LOG.info('Current version from changelog: `%s`', line)
                 break
 
         if version_line_idx is None:
-            raise ProjectorExeption('Version line not found in _changelog')
+            raise ProjectorExeption('Version line not found in changelog')
 
         if not unreleased_entry_exists:
             changelog[version_line_idx:version_line_idx] = [
@@ -200,7 +207,7 @@ class ChangelogData(DataContainer):
         return result
 
     def deduce_version_increment(self):
-        """Deduces version increment chunk from a _changelog.
+        """Deduces version increment chunk from a changelog.
 
         Changelog bullets:
             * changed/fixed
@@ -225,7 +232,7 @@ class ChangelogData(DataContainer):
     def version_bump(self, new_version):
         """Bumps version number.
 
-        Returns version number string as in _changelog.
+        Returns version number string as in changelog.
 
         :param tuple new_version:
         :rtype: str|unicode
@@ -238,7 +245,7 @@ class ChangelogData(DataContainer):
         return version_str
 
     def add_change(self, description):
-        """Adds change into _changelog.
+        """Adds change into changelog.
 
         :param str|unicode description:
         """
@@ -251,7 +258,7 @@ class ChangelogData(DataContainer):
         self.file_helper.insert(description, offset=2)
 
     def get_changes(self):
-        """Returns a list of new version changes from a _changelog.
+        """Returns a list of new version changes from a changelog.
 
         :rtype: list
         """
@@ -262,111 +269,121 @@ class ChangelogData(DataContainer):
             changes.append(line)
         return changes
 
+    def get_version_summary(self):
+        """Return version summary string.
+        
+        :rtype: str|unicode 
+        """
+        return '\n'.join(self.get_changes()).strip()
 
-class Application(object):
+
+class Project(object):
     """Encapsulates application (project) related logic."""
 
-    def __init__(self, project_path):
+    def __init__(self, project_path=None, dry_run=False):
         """
         :param str|unicode project_path: Application root (containing setup.py) path.
+        :param bool dry_run: Do not commit changes to filesystem.
         """
-        self._project_path = project_path
-        self._package = None  # type: PackageData
-        self._changelog = None  # type: ChangelogData
-        self._vcs = VcsHelper.get(project_path)
+        self._project_path = project_path or os.getcwd()
+        self.package = None  # type: PackageData
+        self.changelog = None  # type: ChangelogData
+        self.vcs = VcsHelper.get(project_path)
+        self.dry = dry_run
 
         with chdir():
             self._gather_data()
 
     def _gather_data(self):
-        """Gathers data relevant for application related functions."""
+        """Gathers data relevant for project related functions."""
         project_dirname = self._project_path
-        LOG.info('Gathering info from `%s` directory ...', project_dirname)
+        LOG.debug('Gathering info from `%s` directory ...', project_dirname)
 
         if not os.path.isfile('setup.py'):
             raise ProjectorExeption('No `setup.py` file found')
 
-        self._vcs.check()
+        self.vcs.check()
 
         packages = find_packages()
         main_package = packages[0]
 
-        self._package = PackageData.get(main_package)
-        self._changelog = ChangelogData.get()
+        self.package = PackageData.get(main_package)
+        self.changelog = ChangelogData.get()
 
-    def release(self, increment=None, changelog_entry=None, upload=True):
-        """Makes package release.
+    def pull(self):
+        """Pulls changes from a remote repository"""
+        if self.dry:
+            return
+
+        with chdir():
+            self.vcs.pull()
+
+    def get_release_info(self, increment=None):
+        """Returns release info tuple as part of release preparation.
+        
+        :param str|unicode increment: Version chunk to increment (major, minor, patch)
+            If not set, will be deduced from changelog data.
+            
+        :rtype: tuple 
+        """
+        changelog = self.changelog
+
+        increment = increment or changelog.deduce_version_increment()
+
+        next_version = self.package.version_bump(increment)
+        next_version_str = changelog.version_bump(next_version)
+
+        version_summary = changelog.get_version_summary()
+
+        return next_version_str, version_summary
+
+    def release(self, next_version_str, version_summary):
+        """Makes application package release.
 
         * Bumps version number
         * Adds changelog info
         * Tags VCS
-        * Pushes to remote repository
-        * Publishes on PyPI
-
-        :param str|unicode increment: Version chunk to increment (major, minor, patch)
-            If not set, will be deduced from _changelog info.
-
-        :param str|unicode changelog_entry: Message to add to _changelog.
-
-        :param bool upload: Upload to repository and PyPI
         """
-        with chdir():
-            self._vcs.pull()
+        vcs = self.vcs
 
-        package = self._package
-        changelog = self._changelog
-        vcs = self._vcs
-
-        if changelog_entry:
-            self.add_change(changelog_entry)
-
-        increment = increment or changelog.deduce_version_increment()
-
-        new_version = package.version_bump(increment)
-        new_version_str = changelog.version_bump(new_version)
-
-        version_summary = '\n'.join(changelog.get_changes())
-        version_summary = version_summary.strip()
-
-        if not version_summary.strip():
-            raise NoChanges('No changes detected. Please add changes before release')
-
-        LOG.info('Version summary:\n%s' % version_summary)
+        if self.dry:
+            return
 
         with chdir():
 
-            for info in (package, changelog):
+            for info in (self.package, self.changelog):
                 info.write()
                 vcs.add(info.filepath)
 
-            LOG.info('Commit VCS changes ...')
+            LOG.debug('Commit VCS changes ...')
 
-            vcs.commit('Release %s' % new_version_str)
-            vcs.add_tag(new_version_str, version_summary, overwrite=True)
-
-        upload and self.upload()
-
-        LOG.info('Version `%s` released' % new_version_str)
+            vcs.commit('Release %s' % next_version_str)
+            vcs.add_tag(next_version_str, version_summary, overwrite=True)
 
     def add_change(self, description):
-        """Add a change into _changelog.
+        """Add a change description into changelog.
 
         :param str|unicode description:
         """
         LOG.debug('Adding change ...')  # todo commit all staged?
 
         with chdir():
-            changelog = self._changelog
+            changelog = self.changelog
             changelog.add_change(description)
-            changelog.write()
 
-            self._vcs.add(changelog.filepath)
-            self._vcs.commit('%s updated' % changelog.FILENAME_CHANGELOG)
+            if not self.dry:
+                changelog.write()
 
-    def upload(self):
-        """Uploads project data to remote repository Python Package Index server."""
-        LOG.info('Uploading data ...')
+                self.vcs.add(changelog.filepath)
+                self.vcs.commit('%s updated' % changelog.FILENAME_CHANGELOG)
+
+    def publish(self):
+        """Uploads project data to remote VCS and Python Package Index server."""
+        LOG.info('Publishing application ...')
+
+        if self.dry:
+            return
 
         with chdir():
-            self._vcs.push()
+            self.vcs.push()
             DistHelper.upload()

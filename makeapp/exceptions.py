@@ -14,7 +14,3 @@ class ProjectorExeption(MakeappException):
 
 class CommandError(MakeappException):
     """Raised when projector detects external process invocation error."""
-
-
-class NoChanges(ProjectorExeption):
-    """Raised when a release attempted with no changes registered."""

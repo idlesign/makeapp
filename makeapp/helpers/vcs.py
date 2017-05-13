@@ -32,7 +32,7 @@ class VcsHelper(object):
         return run_command('%s %s' % (self.COMMAND, command))
 
     def check(self):
-        """Performs basic _vcs check."""
+        """Performs basic vcs check."""
         data = self.run_command('branch')
         if '* %s' % self.MASTER not in ''.join(data):
             raise ProjectorExeption('VCS needs to be initialized and branch set to `%s`' % self.MASTER)
