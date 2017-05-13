@@ -4,9 +4,9 @@ import logging
 
 import click
 
-from makeapp import VERSION
-from makeapp.appmaker import AppMaker
-from makeapp.apptools import Project, VERSION_NUMBER_CHUNKS
+from . import VERSION
+from .appmaker import AppMaker
+from .apptools import Project, VERSION_NUMBER_CHUNKS
 
 
 TEMPLATE_VARS = AppMaker.BASE_SETTINGS.keys()
@@ -111,8 +111,8 @@ def release(increment):
         click.secho('No changes detected. Please add changes before release', fg='red', err=True)
         sys.exit(1)
 
-    click.secho('Version current: %s' % project.package.version_current, fg='blue')
-    click.secho('Version next: %s' % project.package.version_next, fg='green')
+    click.secho('Version current: %s' % project.package.version_current_str, fg='blue')
+    click.secho('Version next: %s' % project.package.version_next_str, fg='green')
     click.secho(version_summary)
 
     if click.confirm('Commit changes?', default=True):

@@ -55,6 +55,23 @@ class PackageData(DataContainer):
         self.version_increment = 'patch'
 
     @classmethod
+    def get_version_str(cls, version):
+        """Return string representation for a given version.
+        
+        :param tuple version: 
+        :rtype: str|unicode 
+        """
+        return '.'.join(map(str, version))
+
+    @property
+    def version_current_str(self):
+        return self.get_version_str(self.version_current)
+
+    @property
+    def version_next_str(self):
+        return self.get_version_str(self.version_next)
+
+    @classmethod
     def get(cls, package_name):
         """Gathers information from a package,
 
