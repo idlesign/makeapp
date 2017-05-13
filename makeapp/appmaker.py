@@ -193,7 +193,6 @@ class AppMaker(object):
 
         sites_registry = OrderedDict((
             ('PyPI', 'https://pypi.python.org/pypi/{{ app_name }}'),
-            ('Google Code', 'http://code.google.com/p/{{ app_name }}/')
         ))
 
         name_available = True
