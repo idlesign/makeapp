@@ -17,4 +17,4 @@ class CommandError(MakeappException):
 
 
 class NoChanges(ProjectorExeption):
-    """Raised when a release attepted with no changes registered."""
+    """Raised when a release attempted with no changes registered."""
