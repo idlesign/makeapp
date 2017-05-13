@@ -1,151 +1,100 @@
 #!/usr/bin/env python
-"""
-makeapp
-
-Simplifies Python application rollout by providing its basic structure.
-
-"""
 import sys
-import argparse
 import logging
 
-try:
-    input = raw_input
-except NameError:
-    pass
+import click
+
+from makeapp import VERSION
+from makeapp.appmaker import AppMaker
 
 
-from .appmaker import AppMaker
+TEMPLATE_VARS = AppMaker.BASE_SETTINGS.keys()
 
 
-def main():
+@click.group()
+@click.version_option(version='.'.join(map(str, VERSION)))
+def entry_point():
+    """makeapp command line utilities."""
 
-    argparser = argparse.ArgumentParser(
-        prog='makeapp', description='Simplifies Python application rollout by providing its basic structure.')
 
-    argparser.add_argument('app_name', help='Application name')
-    argparser.add_argument('target_path', help='Path to create an application in')
+@entry_point.command()
+@click.argument('app_name')
+@click.argument('target_path')
+@click.option('--debug', help='Show debug messages while processing', is_flag=True)
+@click.option('--description', '-d', help='Short application description')
+@click.option('--license', '-l',
+              help='License to use',
+              type=click.Choice(AppMaker.LICENSES.keys()),
+              default=AppMaker.default_license)
+@click.option('--vcs', '-vcs',
+              help='VCS type to initialize a repo',
+              type=click.Choice(AppMaker.VCS.keys()),
+              default=AppMaker.default_vcs)
+@click.option('--configuration_file', '-f',
+              help='Path to configuration file containing settings to read from',
+              type=click.Path(exists=True, dir_okay=False))
+@click.option('--templates_source_path', '-s',
+              help='Directory containing application structure templates',
+              type=click.Path(exists=True, file_okay=False))
+@click.option('--overwrite_on_conflict', '-o', help='Overwrite files on conflict', is_flag=True)
+@click.option('--templates_to_use', '-t',
+              help='Accepts comma separated list of application structures templates names or paths')
+def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug, **kwargs):
+    """Simplifies Python application rollout providing its basic structure."""
 
-    argparser.add_argument('--debug', help='Show debug messages while processing', action='store_true')
-
-    workflow_args_group = argparser.add_argument_group(
-        'Workflow options', 'These can be adjusted to customize the default makeapp behaviour')
-
-    workflow_args_group.add_argument(
-        '-l', '--license',
-        help='License to use: %s. [ Default: %s ]' % (
-            '; '.join(['%s - %s' % (k, v[0]) for k, v in AppMaker.LICENSES.items()]), AppMaker.default_license
-        ),
-        choices=AppMaker.LICENSES.keys())
-
-    workflow_args_group.add_argument(
-        '-vcs', '--vcs',
-        help='VCS type to initialize a repo: %s. [ Default: %s ]' % (
-            '; '.join(['%s - %s' % (k, v) for k, v in AppMaker.VCS.items()]), AppMaker.default_vcs
-        ),
-        choices=AppMaker.VCS.keys())
-
-    workflow_args_group.add_argument(
-        '-d', '--description',
-        help='Short application description')
-
-    workflow_args_group.add_argument(
-        '-f', '--configuration_file',
-        help='Path to configuration file containing settings to read from')
-
-    workflow_args_group.add_argument(
-        '-s', '--templates_source_path',
-        help='Path containing application structure templates')
-
-    workflow_args_group.add_argument(
-        '-t', '--templates_to_use',
-        help='Accepts comma separated list of application structures templates names or paths')
-
-    workflow_args_group.add_argument(
-        '-o', '--overwrite_on_conflict',
-        help='Overwrite files on conflict', action='store_true')
-
-    workflow_args_group.add_argument(
-        '-i', '--interactive',
-        help='Ask for user input when decision is required', action='store_true')
-
-    settings_args_group = argparser.add_argument_group('Customization')
-    base_settings_keys = AppMaker.BASE_SETTINGS.keys()
-    for key in base_settings_keys:
-        if key != 'app_name':
-            try:
-                settings_args_group.add_argument('--%s' % key)
-            except argparse.ArgumentError:
-                pass
-
-    parsed = argparser.parse_args()
-
-    app_maker_kwargs = {}
-    if parsed.templates_source_path is not None:
-        app_maker_kwargs['templates_path'] = parsed.templates_source_path
-
-    if parsed.templates_to_use is not None:
-        app_maker_kwargs['templates_to_use'] = parsed.templates_to_use.split(',')
+    app_maker_kwargs = {
+        'templates_path': kwargs['templates_source_path'],
+        'templates_to_use': (kwargs['templates_to_use'] or '').split(',') or None,
+    }
 
     log_level = None
-    if parsed.debug:
+    if debug:
         log_level = logging.DEBUG
 
-    app_maker = AppMaker(parsed.app_name, log_level=log_level, **app_maker_kwargs)
+    app_maker = AppMaker(app_name, log_level=log_level, **app_maker_kwargs)
 
     # Try to read settings from default file.
     app_maker.update_settings_from_file()
     # Try to read settings from user supplied configuration file.
-    app_maker.update_settings_from_file(parsed.configuration_file)
+    app_maker.update_settings_from_file(configuration_file)
 
     # Settings from command line override all the previous.
     user_settings = {}
-    for key in base_settings_keys:
-        val = getattr(parsed, key, None)
+    for key in TEMPLATE_VARS:
+        val = kwargs.get(key)
         if val is not None:
             user_settings[key] = val
-
-    def update_setting(settings):
-        for setting in settings:
-            val = getattr(parsed, setting, None)
-            if val is not None:
-                user_settings[setting] = val
-
-    update_setting(('description', 'license', 'vcs'))
 
     app_maker.update_settings(user_settings)
 
     # Print out current settings.
-    app_maker.print_settings()
+    click.echo(click.style(app_maker.get_settings_string(), fg='green'))
 
-    def process_input(prompt, variants=None):
-        """Interprets user input.
-
-        :param prompt:
-        :param variants:
-        :return: boolean
-        """
-        if not parsed.interactive:
-            return True
-
-        if variants is None:
-            variants = ('Y', 'N')
-
-        decision = input('%s [%s]: ' % (prompt, '/'.join(variants))).upper()
-        if decision not in variants:
-            return process_input(prompt)
-        else:
-            return decision == variants[0]
-
-    if process_input('Do you want to check that the application name is not already in use?'):
+    if click.confirm('Do you want to check that `%s` application name is not already in use?' % app_name, default=True):
         if not app_maker.check_app_name_is_available():
             sys.exit(1)
 
-    if process_input('Ready to rollout the application skeleton. Proceed?'):
-        init_repo = process_input('Do you want to initialize a VCS repository in the application directory?')
-        app_maker.rollout(parsed.target_path, overwrite=parsed.overwrite_on_conflict, init_repository=init_repo)
-    else:
-        sys.exit(1)
+    click.confirm('Ready to rollout the application skeleton. Proceed?', abort=True)
+
+    app_maker.rollout(
+        target_path,
+        overwrite=overwrite_on_conflict,
+        init_repository=click.confirm('Do you want to initialize a VCS repository in the application directory?'))
+
+
+def attach_template_vars():
+    """Attaches command line options handlers to `new` command."""
+    global new
+
+    already_handled = ['app_name', 'description', 'license', 'vcs']
+
+    for key in [key for key in TEMPLATE_VARS if key not in already_handled]:
+        new = click.option('--%s' % key)(new)
+
+
+def main():
+    attach_template_vars()
+    entry_point(obj={})
 
 
 if __name__ == '__main__':

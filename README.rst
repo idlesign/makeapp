@@ -34,9 +34,9 @@ Bundled layout skeletons:
 4. Pytest support template.
 
 
-Make new application skeleton using interactive mode (`-i`)::
+Make new application skeleton::
 
-    makeapp my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
+    makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -i -d "My application." --author "The Librarian"
 
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.

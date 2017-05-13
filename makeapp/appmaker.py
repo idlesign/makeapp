@@ -336,11 +336,16 @@ class AppMaker(object):
             data = prepend_data + data
         self._create_file(dest, data)
 
-    def print_settings(self):
-        """Print out settings dict, using logging mechanics."""
-        self.logger.info('Settings: \n%s', '\n'.join(['    %s: %s' % (k, v) for k, v in self.settings.items()]))
-        self.logger.info('Chosen license: %s', self.LICENSES[self.settings['license']][0])
-        self.logger.info('Chosen VCS: %s', self.VCS[self.settings['vcs']])
+    def get_settings_string(self):
+        """Returns settings string."""
+        lines = [
+            'Settings to be used: \n%s' % '\n'.join(
+                ['    %s: %s' % (k, v) for k, v in sorted(self.settings.items(), key=lambda kv: kv[0])]
+            ),
+            'Chosen license: %s' % self.LICENSES[self.settings['license']][0],
+            'Chosen VCS: %s' % self.VCS[self.settings['vcs']]
+        ]
+        return '\n'.join(lines)
 
     def _get_license_data(self):
         """Returns license data: text, and boilerplate text
