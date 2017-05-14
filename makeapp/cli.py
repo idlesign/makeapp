@@ -4,12 +4,9 @@ import logging
 
 import click
 
-from . import VERSION
-from .appmaker import AppMaker
-from .apptools import Project, VERSION_NUMBER_CHUNKS
-
-
-TEMPLATE_VARS = AppMaker.BASE_SETTINGS.keys()
+from makeapp import VERSION
+from makeapp.appmaker import AppMaker
+from makeapp.apptools import Project, VERSION_NUMBER_CHUNKS
 
 
 @click.group()
@@ -58,15 +55,8 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     app_maker.update_settings_from_file()
     # Try to read settings from user supplied configuration file.
     app_maker.update_settings_from_file(configuration_file)
-
     # Settings from command line override all the previous.
-    user_settings = {}
-    for key in TEMPLATE_VARS:
-        val = kwargs.get(key)
-        if val is not None:
-            user_settings[key] = val
-
-    app_maker.update_settings(user_settings)
+    app_maker.update_settings_from_dict(kwargs)
 
     # Print out current settings.
     click.secho(app_maker.get_settings_string(), fg='green')
@@ -93,7 +83,7 @@ def attach_template_vars_to_new():
 
     already_handled = ['app_name', 'description', 'license', 'vcs']
 
-    for key in [key for key in TEMPLATE_VARS if key not in already_handled]:
+    for key in [key for key in AppMaker.get_template_vars() if key not in already_handled]:
         new = click.option('--%s' % key)(new)
 
 

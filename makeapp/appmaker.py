@@ -2,12 +2,12 @@ import os
 import re
 import sys
 import logging
+from datetime import date
+from collections import OrderedDict
 try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
-from datetime import date
-from collections import OrderedDict
 
 import requests
 
@@ -22,7 +22,7 @@ BASE_PATH = os.path.dirname(__file__)
 
 
 class AppMaker(object):
-    """makeapp functionality is encapsulated in this class.
+    """Scaffolding functionality is encapsulated in this class.
 
     Usage example:
         app_maker = AppMaker('my_app')
@@ -31,13 +31,7 @@ class AppMaker(object):
     This will create `my_app` application skeleton in `/home/idle/dev/my_app_env/`.
 
     """
-
-    user_data_path = os.path.join(os.path.expanduser('~'), '.makeapp')
-    user_templates_path = os.path.join(user_data_path, 'app_templates')
-    user_settings_config = os.path.join(user_data_path, 'makeapp.conf')
-
-    default_templates_path = os.path.join(BASE_PATH, 'app_templates')
-    default_template = '__default__'
+    template_default_name = '__default__'
     module_dir_marker = '__module_name__'
 
     license_templates_path = os.path.join(BASE_PATH, 'license_templates')
@@ -91,31 +85,26 @@ class AppMaker(object):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.configure_logging(log_level)
 
-        if templates_path is None:
-            if os.path.exists(self.user_templates_path):
-                templates_path = self.user_templates_path
-            else:
-                templates_path = self.default_templates_path
+        self.path_user_confs = os.path.join(os.path.expanduser('~'), '.makeapp')
+        self.user_settings_config = os.path.join(self.path_user_confs, 'makeapp.conf')
+        self.path_templates_default = os.path.join(BASE_PATH, 'app_templates')
 
-        if not os.path.exists(templates_path):
-            raise AppMakerException('Templates path doesn\'t exist: %s' % templates_path)
-        self.templates_path = templates_path
-        self.logger.debug('Templates path: %s', self.templates_path)
+        self.path_templates_current = self._get_templates_path_current(templates_path)
+        self.logger.debug('Templates path: %s', self.path_templates_current)
 
-        if templates_to_use is None:
-            templates_to_use = []
+        self.templates_paths = self._get_templates_paths(templates_to_use)
 
-        if not templates_to_use or self.default_template not in templates_to_use:
-            templates_to_use.insert(0, self.default_template)
+        self.settings = self._init_settings(app_name)
 
-        self.use_templates = OrderedDict()
-        for template in templates_to_use:
-            name, path = self._find_template(template)
-            self.use_templates[name] = path
-        self.logger.debug('Templates to use: %s', self.use_templates)
+    def _init_settings(self, app_name):
+        """Initializes and returns base settings.
+        
+        :param str|unicode app_name: 
+        :rtype: OrderedDict 
+        """
 
-        self.settings = OrderedDict(self.BASE_SETTINGS)
-        self.logger.debug('Initial settings: %s', self.settings)
+        settings = OrderedDict(self.BASE_SETTINGS)
+        self.logger.debug('Initial settings: %s', settings)
 
         module_name = app_name.split('-', 1)[-1].replace('-', '_')
 
@@ -123,7 +112,48 @@ class AppMaker(object):
             'app_name': app_name,
             'module_name': module_name,
             'module_name_capital': module_name.capitalize(),
-        })
+        }, settings)
+
+        return settings
+
+    def _get_templates_path_current(self, path):
+        """Returns current templates path.
+        
+        :param str|unicode|None path: 
+        :rtype: str|unicode 
+        """
+        path_user_templates = os.path.join(self.path_user_confs, 'app_templates')
+
+        if path is None:
+            path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_default
+
+        if not os.path.exists(path):
+            raise AppMakerException('Templates path doesn\'t exist: %s' % path)
+
+        return path
+
+    def _get_templates_paths(self, names_or_paths):
+        """Returns a mapping of template names to paths.
+        
+        :param list names_or_paths: 
+        :rtype: OrderedDict 
+        """
+        paths = OrderedDict()
+
+        if names_or_paths is None:
+            names_or_paths = []
+
+        # Prepend default (base) template.
+        if not names_or_paths or self.template_default_name not in names_or_paths:
+            names_or_paths.insert(0, self.template_default_name)
+
+        for template in names_or_paths:
+            name, path = self._find_template(template)
+            paths[name] = path
+
+        self.logger.debug('Templates to use: %s', paths)
+
+        return paths
 
     def _find_template(self, name_or_path):
         """Searches a template by it's name or in path.
@@ -134,8 +164,8 @@ class AppMaker(object):
         """
         supposed_paths = (
             name_or_path,
-            os.path.join(self.templates_path, name_or_path),
-            os.path.join(self.default_templates_path, name_or_path),
+            os.path.join(self.path_templates_current, name_or_path),
+            os.path.join(self.path_templates_default, name_or_path),
         )
 
         for supposed_path in supposed_paths:
@@ -144,18 +174,22 @@ class AppMaker(object):
                 return path.split('/')[-1], path
 
         self.logger.error('Unable to find application template. Searched \n%s', '\n  '.join(supposed_paths))
+
         raise AppMakerException('Unable to find application template: %s' % name_or_path)
 
-    def _replace_settings_markers(self, target, strip_unknown=False):
+    def _replace_settings_markers(self, target, strip_unknown=False, settings=None):
         """Replaces settings markers in `target` with current settings values
 
         :param target:
         :param strip_unknown: Strip unknown markers from the target.
-        :return: string
+        :param OrderedDict settings:
+        :rtype: str|unicode
 
         """
+        settings = settings or self.settings
+
         if target is not None:
-            for name, val in self.settings.items():
+            for name, val in settings.items():
                 if val is not None:
                     target = target.replace('{{ %s }}' % name, val)
         if strip_unknown:
@@ -213,7 +247,7 @@ class AppMaker(object):
 
         """
         template_files = {}
-        for _, templates_path in self.use_templates.items():
+        for _, templates_path in self.templates_paths.items():
             for path, _, files in os.walk(templates_path):
                 for fname in files:
 
@@ -288,7 +322,7 @@ class AppMaker(object):
         :param contents:
 
         """
-        contents = self._replace_settings_markers(contents, True)
+        contents = self._replace_settings_markers(contents, strip_unknown=True)
         with open(path, 'w') as f:
             f.write(contents)
 
@@ -312,6 +346,7 @@ class AppMaker(object):
 
         if prepend_data is not None:
             data = prepend_data + data
+
         self._create_file(dest, data)
 
     def get_settings_string(self):
@@ -346,6 +381,27 @@ class AppMaker(object):
                 license_src_text = f.read()
 
         return license_text, license_src_text
+
+    @classmethod
+    def get_template_vars(cls):
+        """Returns known template variables.
+        
+        :rtype: list 
+        """
+        return AppMaker.BASE_SETTINGS.keys()
+
+    def update_settings_from_dict(self, dict_):
+        """Updates settings dict with contents from a given dict.
+        
+        :param dict dict_:  
+        """
+        settings = {}
+        for key in self.get_template_vars():
+            val = dict_.get(key)
+            if val is not None:
+                settings[key] = val
+
+        self.update_settings(settings)
 
     def update_settings_from_file(self, path=None):
         """Updates settings dict with contents of configuration file.
@@ -405,28 +461,29 @@ class AppMaker(object):
             helper.add_remote(remote_address)
             helper.push(upstream=True)
 
-    def _validate_setting(self, setting, variants):
+    def _validate_setting(self, setting, variants, settings):
         """Ensures that the given setting value is one from the given variants."""
-        val = self.settings[setting]
+        val = settings[setting]
         if val not in variants:
             raise AppMakerException(
-                'Unsupported value `%s` for `%s`. Acceptable variants [%s]' % (val, setting, variants)
-            )
+                'Unsupported value `%s` for `%s`. Acceptable variants [%s]' % (val, setting, variants))
 
-    def update_settings(self, settings, verbose=False):
+    def update_settings(self, settings_new, settings_base=None):
         """Updates current settings dictionary with values from a given
         settings dictionary. Settings markers existing in settings dict will
         be replaced with previously calculated settings values.
 
-        :param settings:
-        :param verbose: boolean, whether to log updated settings
-
+        :param dict settings_new:
+        :param OrderedDict settings_base:
+        
         """
-        self.settings.update(settings)
-        for name, val in self.settings.items():
-            self.settings[name] = self._replace_settings_markers(val)
+        settings_base = settings_base or self.settings
 
-        self._validate_setting('license', self.LICENSES.keys())
-        self.settings['license_title'], self.settings['license_title_pypi'] = self.LICENSES[self.settings['license']]
-        self.settings['python_version_major'] = self.settings['python_version'].split('.')[0]
-        self._validate_setting('vcs', self.VCS.keys())
+        settings_base.update(settings_new)
+        for name, val in settings_base.items():
+            settings_base[name] = self._replace_settings_markers(val, settings=settings_base)
+
+        self._validate_setting('license', self.LICENSES.keys(), settings_base)
+        settings_base['license_title'], settings_base['license_title_pypi'] = self.LICENSES[settings_base['license']]
+        settings_base['python_version_major'] = settings_base['python_version'].split('.')[0]
+        self._validate_setting('vcs', self.VCS.keys(), settings_base)
