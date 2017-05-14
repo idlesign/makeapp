@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from tempfile import NamedTemporaryFile
 
 from ..utils import run_command
 from ..exceptions import ProjectorExeption
@@ -82,7 +83,12 @@ class VcsHelper(object):
         :param bool overwrite: Whether to overwrite tag if exists.
         """
         overwrite = '-f' if overwrite else ''
-        self.run_command("tag %s %s -m '%s'" % (name, overwrite, description))
+
+        with NamedTemporaryFile() as f:
+            f.write(description)
+            f.flush()
+
+            self.run_command('tag %s %s -F %s' % (name, overwrite, f.name))
 
     def add(self, filename=None):
         """Adds a file into a changelist.
