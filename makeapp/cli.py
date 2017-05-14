@@ -98,7 +98,7 @@ def release(increment):
     version_str, version_summary = project.get_release_info(increment)
 
     if not version_summary:
-        click.secho('No changes detected. Please add changes before release', fg='red', err=True)
+        click.secho('No changes found in changelog. Please add changes before release', fg='red', err=True)
         sys.exit(1)
 
     click.secho('Version current: %s' % project.package.version_current_str, fg='blue')
