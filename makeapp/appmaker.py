@@ -6,7 +6,6 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
-from contextlib import contextmanager
 from subprocess import Popen
 from datetime import date
 from collections import OrderedDict
@@ -15,24 +14,12 @@ import requests
 
 from .helpers.vcs import VcsHelper
 from .exceptions import AppMakerException
+from .utils import chdir
 
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 PYTHON_VERSION = sys.version_info
 BASE_PATH = os.path.dirname(__file__)
-
-
-@contextmanager
-def chdir(path):
-    """Temporarily switches the current working directory.
-
-    :param path:
-    :return:
-    """
-    prev_wd = os.getcwd()
-    os.chdir(path)
-    yield
-    os.chdir(prev_wd)
 
 
 class AppMaker(object):
@@ -73,17 +60,9 @@ class AppMaker(object):
     ))
     default_license = LICENSE_BSD3CL
 
-    VCS_GIT = 'git'
-    VCS_HG = 'hg'
-    VCS = OrderedDict((
-        (VCS_GIT, 'Git'),
-        (VCS_HG, 'Mercurial'),
-    ))
-    VCS_COMMANDS = {  # todo switch to VcsHelper
-        VCS_GIT: ('git init -q', 'git add -A .'),
-        VCS_HG: ('hg init', 'hg add'),
-    }
-    default_vcs = VCS_GIT
+    VCS = VcsHelper.get_backends()
+
+    default_vcs = VCS.keys()[0]
 
     BASE_SETTINGS = OrderedDict((
         ('app_name', None),
@@ -288,7 +267,7 @@ class AppMaker(object):
                 self._copy_file(src, target, prepend)
 
         if init_repository:
-            self._vcs_init(dest, bool(files.keys()), remote_address=remote_address)
+            self._vcs_init(dest, add_files=bool(files.keys()), remote_address=remote_address)
 
     @staticmethod
     def _comment_out(text):
@@ -343,7 +322,7 @@ class AppMaker(object):
                 ['    %s: %s' % (k, v) for k, v in sorted(self.settings.items(), key=lambda kv: kv[0])]
             ),
             'Chosen license: %s' % self.LICENSES[self.settings['license']][0],
-            'Chosen VCS: %s' % self.VCS[self.settings['vcs']]
+            'Chosen VCS: %s' % self.VCS[self.settings['vcs']].TITLE
         ]
         return '\n'.join(lines)
 
@@ -421,20 +400,20 @@ class AppMaker(object):
         :param str|unicode remote_address:
         """
         vcs = self.settings['vcs']
-        self.logger.info('Initializing %s repository ...', self.VCS[vcs])
+
+        helper = self.VCS[vcs]()  # type: VcsHelper
+
+        self.logger.info('Initializing %s repository ...', helper.TITLE)
 
         with chdir(dest):
-            success = self._run_shell_command(self.VCS_COMMANDS[vcs][0])
-            if success and add_files is not None:
-                self._run_shell_command(self.VCS_COMMANDS[vcs][1])
+            helper.init()
+            add_files and helper.add()
 
         # Linking to a remote.
         if remote_address:
-            # todo HG compatibility
-            helper = VcsHelper.get(dest)
             helper.commit('The beginning')  # todo commit all?
             helper.add_remote(remote_address)
-            helper.push(upstream=True if vcs == self.VCS_GIT else remote_address)
+            helper.push(upstream=True)
 
     def _validate_setting(self, setting, variants):
         """Ensures that the given setting value is one from the given variants."""

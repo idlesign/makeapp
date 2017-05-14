@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 from ..utils import run_command
 from ..exceptions import ProjectorExeption
@@ -7,9 +8,26 @@ from ..exceptions import ProjectorExeption
 class VcsHelper(object):
     """Base helper for VCS related actions."""
 
+    TITLE = None
     MASTER = 'master'
     UPSTREAM = 'origin'
     COMMAND = None
+
+    def __init__(self):
+        self.remote = None
+
+    @classmethod
+    def get_backends(cls):
+        """Returns available backends.
+        
+        :rtype: OrderedDict 
+        """
+        backends = OrderedDict()
+
+        for backend in (GitHelper, MercurialHelper):
+            backends[backend.COMMAND] = backend
+
+        return backends
 
     @classmethod
     def get(cls, vcs_path=None):
@@ -21,7 +39,7 @@ class VcsHelper(object):
         vcs_path = vcs_path or os.getcwd()
 
         helper = None
-        for helper_cls in (GitHelper, MercurialHelper):
+        for helper_cls in cls.get_backends().values():
             if os.path.exists(os.path.join(vcs_path, '.%s' % helper_cls.COMMAND)):
                 helper = helper_cls()
                 break
@@ -31,6 +49,10 @@ class VcsHelper(object):
     def run_command(self, command):
         """Basic command runner to implement."""
         return run_command('%s %s' % (self.COMMAND, command))
+
+    def init(self):
+        """Initializes a repository."""
+        return self.run_command('init -q')
 
     def check(self):
         """Performs basic vcs check."""
@@ -48,11 +70,12 @@ class VcsHelper(object):
         overwrite = '-f' if overwrite else ''
         self.run_command("tag %s %s -m '%s'" % (name, overwrite, description))
 
-    def add(self, filename):
+    def add(self, filename=None):
         """Adds a file into a changelist.
 
-        :param str|unicode filename:
+        :param str|unicode filename: If not provided all files in working tree are added.
         """
+        filename = filename or ''
         self.run_command('add %s' % filename)
 
     def commit(self, message):
@@ -72,6 +95,7 @@ class VcsHelper(object):
         :param str|unicode address: 
         :param str|unicode alias: 
         """
+        self.remote = address
 
     def push(self, upstream=None):
         """Pushes local changes and tags to remote.
@@ -92,6 +116,7 @@ class VcsHelper(object):
 class GitHelper(VcsHelper):
     """Encapsulates Git related commands."""
 
+    TITLE = 'Git'
     COMMAND = 'git'
 
     def add_remote(self, address, alias='origin'):
@@ -100,10 +125,30 @@ class GitHelper(VcsHelper):
         :param str|unicode address: 
         :param str|unicode alias: 
         """
+        super(GitHelper, self).add_remote(address, alias)
         self.run_command('remote add %s %s' % (alias, address))
+
+    def add(self, filename=None):
+        """Adds a file into a changelist.
+
+        :param str|unicode filename: If not provided all files in working tree are added.
+        """
+        filename = filename or '.'
+        super(GitHelper, self).add(filename)
 
 
 class MercurialHelper(VcsHelper):
     """Encapsulates Mercurial related commands."""
 
+    TITLE = 'Mercurial'
     COMMAND = 'hg'
+
+    def push(self, upstream=None):
+        """Pushes local changes and tags to remote.
+
+        :param str|unicode|bool upstream: Upstream URL. If True, remote URL is used. 
+        """
+        if upstream is True and self.remote:
+            upstream = self.remote
+
+        super(MercurialHelper, self).push(upstream)

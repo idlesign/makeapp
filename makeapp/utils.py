@@ -11,8 +11,9 @@ LOG = logging.getLogger(__name__)
 
 @contextmanager
 def chdir(target_path):
-    """Context manager. 
-    Temporarily changes current working directory.
+    """Context manager.
+     
+    Temporarily switches the current working directory.
     
     """
     curr_dir = os.getcwd()
