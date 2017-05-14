@@ -17,7 +17,7 @@ Scaffold a new application:
 
 .. code-block:: bash
 
-    $ makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "The Librarian"
+    $ makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
 
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.
