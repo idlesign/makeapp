@@ -58,6 +58,18 @@ This will automatically:
     * upload application package to PyPI
 
 
+Adding changes
+--------------
+
+When you're ready to add another entry to your changelog use `change` command:
+
+.. code-block:: bash
+
+    $ makeapp change "+ New 'change' command implemented"
+
+This will also stage and commit all changed files.
+
+
 Documentation
 -------------
 
