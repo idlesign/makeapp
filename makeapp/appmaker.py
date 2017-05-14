@@ -6,7 +6,6 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
-from subprocess import Popen
 from datetime import date
 from collections import OrderedDict
 
@@ -381,15 +380,6 @@ class AppMaker(object):
             raise AppMakerException('Unable to read settings from file: %s' % config_path)
 
         self.update_settings(dict(cfg.items('settings')))
-
-    def _run_shell_command(self, command):
-        """Runs the given shell command.
-
-        :param command:
-        :return: bool Status
-        """
-        self.logger.debug('Executing shell command: %s', command)
-        return not bool(Popen(command, shell=True).wait())
 
     def _vcs_init(self, dest, add_files=False, remote_address=None):
         """Initializes an appropriate VCS repository in the given path.
