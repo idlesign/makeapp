@@ -370,12 +370,13 @@ class Project(object):
             vcs.commit('Release %s' % next_version_str)
             vcs.add_tag(next_version_str, version_summary, overwrite=True)
 
-    def add_change(self, description):
+    def add_change(self, description, stage_modified=True):
         """Add a change description into changelog.
 
         :param str|unicode description:
+        :param bool stage_modified: Whether to stage modified files to commit.
         """
-        LOG.debug('Adding change ...')  # todo commit all staged?
+        LOG.debug('Adding change ...')
 
         with chdir(self.project_path):
             changelog = self.changelog
@@ -383,8 +384,15 @@ class Project(object):
 
             changelog.write()
 
-            self.vcs.add(changelog.filepath)
-            self.vcs.commit('%s updated' % changelog.FILENAME_CHANGELOG)
+            commit_message = '%s updated' % changelog.FILENAME_CHANGELOG
+
+            files_to_stage = [changelog.filepath]
+            if stage_modified:
+                files_to_stage.extend(self.vcs.get_modified())
+                commit_message = description
+
+            self.vcs.add(files_to_stage)
+            self.vcs.commit(commit_message)
 
     def publish(self):
         """Uploads project data to remote VCS and Python Package Index server."""

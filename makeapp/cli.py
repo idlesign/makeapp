@@ -76,8 +76,6 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     app_maker.rollout(
         target_path, overwrite=overwrite_on_conflict, init_repository=init_repo, remote_address=repo_address)
 
-    click.secho('Done', fg='green')
-
 
 def attach_template_vars_to_new():
     """Attaches command line options handlers to `new` command."""
@@ -113,7 +111,12 @@ def release(increment):
         if click.confirm('Publish to remotes?', default=True):
             project.publish()
 
-    click.secho('Done', fg='green')
+
+@entry_point.command()
+@click.argument('description')
+def change(description):
+    """Fixates a change adding a message to a changelog."""
+    Project().add_change(description)
 
 
 def main():

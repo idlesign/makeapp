@@ -54,6 +54,20 @@ class VcsHelper(object):
         """Initializes a repository."""
         return self.run_command('init -q')
 
+    def get_modified(self):
+        """Returns modified filepaths.
+        
+        :rtype: list 
+        """
+        lines = self.run_command('status -s')
+        modified = []
+        for line in lines:
+            marker, filepath = line.split(' ', 1)
+            if 'M' in marker:
+                modified.append(filepath)
+
+        return modified
+
     def check(self):
         """Performs basic vcs check."""
         data = self.run_command('branch')
@@ -73,9 +87,14 @@ class VcsHelper(object):
     def add(self, filename=None):
         """Adds a file into a changelist.
 
-        :param str|unicode filename: If not provided all files in working tree are added.
+        :param str|unicode|list filename: If not provided all files in working tree are added.
         """
-        filename = filename or ''
+        filename = filename or []
+        if isinstance(filename, list):
+            filename = ' '.join(filename)
+
+        filename = filename.strip() or ''
+
         self.run_command('add %s' % filename)
 
     def commit(self, message):
