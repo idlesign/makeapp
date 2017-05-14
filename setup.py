@@ -22,7 +22,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
 
-    install_requires=['requests', 'click'],
+    install_requires=['requests', 'click', 'jinja2'],
     entry_points={
         'console_scripts': ['makeapp = makeapp.cli:main'],
     },

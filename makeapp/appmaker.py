@@ -10,6 +10,7 @@ except ImportError:
     import ConfigParser as configparser
 
 import requests
+from jinja2 import Environment, FileSystemLoader
 
 from .helpers.vcs import VcsHelper
 from .exceptions import AppMakerException
@@ -72,6 +73,22 @@ class AppMaker(object):
         ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
         ('python_version_major', str(PYTHON_VERSION[0])),
     ))
+
+    def render(self, filename):
+        """Renders file contents with settings as context.
+        
+        :param str|unicode filename: 
+        :rtype: str|unicode 
+        """
+        env = Environment(
+            loader=FileSystemLoader(self.templates_paths.values() + ['.']),  # Use current working dir.
+            keep_trailing_newline=True,
+        )
+
+        with chdir(os.path.dirname(filename)):
+            template = env.get_template(os.path.basename(filename))
+
+        return template.render(**self.settings)
 
     def __init__(self, app_name, templates_to_use=None, templates_path=None, log_level=None):
         """Initializes app maker object.
@@ -192,8 +209,10 @@ class AppMaker(object):
             for name, val in settings.items():
                 if val is not None:
                     target = target.replace('{{ %s }}' % name, val)
+
         if strip_unknown:
             target = re.sub(RE_UNKNOWN_MARKER, '', target)
+
         return target
 
     def check_app_name_is_available(self):
@@ -202,17 +221,19 @@ class AppMaker(object):
         :return: boolean
 
         """
-        self.logger.info('Checking `%s` name is available ...', self.settings['app_name'])
+        app_name = self.settings['app_name']
+
+        self.logger.info('Checking `%s` name is available ...', app_name)
 
         sites_registry = OrderedDict((
-            ('PyPI', 'https://pypi.python.org/pypi/{{ app_name }}'),
+            ('PyPI', 'https://pypi.python.org/pypi/' + app_name),
         ))
 
         name_available = True
 
         for label, url in sites_registry.items():
-            url = self._replace_settings_markers(url)
             response = requests.get(url)
+
             if response.status_code == 200:
                 self.logger.warning('Application name seems to be in use: %s - %s', label, url)
                 name_available = False
@@ -221,9 +242,7 @@ class AppMaker(object):
         if name_available:
             self.logger.info(
                 'Application name `%s` seems to be available (no mention found at: %s)',
-                self.settings['app_name'],
-                ', '.join(sites_registry.keys())
-            )
+                self.settings['app_name'], ', '.join(sites_registry.keys()))
 
         return name_available
 
@@ -234,10 +253,8 @@ class AppMaker(object):
         :param format:
 
         """
-        if not verbosity_lvl:
-            verbosity_lvl = logging.INFO
         logging.basicConfig(format=format)
-        self.logger.setLevel(verbosity_lvl)
+        self.logger.setLevel(verbosity_lvl or logging.INFO)
 
     def _get_template_files(self):
         """Returns a dictionary containing all source files paths [gathered from different
@@ -247,6 +264,7 @@ class AppMaker(object):
 
         """
         template_files = {}
+
         for _, templates_path in self.templates_paths.items():
             for path, _, files in os.walk(templates_path):
                 for fname in files:
@@ -255,14 +273,17 @@ class AppMaker(object):
                         continue
 
                     full_path = os.path.join(path, fname)
+
                     rel_path = full_path.replace(
                         self.module_dir_marker, self.settings['module_name']
                     ).replace(
                         templates_path, ''
                     ).lstrip('/')
+
                     template_files[rel_path] = full_path
 
         self.logger.debug('Template files: %s', template_files.keys())
+
         return template_files
 
     def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None):
@@ -286,17 +307,20 @@ class AppMaker(object):
         license_txt, license_src = self._get_license_data()
         license_src = self._comment_out(license_src)
         license_dest = os.path.join(dest, 'LICENSE')
+
         if not os.path.exists(license_dest) or overwrite:
             self._create_file(license_dest, license_txt)
 
         files = self._get_template_files()
         for target, src in files.items():
             target = os.path.join(dest, target)
+
             if not os.path.exists(target) or overwrite:
                 prepend = None
                 if os.path.splitext(target)[1] == '.py':
                     # Prepend license text to source files if required.
                     prepend = license_src
+
                 self._copy_file(src, target, prepend)
 
         if init_repository:
@@ -322,9 +346,11 @@ class AppMaker(object):
         :param contents:
 
         """
-        contents = self._replace_settings_markers(contents, strip_unknown=True)
+
         with open(path, 'w') as f:
             f.write(contents)
+            if contents.endswith('\n'):
+                f.write('\n')
 
     def _copy_file(self, src, dest, prepend_data=None):
         """Copies a file from `src` to `dest` replacing settings markers
@@ -338,11 +364,11 @@ class AppMaker(object):
         self.logger.info('Creating %s ...', dest)
 
         dirname = os.path.dirname(dest)
+
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        with open(src) as f:
-            data = f.read()
+        data = self.render(src)
 
         if prepend_data is not None:
             data = prepend_data + data

@@ -26,7 +26,8 @@ Requirements
 
 1. Python 2.7+, 3.2+
 2. Requests (Python module)
-
+3. Click (Python module)
+4. Jinja2 (Python module)
 
 
 Table of Contents

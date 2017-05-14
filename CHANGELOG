@@ -4,7 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
-* IMPORTANT: `click` package in now required.
+* IMPORTANT: `click` and `jinja2` packages are now required.
 * IMPORTANT: `makeapp` CLI now uses `new` command for skeleton rollouts.
 * IMPORTANT: CLI now is interactive only.
 + CLI is now cross-platform.
