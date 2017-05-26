@@ -65,7 +65,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
         if not app_maker.check_app_name_is_available():
             sys.exit(1)
 
-    click.confirm('Ready to rollout application skeleton. Proceed?', abort=True)
+    click.confirm('Ready to rollout application skeleton. Proceed?', abort=True, default=True)
 
     init_repo = click.confirm('Do you want to initialize a VCS repository in the application directory?', default=True)
 
