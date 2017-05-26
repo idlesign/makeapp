@@ -389,7 +389,7 @@ class Project(object):
             files_to_stage = [changelog.filepath]
             if stage_modified:
                 files_to_stage.extend(self.vcs.get_modified())
-                commit_message = description
+                commit_message = description.strip(' +-')
 
             self.vcs.add(files_to_stage)
             self.vcs.commit(commit_message)
