@@ -81,8 +81,10 @@ class AppMaker(object):
         :rtype: str|unicode 
         """
         env = Environment(
-            loader=FileSystemLoader(self.templates_paths.values() + ['.']),  # Use current working dir.
+            loader=FileSystemLoader([
+                self.path_templates_default, self.path_templates_current] + ['.']),  # Use current working dir.
             keep_trailing_newline=True,
+            trim_blocks=True,
         )
 
         with chdir(os.path.dirname(filename)):
