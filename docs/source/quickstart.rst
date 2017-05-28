@@ -74,3 +74,13 @@ When you're ready to add another entry to your changelog use `change` command:
     $ makeapp change "+ New 'change' command implemented"
 
 This will also stage and commit all changed files.
+
+
+Bash completion
+---------------
+
+To enable bash completion for ``makeapp`` command append the following line into your ``.bashrc``:
+
+.. code-block:: bash
+
+    eval "$(_MAKEAPP_COMPLETE=source makeapp)"
