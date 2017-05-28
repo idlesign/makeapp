@@ -35,7 +35,6 @@ class AppMaker(object):
     template_default_name = '__default__'
     module_dir_marker = '__module_name__'
 
-    license_templates_path = os.path.join(BASE_PATH, 'license_templates')
     LICENSE_NO = 'no'
     LICENSE_MIT = 'mit'
     LICENSE_APACHE = 'apache2'
@@ -80,7 +79,11 @@ class AppMaker(object):
         """
         env = Environment(
             loader=FileSystemLoader([
-                self.path_templates_default, self.path_templates_current] + ['.']),  # Use current working dir.
+                self.path_templates_default,
+                self.path_templates_current,
+                # self.path_templates_license,
+                '.',  # Use current working dir.
+                ]),
             keep_trailing_newline=True,
             trim_blocks=True,
         )
@@ -103,13 +106,15 @@ class AppMaker(object):
         self.configure_logging(log_level)
 
         self.path_user_confs = os.path.join(os.path.expanduser('~'), '.makeapp')
-        self.user_settings_config = os.path.join(self.path_user_confs, 'makeapp.conf')
         self.path_templates_default = os.path.join(BASE_PATH, 'app_templates')
+        self.path_templates_license = os.path.join(BASE_PATH, 'license_templates')
 
+        self.user_settings_config = os.path.join(self.path_user_confs, 'makeapp.conf')
         self.path_templates_current = self._get_templates_path_current(templates_path)
+
         self.logger.debug('Templates path: %s', self.path_templates_current)
 
-        self.templates_paths = self._get_templates_paths(templates_to_use)
+        self.paths_templates = self._get_templates_paths(templates_to_use)
 
         self.settings = self._init_settings(app_name)
 
@@ -266,7 +271,7 @@ class AppMaker(object):
         """
         template_files = {}
 
-        for _, templates_path in self.templates_paths.items():
+        for _, templates_path in self.paths_templates.items():
             for path, _, files in os.walk(templates_path):
                 for fname in files:
 
@@ -393,21 +398,15 @@ class AppMaker(object):
 
         :return: Tuple (license_text, license_src_text)
         """
-        license_path = os.path.join(self.license_templates_path, self.settings['license'])
+        def render(filename):
+            path = os.path.join(self.path_templates_license, filename)
+            if os.path.exists(path):
+                return self.render(path)
+            return None
 
-        if not os.path.exists(license_path):
-            raise AppMakerException('Unable to find license file: %s' % license_path)
+        license = self.settings['license']
 
-        with open(license_path) as f:
-            license_text = f.read()
-
-        license_src_text = None
-        license_src_path = os.path.join(self.license_templates_path, '%s_src' % self.settings['license'])
-        if os.path.exists(license_src_path):
-            with open(license_src_path) as f:
-                license_src_text = f.read()
-
-        return license_text, license_src_text
+        return render(license), render('%s_src' % license)
 
     @classmethod
     def get_template_vars(cls):
