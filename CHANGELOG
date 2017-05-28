@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v0.9.0
+------
 * Fixed template vars replacement for licenses.
 + Added get_app_title_rst() context function.
 + Templates now use Jinja inheritance.
