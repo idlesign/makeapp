@@ -60,22 +60,20 @@ class AppMaker(object):
 
     BASE_SETTINGS = OrderedDict((
         ('app_name', None),
+        ('module_name', None),
         ('description', 'Sample short description'),
-        ('author', '{{ app_name }} project contributors'),
+        ('author', '{{ app_name }} contributors'),
         ('author_email', ''),
         ('url', 'https://pypi.python.org/pypi/{{ app_name }}'),
         ('year', str(date.today().year)),
-        ('module_name', None),
         ('license', default_license),
-        ('license_title', LICENSES[default_license][1]),
-        ('license_title_pypi', LICENSES[default_license][1]),
+        ('license_title', LICENSES[default_license][0]),
         ('vcs', default_vcs),
         ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
-        ('python_version_major', str(PYTHON_VERSION[0])),
     ))
 
     def render(self, filename):
-        """Renders file contents with settings as context.
+        """Renders file contents with settings as get_context.
         
         :param str|unicode filename: 
         :rtype: str|unicode 
@@ -90,7 +88,7 @@ class AppMaker(object):
         with chdir(os.path.dirname(filename)):
             template = env.get_template(os.path.basename(filename))
 
-        return template.render(**self.settings)
+        return template.render(**self.context_mutator.get_context())
 
     def __init__(self, app_name, templates_to_use=None, templates_path=None, log_level=None):
         """Initializes app maker object.
@@ -115,6 +113,8 @@ class AppMaker(object):
 
         self.settings = self._init_settings(app_name)
 
+        self.context_mutator = ContextMutator(self)
+
     def _init_settings(self, app_name):
         """Initializes and returns base settings.
         
@@ -130,7 +130,6 @@ class AppMaker(object):
         self.update_settings({
             'app_name': app_name,
             'module_name': module_name,
-            'module_name_capital': module_name.capitalize(),
         }, settings)
 
         return settings
@@ -512,6 +511,37 @@ class AppMaker(object):
             settings_base[name] = self._replace_settings_markers(val, settings=settings_base)
 
         self._validate_setting('license', self.LICENSES.keys(), settings_base)
-        settings_base['license_title'], settings_base['license_title_pypi'] = self.LICENSES[settings_base['license']]
-        settings_base['python_version_major'] = settings_base['python_version'].split('.')[0]
         self._validate_setting('vcs', self.VCS.keys(), settings_base)
+
+
+class ContextMutator(object):
+    """Mutator applying additional transformations to template get_context."""
+
+    def __init__(self, maker):
+        """
+        :param AppMaker maker:
+        """
+        self._maker = maker
+        self._context = maker.settings
+
+    @property
+    def app_title_rst(self):
+        """Returns application title for RST."""
+        title = self._context['app_name']
+        title = '%s\n%s' % (title, '=' * len(title))
+        return title
+
+    def get_context(self):
+        maker = self._maker
+        context = dict(self._context)
+
+        license_tuple = maker.LICENSES.get(context['license'], maker.LICENSES[maker.default_license])
+
+        context.update({
+            'app_title_rst': self.app_title_rst,
+            'license_title': license_tuple[0],
+            'license_title_pypi': license_tuple[1],
+            'python_version_major': context['python_version'].split('.')[0],
+            'module_name_capital': context['module_name'].capitalize(),
+        })
+        return context
