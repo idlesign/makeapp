@@ -1,5 +1,4 @@
-{{ app_name }} installation
-================================================
+{{ get_app_title_rst('installation') }}
 
 
 Python ``pip`` package is required to install ``{{ app_name }}``.

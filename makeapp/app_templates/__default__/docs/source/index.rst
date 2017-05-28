@@ -1,5 +1,4 @@
-{{ app_name }} documentation
-================================================
+{{ get_app_title_rst('documentation') }}
 {{ url }}
 
 

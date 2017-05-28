@@ -1,5 +1,4 @@
-{{ app_name }}
-================================================
+{{ get_app_title_rst() }}
 {{ url }}
 
 .. image:: https://img.shields.io/pypi/v/{{ app_name }}.svg

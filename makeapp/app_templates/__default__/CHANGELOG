@@ -1,5 +1,4 @@
-{{ app_name }} changelog
-================================================
+{{ get_app_title_rst('changelog') }}
 
 v0.1.0
 ------

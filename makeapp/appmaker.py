@@ -524,10 +524,11 @@ class ContextMutator(object):
         self._maker = maker
         self._context = maker.settings
 
-    @property
-    def app_title_rst(self):
+    def get_app_title_rst(self, continuation=''):
         """Returns application title for RST."""
-        title = self._context['app_name']
+        if continuation:
+            continuation = ' ' + continuation
+        title = self._context['app_name'] + continuation
         title = '%s\n%s' % (title, '=' * len(title))
         return title
 
@@ -538,7 +539,7 @@ class ContextMutator(object):
         license_tuple = maker.LICENSES.get(context['license'], maker.LICENSES[maker.default_license])
 
         context.update({
-            'app_title_rst': self.app_title_rst,
+            'get_app_title_rst': self.get_app_title_rst,
             'license_title': license_tuple[0],
             'license_title_pypi': license_tuple[1],
             'python_version_major': context['python_version'].split('.')[0],

@@ -1,5 +1,4 @@
-{{ app_name }} authors
-================================================
+{{ get_app_title_rst('authors') }}
 
 Created by {{ author }}.
 
@@ -15,4 +14,3 @@ Translators
 -----------
 
 Here could be your name.
-
