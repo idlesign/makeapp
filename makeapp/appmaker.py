@@ -55,7 +55,7 @@ class AppMaker(object):
 
     VCS = VcsHelper.get_backends()
 
-    default_vcs = VCS.keys()[0]
+    default_vcs = list(VCS.keys())[0]
 
     BASE_SETTINGS = OrderedDict((
         ('app_name', None),

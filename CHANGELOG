@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Fixed 'TypeError' on Python 3
+
+
 v0.9.0
 ------
 * Fixed template vars replacement for licenses.
