@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+* Python 3.6 added to tox configs.
 * README badges inlined.
 
 
