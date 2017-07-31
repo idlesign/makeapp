@@ -10,7 +10,7 @@ except ImportError:
     import ConfigParser as configparser
 
 import requests
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, _compat
 
 from .helpers.vcs import VcsHelper
 from .exceptions import AppMakerException
@@ -354,6 +354,8 @@ class AppMaker(object):
         :param contents:
 
         """
+        if _compat.PY2:
+            contents = contents.encode('utf8')
 
         with open(path, 'w') as f:
             f.write(contents)
