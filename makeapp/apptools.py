@@ -125,7 +125,8 @@ class PackageData(DataContainer):
 
         if increment not in VERSION_NUMBER_CHUNKS:
             raise ProjectorExeption(
-                'Unsupported version chunk to increment: `%s`. Should be one of: %s' % (increment, VERSION_NUMBER_CHUNKS))
+                'Unsupported version chunk to increment: `%s`. Should be one of: %s' %
+                (increment, VERSION_NUMBER_CHUNKS))
 
         version_old = self.version_current
         version_next = []
@@ -190,9 +191,11 @@ class ChangelogData(DataContainer):
         unreleased_str = cls.UNRELEASED_STR
         unreleased_entry_exists = False
         version_line_idx = None
+
         for supposed_line_idx in (3, 4, 5):
             line = changelog[supposed_line_idx]
             unreleased_entry_exists = line == unreleased_str
+
             if unreleased_entry_exists or line.startswith('v'):
                 version_line_idx = supposed_line_idx
                 LOG.info('Current version from changelog: `%s`', line)
@@ -202,6 +205,7 @@ class ChangelogData(DataContainer):
             raise ProjectorExeption('Version line not found in changelog')
 
         if not unreleased_entry_exists:
+            # Add `Unreleased` entry.
             changelog[version_line_idx:version_line_idx] = [
                 unreleased_str,
                 '-' * len(unreleased_str),
