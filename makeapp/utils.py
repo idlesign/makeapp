@@ -1,7 +1,7 @@
 import os
 import logging
 from contextlib import contextmanager
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 from .exceptions import CommandError
 
@@ -34,7 +34,7 @@ def run_command(command):
     :raises: CommandError
     :rtype: list
     """
-    prc = Popen(command, stdout=PIPE, shell=True, universal_newlines=True)
+    prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True)
 
     LOG.debug('Run command: `%s` ...', command)
     data = []
@@ -54,6 +54,6 @@ def run_command(command):
         data.append(item)
 
     if has_error:
-        raise CommandError('Command `%s` failed: %s' % (command, data))
+        raise CommandError('Command `%s` failed: %s' % (command, '\n'.join(data).encode('utf8')))
 
     return data

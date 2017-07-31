@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ CommandError now handles non-ASCII.
 + CLI: 'new' command now asks whether to push files to remote.
 + Added suppport for non-ASCII symbols in template files.
 * Fixed bogus rollout of all templates when none of them is specified.
