@@ -500,12 +500,12 @@ class AppMaker(object):
             helper.init()
             add_files and helper.add()
 
-        # Linking to a remote.
-        if remote_address:
-            helper.commit('The beginning')  # todo commit all?
-            helper.add_remote(remote_address)
-            if remote_push:
-                helper.push(upstream=True)
+            # Linking to a remote.
+            if remote_address:
+                helper.commit('The beginning')  # todo commit all?
+                helper.add_remote(remote_address)
+                if remote_push:
+                    helper.push(upstream=True)
 
     def _validate_setting(self, setting, variants, settings):
         """Ensures that the given setting value is one from the given variants."""
