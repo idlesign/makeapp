@@ -4,6 +4,8 @@ makeapp changelog
 
 Unreleased
 ----------
+* CLI: pull on 'release' command now would not fail if no remote.
+* CLI: pull on 'release' command now won't fail if no remote.
 + CommandError now handles non-ASCII.
 + CLI: 'new' command now asks whether to push files to remote.
 + Added suppport for non-ASCII symbols in template files.

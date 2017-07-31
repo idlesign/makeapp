@@ -3,7 +3,7 @@ from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
 from ..utils import run_command
-from ..exceptions import ProjectorExeption
+from ..exceptions import ProjectorExeption, CommandError
 
 
 class VcsHelper(object):
@@ -110,9 +110,20 @@ class VcsHelper(object):
         """
         self.run_command("commit -m '%s'" % message)
 
+    def get_remotes(self):
+        """Returns a list of remotes."""
+        return self.run_command('remote')
+
     def pull(self):
         """Pulls updates from remotes."""
-        self.run_command('pull')
+        try:
+            self.run_command('pull')
+
+        except CommandError:
+            # Fail if no remotes is OK.
+
+            if self.get_remotes():
+                raise
 
     def add_remote(self, address, alias='origin'):
         """Adds a remote repository.
@@ -167,6 +178,10 @@ class MercurialHelper(VcsHelper):
 
     TITLE = 'Mercurial'
     COMMAND = 'hg'
+
+    def get_remotes(self):
+        """Returns a list of remotes."""
+        return []
 
     def push(self, upstream=None):
         """Pushes local changes and tags to remote.
