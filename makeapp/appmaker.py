@@ -294,13 +294,19 @@ class AppMaker(object):
 
         return template_files
 
-    def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None):
+    def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None, remote_push=False):
         """Rolls out the application skeleton into `dest` path.
 
-        :param str|unicode dest: app skeleton destination
-        :param bool overwrite:
-        :param bool init_repository:
-        :param str|unicode remote_address:
+        :param str|unicode dest: App skeleton destination path.
+
+        :param bool overwrite: Whether to overwrite existing files.
+
+        :param bool init_repository: Whether to initialize a repository.
+
+        :param str|unicode remote_address: Remote repository address to add to DVCS.
+
+        :param bool remote_push: Whether to push to remote.
+
         """
         self.logger.info('Application target path: %s', dest)
 
@@ -332,7 +338,11 @@ class AppMaker(object):
                 self._copy_file(src, target, prepend)
 
         if init_repository:
-            self._vcs_init(dest, add_files=bool(files.keys()), remote_address=remote_address)
+            self._vcs_init(
+                dest,
+                add_files=bool(files.keys()),
+                remote_address=remote_address,
+                remote_push=remote_push)
 
     @staticmethod
     def _comment_out(text):
@@ -467,13 +477,18 @@ class AppMaker(object):
 
         self.update_settings(dict(cfg.items('settings')))
 
-    def _vcs_init(self, dest, add_files=False, remote_address=None):
+    def _vcs_init(self, dest, add_files=False, remote_address=None, remote_push=False):
         """Initializes an appropriate VCS repository in the given path.
         Optionally adds the given files.
 
-        :param str|unicode dest:
-        :param bool add_files:
-        :param str|unicode remote_address:
+        :param str|unicode dest: Path to initialize VCS repository.
+
+        :param bool add_files: Whether to add files to commit automatically.
+
+        :param str|unicode remote_address: Remote repository address to add to DVCS.
+
+        :param bool remote_push: Whether to push to remote.
+
         """
         vcs = self.settings['vcs']
 
@@ -489,7 +504,8 @@ class AppMaker(object):
         if remote_address:
             helper.commit('The beginning')  # todo commit all?
             helper.add_remote(remote_address)
-            helper.push(upstream=True)
+            if remote_push:
+                helper.push(upstream=True)
 
     def _validate_setting(self, setting, variants, settings):
         """Ensures that the given setting value is one from the given variants."""

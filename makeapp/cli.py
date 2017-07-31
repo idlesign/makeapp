@@ -69,12 +69,22 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
 
     init_repo = click.confirm('Do you want to initialize a VCS repository in the application directory?', default=True)
 
-    repo_address = ''
+    remote_address = ''
+    remote_push = False
+
     if init_repo:
-        repo_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
+        remote_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
+
+        if remote_address:
+            remote_push = click.confirm('Do you want to push files to remote?', default=True)
 
     app_maker.rollout(
-        target_path, overwrite=overwrite_on_conflict, init_repository=init_repo, remote_address=repo_address)
+        target_path,
+        overwrite=overwrite_on_conflict,
+        init_repository=init_repo,
+        remote_address=remote_address,
+        remote_push=remote_push,
+    )
 
 
 def attach_template_vars_to_new():
