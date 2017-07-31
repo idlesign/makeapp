@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v0.10.0
+-------
 * CLI: Fixed 'new' command crash if remote is given.
 * CLI: 'release' now handles non-ASCII in changelog on Py2.
 * Version number now starts with 0.0.0 Unreleased.
