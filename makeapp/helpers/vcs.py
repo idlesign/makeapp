@@ -2,6 +2,8 @@ import os
 from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
+from jinja2 import _compat
+
 from ..utils import run_command
 from ..exceptions import ProjectorExeption, CommandError
 
@@ -83,6 +85,9 @@ class VcsHelper(object):
         :param bool overwrite: Whether to overwrite tag if exists.
         """
         overwrite = '-f' if overwrite else ''
+
+        if _compat.PY2:
+            description = description.encode('utf8')
 
         with NamedTemporaryFile() as f:
             f.write(description)
