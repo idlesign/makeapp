@@ -1,6 +1,6 @@
 {{ get_app_title_rst('changelog') }}
 
-v0.1.0
-------
-+ Basic functionality.
 
+Unreleased
+----------
++ Basic functionality.
