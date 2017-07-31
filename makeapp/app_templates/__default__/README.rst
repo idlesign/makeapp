@@ -1,13 +1,15 @@
 {{ get_app_title_rst() }}
 {{ url }}
 
-.. image:: https://img.shields.io/pypi/v/{{ app_name }}.svg
+|release| |stats|  |lic|
+
+.. |release| image:: https://img.shields.io/pypi/v/{{ app_name }}.svg
     :target: https://pypi.python.org/pypi/{{ app_name }}
 
-.. image:: https://img.shields.io/pypi/dm/{{ app_name }}.svg
+.. |stats| image:: https://img.shields.io/pypi/dm/{{ app_name }}.svg
     :target: https://pypi.python.org/pypi/{{ app_name }}
 
-.. image:: https://img.shields.io/pypi/l/{{ app_name }}.svg
+.. |lic| image:: https://img.shields.io/pypi/l/{{ app_name }}.svg
     :target: https://pypi.python.org/pypi/{{ app_name }}
 
 

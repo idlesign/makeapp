@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* README badges inlined.
+
+
 v0.9.1
 ------
 * Fixed 'TypeError' on Python 3
