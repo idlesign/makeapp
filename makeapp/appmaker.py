@@ -163,8 +163,10 @@ class AppMaker(object):
         """
         paths = OrderedDict()
 
-        if names_or_paths is None:
+        if not names_or_paths:
             names_or_paths = []
+
+        names_or_paths = [name for name in names_or_paths if name]
 
         # Prepend default (base) template.
         if not names_or_paths or self.template_default_name not in names_or_paths:

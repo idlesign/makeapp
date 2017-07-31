@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+* Fixed bogus rollout of all templates when none of them is specified.
 * Python 3.6 added to tox configs.
 * README badges inlined.
 
