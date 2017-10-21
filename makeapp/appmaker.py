@@ -502,9 +502,9 @@ class AppMaker(object):
 
             # Linking to a remote.
             if remote_address:
-                helper.commit('The beginning')  # todo commit all?
                 helper.add_remote(remote_address)
                 if remote_push:
+                    helper.commit('The beginning')
                     helper.push(upstream=True)
 
     def _validate_setting(self, setting, variants, settings):

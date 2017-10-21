@@ -76,7 +76,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
         remote_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
 
         if remote_address:
-            remote_push = click.confirm('Do you want to push files to remote?', default=True)
+            remote_push = click.confirm('Do you want to commit and push files to remote?', default=False)
 
     app_maker.rollout(
         target_path,

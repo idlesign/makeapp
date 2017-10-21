@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+* 'new' command now won't commit files if not asked for this
 * Fixed crash on commit message quotes
 
 
