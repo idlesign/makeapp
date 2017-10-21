@@ -6,9 +6,6 @@ https://github.com/idlesign/makeapp
 .. image:: https://img.shields.io/pypi/v/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
 
-.. image:: https://img.shields.io/pypi/dm/makeapp.svg
-    :target: https://pypi.python.org/pypi/makeapp
-
 .. image:: https://img.shields.io/pypi/l/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
 
