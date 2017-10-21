@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v0.11.1
+-------
 * 'new' command now won't commit files if not asked for this
 * Fixed crash on commit message quotes
 
