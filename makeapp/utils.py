@@ -39,13 +39,12 @@ def run_command(command):
     LOG.debug('Run command: `%s` ...', command)
     data = []
 
-    result = ''.join(item.decode('utf-8') for item in prc.communicate() if item)
+    out, _ = prc.communicate()
+    out = out.decode('utf-8')
+
     has_error = prc.returncode
 
-    for item in result.splitlines():
-        if not item:
-            continue
-
+    for item in out.splitlines():
         item = item.strip()
 
         if not item:
