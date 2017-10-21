@@ -113,7 +113,7 @@ class VcsHelper(object):
 
         :param str|unicode message: Commit description.
         """
-        self.run_command("commit -m '%s'" % message)
+        self.run_command("commit -m '%s'" % message.replace("'", "''"))
 
     def get_remotes(self):
         """Returns a list of remotes."""

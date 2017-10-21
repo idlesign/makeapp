@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Fixed crash on commit message quotes
+
+
 v0.11.0
 -------
 + Added 'click' console application template.
