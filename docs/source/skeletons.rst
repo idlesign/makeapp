@@ -29,6 +29,12 @@ Bundled application templates
   application which will use ``pytest`` instead of ``unittest`` for tests.
 
 
+* **Click console application**
+
+  Template alias: ``click``. Use `-t click` command switch to rollout a console
+  application which will use ``click`` instead of ``argparse``.
+
+
 .. note::
 
     You can mix application layout flavors with templates combinations.

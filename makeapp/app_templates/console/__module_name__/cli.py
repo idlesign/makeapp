@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 {% block imports %}
 import sys
 import argparse
+from {{ module_name }} import VERSION
 {% endblock %}
 
 
@@ -25,3 +28,6 @@ def main():
 
     sys.exit(1)
 {% endblock %}
+
+if __name__ == '__main__':
+    main()

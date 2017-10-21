@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
++ Added 'click' console application template.
+
+
 v0.10.0
 -------
 * CLI: Fixed 'new' command crash if remote is given.
