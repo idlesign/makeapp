@@ -11,6 +11,8 @@ Main heading
 Secondary heading
 -----------------
 
+Minor heading
+~~~~~~~~~~~~~
 
 
 Typography
