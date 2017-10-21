@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v0.11.0
+-------
 + Added 'click' console application template.
 
 
