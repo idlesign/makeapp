@@ -10,6 +10,9 @@
     :target: https://pypi.python.org/pypi/{{ app_name }}
 
 
+**Work in progress. Stay tuned.**
+
+
 Description
 -----------
 
