@@ -1,7 +1,7 @@
 {{ get_app_title_rst() }}
 {{ url }}
 
-|release| |stats|  |lic|
+|release|  |lic|
 
 .. |release| image:: https://img.shields.io/pypi/v/{{ app_name }}.svg
     :target: https://pypi.python.org/pypi/{{ app_name }}
