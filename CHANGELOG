@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ setup.py now reads application version number w/o module import.
 * 'Work in progress' note added into readme
 * PyPI downloads badges removed
 

@@ -1,28 +1,37 @@
-import os
 import io
+import os
+import re
+
 from setuptools import setup, find_packages
+
 {% block imports %}{% endblock %}
-
-from {{ module_name }} import VERSION
-
 
 PATH_BASE = os.path.dirname(__file__)
 {% block constants %}{% endblock %}
 
 
-def get_readme():
-    # This will return README (including those with Unicode symbols).
-    with io.open(os.path.join(PATH_BASE, 'README.rst')) as f:
+def read_file(fpath):
+    """Reads a file within package directories."""
+    with io.open(os.path.join(PATH_BASE, fpath)) as f:
         return f.read()
+
+
+def get_version():
+    """Returns version number, without module import (which can lead to ImportError
+    if some dependencies are unavailable before install."""
+    contents = read_file(os.path.join('{{ module_name }}', 'init.py'))
+    version = re.search('VERSION = \(([^)]+)\)', contents)
+    version = version.group(1).replace(', ', '.').strip()
+    return version
 
 
 setup(
     name='{{ app_name }}',
-    version='.'.join(map(str, VERSION)),
+    version=get_version(),
     url='{{ url }}',
 
     description='{{ description }}',
-    long_description=get_readme(),
+    long_description=read_file('README.rst'),
     license='{{ license_title }}',
 
     author='{{ author }}',
