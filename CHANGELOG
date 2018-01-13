@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ Added CONTRIBUTING file.
 + Introduced VERSION_STR constant.
 + Final dot is automatically added to change description.
 + setup.py now reads application version number w/o module import.
