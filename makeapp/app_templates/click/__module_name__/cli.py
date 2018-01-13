@@ -4,13 +4,13 @@
 {% block imports %}
 import sys
 import click
-from {{ module_name }} import VERSION
+from {{ module_name }} import VERSION_STR
 {% endblock %}
 
 
 {% block body %}
 @click.group()
-@click.version_option(version='.'.join(map(str, VERSION)))
+@click.version_option(version=VERSION_STR)
 def entry_point():
     """{{ module_name }} command line utilities."""
 
