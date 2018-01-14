@@ -19,7 +19,7 @@ def read_file(fpath):
 def get_version():
     """Returns version number, without module import (which can lead to ImportError
     if some dependencies are unavailable before install."""
-    contents = read_file(os.path.join('{{ module_name }}', 'init.py'))
+    contents = read_file(os.path.join('{{ module_name }}', '__init__.py'))
     version = re.search('VERSION = \(([^)]+)\)', contents)
     version = version.group(1).replace(', ', '.').strip()
     return version
