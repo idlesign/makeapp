@@ -167,6 +167,16 @@ class PackageData(DataContainer):
 class ChangelogData(DataContainer):
     """Information gathered from changelog file."""
 
+    PREFIXES = '!+-*'
+    """Line prefixes denoting change nature.
+    
+    ! Important change/improvement/fix
+    + New feature / addition
+    - Feature deprecation / removal
+    * Minor change/improvement/fix
+    
+    """
+
     FILENAME_CHANGELOG = 'CHANGELOG'
     UNRELEASED_STR = 'Unreleased'
 
@@ -273,7 +283,7 @@ class ChangelogData(DataContainer):
         if not description:
             return
 
-        if description[0] not in ('*', '-', '+'):
+        if description[0] not in self.PREFIXES:
             description = '* %s' % description
 
         self.file_helper.insert(description, offset=2)
@@ -296,6 +306,23 @@ class ChangelogData(DataContainer):
         :rtype: str|unicode 
         """
         return '\n'.join(self.get_changes()).strip()
+
+    def sort_version_changes(self):
+        """Sorts changes of latest version inplace."""
+
+        priorities = {prefix: priority for priority, prefix in enumerate(self.PREFIXES)}
+
+        def sorter(line):
+            line = line.lower().replace('\'"`', '')
+            priority = priorities.get(line[0], 3)
+            return '%s %s' % (priority, line)
+
+        for line_offset, change in enumerate(sorted(self.get_changes(), key=sorter), 2):
+            self.file_helper.line_replace(change, offset=line_offset)
+
+    def write(self):
+        self.sort_version_changes()
+        super(ChangelogData, self).write()
 
 
 class Project(object):
@@ -395,7 +422,7 @@ class Project(object):
             files_to_stage = [changelog.filepath]
             if stage_modified:
                 files_to_stage.extend(self.vcs.get_modified())
-                commit_message = description.strip('+-')
+                commit_message = description.strip(changelog.PREFIXES)
 
             self.vcs.add(files_to_stage)
             self.vcs.commit(commit_message)
