@@ -13,26 +13,31 @@ Bundled application templates
 
 * **Console application**
 
-  Template alias: ``console``. Use `-t console` command switch to rollout a console
-  application skeleton.
+  Template alias: ``console``.
+
+  Use `-t console` command switch to rollout a console application skeleton.
 
 
 * **Django application**
 
-  Template alias: ``django``. Use `-t console` command switch to rollout a Django
-  reusable application skeleton.
+  Template alias: ``django``.
+
+  Use `-t django` command switch to rollout a Django reusable application skeleton.
 
 
 * **pytest support template**
 
-  Template alias: ``pytest``. Use `-t pytest` command switch to rollout Python
-  application which will use ``pytest`` instead of ``unittest`` for tests.
+  Template alias: ``pytest``.
+
+  Use `-t pytest` command switch to rollout Python application which will
+  use ``pytest`` instead of ``unittest`` for tests.
 
 
 * **Click console application**
 
-  Template alias: ``click``. Use `-t click` command switch to rollout a console
-  application which will use ``click`` instead of ``argparse``.
+  Template alias: ``click``.
+
+  Use `-t click` command switch to rollout a console application which will use ``click`` instead of ``argparse``.
 
 
 .. note::
