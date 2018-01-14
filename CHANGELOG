@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v0.12.0
+-------
 + Added CONTRIBUTING file.
 + Changelog entries are sorter by priorities.
 + Final dot is automatically added to change description.
