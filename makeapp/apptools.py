@@ -409,7 +409,10 @@ class Project(object):
         """
         LOG.debug('Adding change ...')
 
-        description = description.strip(' .') + '.'
+        description = description.strip(' ')
+
+        if not description.endswith('.!'):
+            description += '.'
 
         with chdir(self.project_path):
             changelog = self.changelog

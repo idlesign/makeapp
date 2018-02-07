@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Improved addition of a final dot into change description..
+
+
 v0.12.0
 -------
 + Added CONTRIBUTING file.
