@@ -343,15 +343,30 @@ class Project(object):
 
     def _gather_data(self):
         """Gathers data relevant for project related functions."""
-        project_dirname = self.project_path
-        LOG.debug('Gathering info from `%s` directory ...', project_dirname)
+        project_path = self.project_path
+        LOG.debug('Gathering info from `%s` directory ...', project_path)
 
         if not os.path.isfile('setup.py'):
             raise ProjectorExeption('No `setup.py` file found')
 
         self.vcs.check()
 
-        packages = find_packages()
+        packages = set(find_packages())
+
+        if len(packages) > 1:
+            # Try to narrow down packages list.
+            # todo Seems to be error prone on edge cases (with many packages).
+
+            parent_dirname = os.path.basename(project_path)
+
+            if parent_dirname in packages:
+                packages = [parent_dirname]
+
+            else:
+                packages.discard('tests')
+
+        LOG.debug('Found packages: %s', packages)
+
         main_package = packages[0]
 
         self.package = PackageData.get(main_package)

@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+* Fixed work of 'change' and 'release' commands for some builtin templates.
 * Improved addition of a final dot into change description..
 
 
