@@ -1,0 +1,3 @@
+[run]
+include = makeapp/*
+omit = makeapp/app_templates/*, makeapp/license_templates/*, makeapp/cli.py

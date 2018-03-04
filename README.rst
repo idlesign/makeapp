@@ -3,11 +3,22 @@ makeapp
 https://github.com/idlesign/makeapp
 
 
-.. image:: https://img.shields.io/pypi/v/makeapp.svg
+|release| |lic| |ci| |coverage| |health|
+
+.. |release| image:: https://img.shields.io/pypi/v/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
 
-.. image:: https://img.shields.io/pypi/l/makeapp.svg
+.. |lic| image:: https://img.shields.io/pypi/l/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
+
+.. |ci| image:: https://img.shields.io/travis/idlesign/makeapp/master.svg
+    :target: https://travis-ci.org/idlesign/makeapp
+
+.. |coverage| image:: https://img.shields.io/coveralls/idlesign/makeapp/master.svg
+    :target: https://coveralls.io/r/idlesign/makeapp
+
+.. |health| image:: https://landscape.io/github/idlesign/makeapp/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/idlesign/makeapp/master
 
 
 Description
