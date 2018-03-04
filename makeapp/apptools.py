@@ -426,7 +426,7 @@ class Project(object):
 
         description = description.strip(' ')
 
-        if not description.endswith('.!'):
+        if not description.endswith(('.', '!')):
             description += '.'
 
         with chdir(self.project_path):
