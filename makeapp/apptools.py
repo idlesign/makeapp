@@ -351,7 +351,7 @@ class Project(object):
 
         self.vcs.check()
 
-        packages = set(find_packages())
+        packages = find_packages()
 
         if len(packages) > 1:
             # Try to narrow down packages list.
@@ -363,7 +363,8 @@ class Project(object):
                 packages = [parent_dirname]
 
             else:
-                packages.discard('tests')
+                'tests' in packages and packages.remove('tests')
+
 
         LOG.debug('Found packages: %s', packages)
 
