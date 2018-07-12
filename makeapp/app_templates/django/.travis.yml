@@ -1,28 +1,40 @@
 language: python
 
 python:
+  - 3.7
+  - 3.6
+  - 3.5
   - 3.4
-  - 3.3
   - 2.7
 
 env:
+  - DJANGO="Django>=2.0,<2.1"
+  - DJANGO="Django>=1.10,<1.11"
+  - DJANGO="Django>=1.9,<1.10"
   - DJANGO="Django>=1.8,<1.9"
   - DJANGO="Django>=1.7,<1.8"
-  - DJANGO="Django>=1.6,<1.7"
-  - DJANGO="Django>=1.4,<1.5"
+
   
 install:
   - pip install -U coverage coveralls $DJANGO
 
 script: coverage run -a --source={{ module_name }} {{ module_name }}/runtests.py
 
+
 matrix:
 
   exclude:
-   - python: 3.4
-     env: DJANGO="Django>=1.4,<1.5"
-   - python: 3.3
-     env: DJANGO="Django>=1.4,<1.5"
+   - python: 3.7
+     env: DJANGO="Django>=1.7,<1.8"
+
+   - python: 3.6
+     env: DJANGO="Django>=1.7,<1.8"
+
+   - python: 3.5
+     env: DJANGO="Django>=1.7,<1.8"
+
+   - python: 2.7
+     env: DJANGO="Django>=2.0,<2.1"
      
 
 after_success:
