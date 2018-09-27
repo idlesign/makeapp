@@ -41,8 +41,7 @@ class TemplateFile(object):
 class DynamicParentTemplate(object):
     """Represents jinja dynamic `parent_template` variable."""
 
-    def __init__(self, filename, parents):
-        self.filename = filename
+    def __init__(self, parents):
         self.parents = parents
         self.parents_initial = parents[:]
         self.current = parents[-1]
@@ -167,7 +166,7 @@ class AppMaker(object):
                         template_parents.append(path_rel)
 
                 if template_parents:
-                    context['parent_template'] = DynamicParentTemplate(filename, template_parents)
+                    context['parent_template'] = DynamicParentTemplate(template_parents)
 
         rendered = template.render(**context)
 
