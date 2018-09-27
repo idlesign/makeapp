@@ -1,15 +1,17 @@
+import logging
 import os
 import re
 import sys
-import logging
-from datetime import date
 from collections import OrderedDict
+from datetime import date
+
 try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
 
 import requests
+
 from jinja2 import Environment, FileSystemLoader, _compat
 
 from .helpers.vcs import VcsHelper
@@ -20,6 +22,53 @@ from .utils import chdir
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 PYTHON_VERSION = sys.version_info
 BASE_PATH = os.path.dirname(__file__)
+
+
+class TemplateFile(object):
+    """Represents app template file info."""
+
+    __slots__ = ['template', 'path_full', 'path_rel']
+
+    def __init__(self, template, path_full, path_rel):
+        self.template = template
+        self.path_full = path_full
+        self.path_rel= path_rel
+
+    def __str__(self):
+        return self.path_full
+
+
+class DynamicParentTemplate(object):
+    """Represents jinja dynamic `parent_template` variable."""
+
+    def __init__(self, filename, parents):
+        self.filename = filename
+        self.parents = parents
+        self.parents_initial = parents[:]
+        self.current = parents[-1]
+
+    def pop(self):
+        try:
+            current = self.parents.pop()
+
+        except IndexError:
+            raise IndexError('No more parents to pop. Initial parents: %s' % self.parents_initial)
+
+        self.current = current
+        return current
+
+    def __repr__(self):
+        return 'Namespace'  # hack
+
+
+class DynamicParentLoader(FileSystemLoader):
+
+    def get_source(self, environment, template):
+
+        if isinstance(template, DynamicParentTemplate):
+            template = '%s' % template.pop()
+
+        return super(DynamicParentLoader, self).get_source(environment, template)
 
 
 class AppMaker(object):
@@ -74,13 +123,16 @@ class AppMaker(object):
     def render(self, filename):
         """Renders file contents with settings as get_context.
         
-        :param str|unicode filename: 
-        :rtype: str|unicode 
+        :param str|unicode|TemplateFile filename:
+        :rtype: str|unicode
         """
+        path_builtin = self.path_templates_builtin
+        path_current = self.path_templates_current
+
         env = Environment(
-            loader=FileSystemLoader([
-                self.path_templates_default,
-                self.path_templates_current,
+            loader=DynamicParentLoader([
+                path_builtin,
+                path_current,
                 # self.path_templates_license,
                 '.',  # Use current working dir.
                 ]),
@@ -88,10 +140,38 @@ class AppMaker(object):
             trim_blocks=True,
         )
 
-        with chdir(os.path.dirname(filename)):
-            template = env.get_template(os.path.basename(filename))
+        context = self.context_mutator.get_context()
 
-        return template.render(**self.context_mutator.get_context())
+        filename_ = '%s' % filename
+
+        with chdir(os.path.dirname(filename_)):
+            template = env.get_template(os.path.basename(filename_))
+
+        if isinstance(filename, TemplateFile):
+            # Let's compute template inheritance hierarchy for `parent_template`
+            # dynamic variable.
+            paths = self.paths_templates
+            template_name = filename.template
+            template_idx = list(paths.keys()).index(template_name)
+
+            if template_idx > 0:  # if not __default__ template
+
+                template_parents = []
+
+                for template_parent in list(paths.keys())[:template_idx - 1 or 1]:
+                    path_full = os.path.join(paths[template_parent], filename.path_rel)
+
+                    if os.path.exists(path_full):
+                        # Check parent file exists in template.
+                        path_rel = os.path.join(template_parent, filename.path_rel)
+                        template_parents.append(path_rel)
+
+                if template_parents:
+                    context['parent_template'] = DynamicParentTemplate(filename, template_parents)
+
+        rendered = template.render(**context)
+
+        return rendered
 
     def __init__(self, app_name, templates_to_use=None, templates_path=None, log_level=None):
         """Initializes app maker object.
@@ -106,7 +186,7 @@ class AppMaker(object):
         self.configure_logging(log_level)
 
         self.path_user_confs = os.path.join(os.path.expanduser('~'), '.makeapp')
-        self.path_templates_default = os.path.join(BASE_PATH, 'app_templates')
+        self.path_templates_builtin = os.path.join(BASE_PATH, 'app_templates')
         self.path_templates_license = os.path.join(BASE_PATH, 'license_templates')
 
         self.user_settings_config = os.path.join(self.path_user_confs, 'makeapp.conf')
@@ -148,7 +228,7 @@ class AppMaker(object):
         path_user_templates = os.path.join(self.path_user_confs, 'app_templates')
 
         if path is None:
-            path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_default
+            path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_builtin
 
         if not os.path.exists(path):
             raise AppMakerException('Templates path doesn\'t exist: %s' % path)
@@ -190,7 +270,7 @@ class AppMaker(object):
         supposed_paths = (
             name_or_path,
             os.path.join(self.path_templates_current, name_or_path),
-            os.path.join(self.path_templates_default, name_or_path),
+            os.path.join(self.path_templates_builtin, name_or_path),
         )
 
         for supposed_path in supposed_paths:
@@ -273,7 +353,7 @@ class AppMaker(object):
         """
         template_files = {}
 
-        for _, templates_path in self.paths_templates.items():
+        for template_name, templates_path in self.paths_templates.items():
             for path, _, files in os.walk(templates_path):
                 for fname in files:
 
@@ -282,13 +362,14 @@ class AppMaker(object):
 
                     full_path = os.path.join(path, fname)
 
-                    rel_path = full_path.replace(
-                        self.module_dir_marker, self.settings['module_name']
-                    ).replace(
-                        templates_path, ''
-                    ).lstrip('/')
+                    rel_path = full_path.replace(templates_path, '').lstrip('/')
 
-                    template_files[rel_path] = full_path
+                    template_file = TemplateFile(
+                        template=template_name, path_full=full_path, path_rel=rel_path)
+
+                    rel_path = rel_path.replace(self.module_dir_marker, self.settings['module_name'])
+
+                    template_files[rel_path] = template_file
 
         self.logger.debug('Template files: %s', template_files.keys())
 
@@ -326,7 +407,7 @@ class AppMaker(object):
             self._create_file(license_dest, license_txt)
 
         files = self._get_template_files()
-        for target, src in files.items():
+        for target, template_file in files.items():
             target = os.path.join(dest, target)
 
             if not os.path.exists(target) or overwrite:
@@ -335,7 +416,7 @@ class AppMaker(object):
                     # Prepend license text to source files if required.
                     prepend = license_src
 
-                self._copy_file(src, target, prepend)
+                self._copy_file(template_file, target, prepend)
 
         if init_repository:
             self._vcs_init(
@@ -376,9 +457,10 @@ class AppMaker(object):
         """Copies a file from `src` to `dest` replacing settings markers
         with the given settings values, optionally prepending some data.
 
-        :param src: source file
-        :param dest: destination file
-        :param prepend_data: data to prepend to dest file contents
+        :param str|unicode template_name: source file
+        :param TemplateFile src: source file
+        :param str|unicode dest: destination file
+        :param str|unicode prepend_data: data to prepend to dest file contents
 
         """
         self.logger.info('Creating %s ...', dest)

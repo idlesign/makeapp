@@ -1,4 +1,4 @@
-{% extends "__default__/setup.py" %}
+{% extends parent_template %}
 
 {% block imports %}
 import sys

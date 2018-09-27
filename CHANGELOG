@@ -5,6 +5,7 @@ makeapp changelog
 Unreleased
 ----------
 * Django app template is updated.
+* Improved multiple app templates handling.
 
 
 v0.12.1

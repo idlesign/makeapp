@@ -1,4 +1,4 @@
-{% extends "__default__/MANIFEST.in" %}
+{% extends parent_template %}
 
 {% block recursive_include %}
 {{ super() }}
