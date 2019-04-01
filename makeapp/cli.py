@@ -129,7 +129,7 @@ def release(increment, debug):
 
 
 @entry_point.command()
-@click.argument('description')
+@click.argument('description', nargs=-1)
 def change(description):
     """Fixates a change adding a message to a changelog."""
     Project().add_change(description)

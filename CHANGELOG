@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
++ CLI. 'change' command now accepts multiple changes descriptions.
+
+
 v0.12.2
 -------
 * Django app template is updated.

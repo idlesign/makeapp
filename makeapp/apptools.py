@@ -417,22 +417,31 @@ class Project(object):
             vcs.commit('Release %s' % next_version_str)
             vcs.add_tag(next_version_str, version_summary, overwrite=True)
 
-    def add_change(self, description, stage_modified=True):
+    def add_change(self, descriptions, stage_modified=True):
         """Add a change description into changelog.
 
-        :param str|unicode description:
+        :param list|tuple|str|unicode descriptions: Single change description.
+            Or multiple changes descriptions in list or tuple.
+
         :param bool stage_modified: Whether to stage modified files to commit.
+
         """
         LOG.debug('Adding change ...')
 
-        description = description.strip(' ')
-
-        if not description.endswith(('.', '!')):
-            description += '.'
-
         with chdir(self.project_path):
             changelog = self.changelog
-            changelog.add_change(description)
+
+            if not isinstance(descriptions, (list, tuple)):
+                descriptions = [descriptions]
+
+            for description in descriptions:
+
+                description = description.strip(' ')
+
+                if not description.endswith(('.', '!')):
+                    description += '.'
+
+                changelog.add_change(description)
 
             changelog.write()
 
@@ -441,7 +450,10 @@ class Project(object):
             files_to_stage = [changelog.filepath]
             if stage_modified:
                 files_to_stage.extend(self.vcs.get_modified())
-                commit_message = description.strip(changelog.PREFIXES)
+
+                if len(descriptions) == 1:
+                    # Set a description as a commit message.
+                    commit_message = descriptions[0].strip(changelog.PREFIXES)
 
             self.vcs.add(files_to_stage)
             self.vcs.commit(commit_message)
