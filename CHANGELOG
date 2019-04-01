@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.0.0
+------
 + Celebrating 1.0.
 + CLI. 'change' command now accepts multiple changes descriptions.
 
