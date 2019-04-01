@@ -9,6 +9,18 @@ from .exceptions import CommandError
 LOG = logging.getLogger(__name__)
 
 
+def configure_logging(level=None, logger=None, format='%(message)s'):
+    """Switches on logging at a given level. For a given logger or globally.
+
+    :param int level:
+    :param logger:
+    :param str|unicode format:
+
+    """
+    logging.basicConfig(format=format, level=level if logger else None)
+    logger and logger.setLevel(level or logging.INFO)
+
+
 @contextmanager
 def chdir(target_path):
     """Context manager.

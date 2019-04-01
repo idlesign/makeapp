@@ -7,6 +7,7 @@ import click
 from makeapp import VERSION
 from makeapp.appmaker import AppMaker
 from makeapp.apptools import Project, VERSION_NUMBER_CHUNKS
+from makeapp.utils import configure_logging
 
 
 @click.group()
@@ -99,8 +100,13 @@ def attach_template_vars_to_new():
 
 @entry_point.command()
 @click.option('--increment', help='Version number chunk to increment', type=click.Choice(VERSION_NUMBER_CHUNKS))
-def release(increment):
+@click.option('--debug', help='Show debug messages while processing', is_flag=True)
+def release(increment, debug):
     """Performs new application version release."""
+
+    if debug:
+        configure_logging(logging.DEBUG)
+
     project = Project()
 
     project.pull()

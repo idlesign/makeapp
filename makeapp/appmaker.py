@@ -16,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader, _compat
 
 from .helpers.vcs import VcsHelper
 from .exceptions import AppMakerException
-from .utils import chdir
+from .utils import chdir, configure_logging
 
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
@@ -340,8 +340,7 @@ class AppMaker(object):
         :param format:
 
         """
-        logging.basicConfig(format=format)
-        self.logger.setLevel(verbosity_lvl or logging.INFO)
+        configure_logging(verbosity_lvl, logger=self.logger, format=format)
 
     def _get_template_files(self):
         """Returns a dictionary containing all source files paths [gathered from different
