@@ -2,6 +2,12 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Added QA for py3.7.
+* Dropped QA for py<3.5.
+
+
 v1.0.0
 ------
 + Celebrating 1.0.
