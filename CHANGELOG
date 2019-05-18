@@ -8,6 +8,7 @@ Unreleased
 * Dropped QA for py<3.5.
 * Template. Default. Python<3.4 removed from tox.
 * Template. Django. Python<3.4 and  Django<1.8 removed from tox.
+* Template. pytest. Empty init file from test directory.
 
 
 v1.0.0
