@@ -8,5 +8,5 @@ import sys
 
 {% block tests %}
 {{ super() }}
-    tests_require = ['pytest'],
+    tests_require=['pytest'],
 {% endblock %}
