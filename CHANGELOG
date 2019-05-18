@@ -6,6 +6,7 @@ Unreleased
 ----------
 * Added QA for py3.7.
 * Dropped QA for py<3.5.
+* Template. Default. Python<3.4 removed from tox.
 
 
 v1.0.0
