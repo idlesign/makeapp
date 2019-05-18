@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.1.0
+------
 * Added QA for py3.7.
 * Dropped QA for py<3.5.
 * Template. Default. Python<3.4 removed from tox.
