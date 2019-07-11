@@ -22,6 +22,7 @@ from .utils import chdir, configure_logging
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 PYTHON_VERSION = sys.version_info
 BASE_PATH = os.path.dirname(__file__)
+TEMPLATE_CONFIG_NAME = 'makeappconf.py'
 
 
 class TemplateFile(object):
@@ -30,12 +31,190 @@ class TemplateFile(object):
     __slots__ = ['template', 'path_full', 'path_rel']
 
     def __init__(self, template, path_full, path_rel):
+        """
+        :param AppTemplate template:
+        :param str path_full:
+        :param str path_rel:
+
+        """
         self.template = template
         self.path_full = path_full
         self.path_rel= path_rel
 
     def __str__(self):
         return self.path_full
+
+    @property
+    def parent_paths(self):
+        """A list of parent template paths."""
+        paths = []
+
+        path_rel = self.path_rel
+
+        parent = self.template
+
+        while True:
+            parent = parent.parent
+
+            if not parent:
+                break
+
+            path_full = os.path.join(parent.path, path_rel)
+
+            if os.path.exists(path_full):
+                # Check parent file exists in template.
+                paths.append(os.path.join(parent.name, path_rel))
+
+            if parent.is_default:
+                break
+
+        return paths
+
+
+class AppTemplate(object):
+    """Represents an application template."""
+
+    def __init__(self, maker, name, path, parent=None):
+        """
+
+        :param AppMaker maker:
+        :param str name:
+        :param str path:
+        :param AppTemplate parent:
+
+        """
+        self.maker = maker
+        self.name = name
+        self.path = path
+        self.parent = parent
+        self._config = self._read_config()
+        self._process_config()
+
+    def __str__(self):
+        return '%s: %s' % (self.name, self.path)
+
+    @property
+    def is_default(self):
+        """Whether current template is default (root)."""
+        return self.name == self.maker.template_default_name
+
+    def _read_config(self):
+        """Reads template config module data."""
+
+        module_fake_name = 'makeapp.config.%s' % self.name
+        config_path = os.path.join(self.path, TEMPLATE_CONFIG_NAME)
+
+        if os.path.exists(config_path):
+
+            if PYTHON_VERSION[0] == 2:
+                import imp
+                return imp.load_source(module_fake_name, config_path)
+
+            import importlib.util
+
+            spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            return module
+
+        return None
+
+    def _process_config(self):
+        parent_name = getattr(self._config, 'parent_template', None)
+
+        if parent_name:
+            # Inject parent.
+            # Here actually may be a graph, but
+            # for now don't bother with it, just handle the simplest case.
+            app_template = self.contribute_to_maker(
+                maker=self.maker,
+                template=parent_name,
+                parent=self.parent,
+            )
+            self.parent = app_template
+
+    def get_files(self):
+        """Returns a mapping of relative filenames to TemplateFiles objects.
+
+        :rtype: OrderedDict
+        """
+        template_files = OrderedDict()
+
+        maker = self.maker
+        templates_path = self.path
+
+        for path, _, files in os.walk(templates_path):
+
+            for fname in files:
+
+                if fname == '__pycache__' or os.path.splitext(fname)[-1] == '.pyc' or fname == TEMPLATE_CONFIG_NAME:
+                    continue
+
+                full_path = os.path.join(path, fname)
+
+                rel_path = full_path.replace(templates_path, '').lstrip('/')
+
+                template_file = TemplateFile(
+                    template=self,
+                    path_full=full_path,
+                    path_rel=rel_path,
+                )
+
+                rel_path = rel_path.replace(maker.module_dir_marker, maker.settings['module_name'])
+                template_files[rel_path] = template_file
+
+        return template_files
+
+    @classmethod
+    def contribute_to_maker(cls, maker, template, parent):
+        """
+        :param AppMaker maker:
+        :param str template:
+        :param AppTemplate parent:
+        :rtype: AppTemplate
+
+        """
+        name, path = cls._find(
+            template,
+            search_paths=(
+                template,
+                os.path.join(maker.path_templates_current, template),
+                os.path.join(maker.path_templates_builtin, template),
+            )
+        )
+
+        app_template = AppTemplate(
+            maker=maker,
+            name=name,
+            path=path,
+            parent=parent,
+        )
+
+        maker.app_templates.append(app_template)
+
+        if app_template.is_default:
+            maker.app_template_default = app_template
+
+        return app_template
+
+    @classmethod
+    def _find(cls, name_or_path, search_paths):
+        """Searches a template by it's name or in path.
+
+        :param name_or_path:
+        :return: A tuple (template_name, template_path)
+        :param tuple search_paths:
+        :rtype: tuple[str, str]
+
+        """
+        for supposed_path in search_paths:
+            if '/' in supposed_path and os.path.exists(supposed_path):
+                path = os.path.abspath(supposed_path)
+                return path.split('/')[-1], path
+
+        raise AppMakerException(
+            'Unable to find application template %s. Searched \n%s' % (name_or_path, '\n  '.join(search_paths)))
 
 
 class DynamicParentTemplate(object):
@@ -119,6 +298,9 @@ class AppMaker(object):
         ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
     ))
 
+    app_template_default = None  # type: AppTemplate
+    """Default (root) application template object. Populated at runtime."""
+
     def render(self, filename):
         """Renders file contents with settings as get_context.
         
@@ -148,25 +330,11 @@ class AppMaker(object):
 
         if isinstance(filename, TemplateFile):
             # Let's compute template inheritance hierarchy for `parent_template`
-            # dynamic variable.
-            paths = self.paths_templates
-            template_name = filename.template
-            template_idx = list(paths.keys()).index(template_name)
+            # context dynamic variable.
+            parent_paths = filename.parent_paths
 
-            if template_idx > 0:  # if not __default__ template
-
-                template_parents = []
-
-                for template_parent in list(paths.keys())[:template_idx - 1 or 1]:
-                    path_full = os.path.join(paths[template_parent], filename.path_rel)
-
-                    if os.path.exists(path_full):
-                        # Check parent file exists in template.
-                        path_rel = os.path.join(template_parent, filename.path_rel)
-                        template_parents.append(path_rel)
-
-                if template_parents:
-                    context['parent_template'] = DynamicParentTemplate(template_parents)
+            if parent_paths:
+                context['parent_template'] = DynamicParentTemplate(parent_paths)
 
         rendered = template.render(**context)
 
@@ -193,7 +361,8 @@ class AppMaker(object):
 
         self.logger.debug('Templates path: %s', self.path_templates_current)
 
-        self.paths_templates = self._get_templates_paths(templates_to_use)
+        self.app_templates = []
+        self._init_app_templates(templates_to_use)
 
         self.settings = self._init_settings(app_name)
 
@@ -230,56 +399,39 @@ class AppMaker(object):
             path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_builtin
 
         if not os.path.exists(path):
-            raise AppMakerException('Templates path doesn\'t exist: %s' % path)
+            raise AppMakerException("Templates path doesn't exist: %s" % path)
 
         return path
 
-    def _get_templates_paths(self, names_or_paths):
-        """Returns a mapping of template names to paths.
+    def _init_app_templates(self, names_or_paths):
+        """Returns a list of application template objects.
         
         :param list names_or_paths: 
-        :rtype: OrderedDict 
-        """
-        paths = OrderedDict()
+        :rtype: list[AppTemplate]
 
+        """
         if not names_or_paths:
             names_or_paths = []
 
         names_or_paths = [name for name in names_or_paths if name]
 
+        default_template_name = self.template_default_name
+
         # Prepend default (base) template.
-        if not names_or_paths or self.template_default_name not in names_or_paths:
-            names_or_paths.insert(0, self.template_default_name)
+        if not names_or_paths or default_template_name not in names_or_paths:
+            names_or_paths.insert(0, default_template_name)
 
-        for template in names_or_paths:
-            name, path = self._find_template(template)
-            paths[name] = path
+        prev_template = None
 
-        self.logger.debug('Templates to use: %s', paths)
+        for template_spec in names_or_paths:
 
-        return paths
+            prev_template = AppTemplate.contribute_to_maker(
+                maker=self,
+                template=template_spec,
+                parent=prev_template,
+            )
 
-    def _find_template(self, name_or_path):
-        """Searches a template by it's name or in path.
-
-        :param name_or_path:
-        :return: A tuple (template_name, template_path)
-
-        """
-        supposed_paths = (
-            name_or_path,
-            os.path.join(self.path_templates_current, name_or_path),
-            os.path.join(self.path_templates_builtin, name_or_path),
-        )
-
-        for supposed_path in supposed_paths:
-            if '/' in supposed_path and os.path.exists(supposed_path):
-                path = os.path.abspath(supposed_path)
-                return path.split('/')[-1], path
-
-        self.logger.error('Unable to find application template. Searched \n%s', '\n  '.join(supposed_paths))
-
-        raise AppMakerException('Unable to find application template: %s' % name_or_path)
+        self.logger.debug('Templates to use: %s', self.app_templates)
 
     def _replace_settings_markers(self, target, strip_unknown=False, settings=None):
         """Replaces settings markers in `target` with current settings values
@@ -346,28 +498,13 @@ class AppMaker(object):
         """Returns a dictionary containing all source files paths [gathered from different
         templates], indexed by relative paths.
 
-        :return: dict
+        :return: OrderedDict
 
         """
-        template_files = {}
+        template_files = OrderedDict()
 
-        for template_name, templates_path in self.paths_templates.items():
-            for path, _, files in os.walk(templates_path):
-                for fname in files:
-
-                    if fname == '__pycache__' or os.path.splitext(fname)[-1] == '.pyc':
-                        continue
-
-                    full_path = os.path.join(path, fname)
-
-                    rel_path = full_path.replace(templates_path, '').lstrip('/')
-
-                    template_file = TemplateFile(
-                        template=template_name, path_full=full_path, path_rel=rel_path)
-
-                    rel_path = rel_path.replace(self.module_dir_marker, self.settings['module_name'])
-
-                    template_files[rel_path] = template_file
+        for template in self.app_templates:
+            template_files.update(template.get_files())
 
         self.logger.debug('Template files: %s', template_files.keys())
 

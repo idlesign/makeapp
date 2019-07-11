@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ Added support for configuration files in app templates.
 * Django app template now for Django>=1.8 and Python>=3.5.
 
 
