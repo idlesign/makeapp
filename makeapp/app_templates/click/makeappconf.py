@@ -1,0 +1,2 @@
+
+parent_template = 'console'

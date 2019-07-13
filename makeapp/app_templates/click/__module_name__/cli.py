@@ -1,4 +1,4 @@
-{% extends "console/__module_name__/cli.py" %}
+{% extends parent_template %}
 
 
 {% block imports %}
