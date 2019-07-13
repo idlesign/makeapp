@@ -221,18 +221,20 @@ class DynamicParentTemplate(object):
     """Represents jinja dynamic `parent_template` variable."""
 
     def __init__(self, parents):
+        parents = parents[::-1]
         self.parents = parents
         self.parents_initial = parents[:]
-        self.current = parents[-1]
 
-    def pop(self):
+    @property
+    def current(self):
+
         try:
             current = self.parents.pop()
 
         except IndexError:
+            # Mostly for template inheritance debug purposes.
             raise IndexError('No more parents to pop. Initial parents: %s' % self.parents_initial)
 
-        self.current = current
         return current
 
     def __repr__(self):
@@ -240,13 +242,22 @@ class DynamicParentTemplate(object):
 
 
 class DynamicParentLoader(FileSystemLoader):
+    """Allows dynamic swapping of `parent_template` template context variable."""
 
     def get_source(self, environment, template):
 
-        if isinstance(template, DynamicParentTemplate):
-            template = '%s' % template.pop()
+        is_dynamic = isinstance(template, DynamicParentTemplate)
 
-        return super(DynamicParentLoader, self).get_source(environment, template)
+        if is_dynamic:
+            template = '%s' % template.current
+
+        source, filename, uptodate = super(DynamicParentLoader, self).get_source(environment, template)
+
+        if is_dynamic:
+            # Prevent `parent_template` context variable caching.
+            uptodate = lambda: False
+
+        return source, filename, uptodate
 
 
 class AppMaker(object):
