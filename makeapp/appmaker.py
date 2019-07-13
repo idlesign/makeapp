@@ -121,18 +121,23 @@ class AppTemplate(object):
         return None
 
     def _process_config(self):
-        parent_name = getattr(self._config, 'parent_template', None)
+        parent_names = getattr(self._config, 'parent_template', None)
 
-        if parent_name:
-            # Inject parent.
-            # Here actually may be a graph, but
-            # for now don't bother with it, just handle the simplest case.
-            app_template = self.contribute_to_maker(
-                maker=self.maker,
-                template=parent_name,
-                parent=self.parent,
-            )
-            self.parent = app_template
+        if parent_names:
+
+            parent = self.parent
+
+            for parent_name in parent_names:
+                # Inject parents.
+                # Here actually may be a graph, but
+                # for now don't bother with it, just handle the simplest case.
+                app_template = self.contribute_to_maker(
+                    maker=self.maker,
+                    template=parent_name,
+                    parent=parent,
+                )
+                parent = app_template
+                self.parent = app_template
 
     def get_files(self):
         """Returns a mapping of relative filenames to TemplateFiles objects.

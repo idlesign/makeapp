@@ -1,2 +1,2 @@
 
-parent_template = 'console'
+parent_template = ['console']
