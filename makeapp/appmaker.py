@@ -139,6 +139,23 @@ class AppTemplate(object):
                 parent = app_template
                 self.parent = app_template
 
+    def run_config_hook(self, hook_name):
+        """Runs a hook function from app config template if defined there.
+        Returns `True` if a hook has been run.
+
+        :param hook_name:
+        :rtype: bool
+
+        """
+        hook_name = 'hook_%s' % hook_name
+        hook_func = getattr(self._config, hook_name, None)
+
+        if hook_func:
+            hook_func(app_template=self)
+            return True
+
+        return False
+
     def get_files(self):
         """Returns a mapping of relative filenames to TemplateFiles objects.
 
@@ -399,6 +416,7 @@ class AppMaker(object):
         self.update_settings({
             'app_name': app_name,
             'module_name': module_name,
+            'vcs_remote': None,
         }, settings)
 
         return settings
@@ -542,6 +560,9 @@ class AppMaker(object):
         """
         self.logger.info('Application target path: %s', dest)
 
+        # Make remote available for hooks.
+        self.settings['vcs_remote'] = remote_address
+
         try:
             os.makedirs(dest)
         except OSError:
@@ -557,6 +578,14 @@ class AppMaker(object):
         if not os.path.exists(license_dest) or overwrite:
             self._create_file(license_dest, license_txt)
 
+        def run_hook(hook_name):
+            """Runs the named hook for every app template."""
+            with chdir(dest):
+                for app_template in self.app_templates:
+                    app_template.run_config_hook(hook_name)
+
+        run_hook('rollout_pre')
+
         files = self._get_template_files()
         for target, template_file in files.items():
             target = os.path.join(dest, target)
@@ -568,6 +597,8 @@ class AppMaker(object):
                     prepend = license_src
 
                 self._copy_file(template_file, target, prepend)
+
+        run_hook('rollout_post')
 
         if init_repository:
             self._vcs_init(
