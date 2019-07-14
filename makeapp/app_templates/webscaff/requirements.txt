@@ -1,0 +1,6 @@
+# Don't forget to pin down these requirements to certain versions in your project.
+
+Django>=2.2.0
+envbox>=1.1.0
+uwsgi>=2.0.18
+uwsgiconf>=0.15.2

@@ -1,0 +1,9 @@
+{% extends parent_template %}
+
+{% block contents %}
+{{ super() }}
+conf/
+venv/
+dumps/
+settings_production.py
+{% endblock %}
