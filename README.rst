@@ -3,7 +3,7 @@ makeapp
 https://github.com/idlesign/makeapp
 
 
-|release| |lic| |ci| |coverage| |health|
+|release| |lic| |ci| |coverage|
 
 .. |release| image:: https://img.shields.io/pypi/v/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
@@ -16,9 +16,6 @@ https://github.com/idlesign/makeapp
 
 .. |coverage| image:: https://img.shields.io/coveralls/idlesign/makeapp/master.svg
     :target: https://coveralls.io/r/idlesign/makeapp
-
-.. |health| image:: https://landscape.io/github/idlesign/makeapp/master/landscape.svg?style=flat
-    :target: https://landscape.io/github/idlesign/makeapp/master
 
 
 Description
