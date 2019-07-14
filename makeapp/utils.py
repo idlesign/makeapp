@@ -1,10 +1,13 @@
-import os
+import fileinput
 import logging
+import os
+import shutil
+import sys
+import tempfile
 from contextlib import contextmanager
 from subprocess import Popen, PIPE, STDOUT
 
 from .exceptions import CommandError
-
 
 LOG = logging.getLogger(__name__)
 
@@ -37,6 +40,35 @@ def chdir(target_path):
         os.chdir(curr_dir)
 
 
+@contextmanager
+def temp_dir():
+    """Context manager to temporarily create a directory.
+
+    :rtype: str
+
+    """
+    dir_tmp = tempfile.mkdtemp(prefix='makeapp_')
+
+    try:
+        yield dir_tmp
+
+    finally:
+        shutil.rmtree(dir_tmp, ignore_errors=True)
+
+
+def replace_infile(filepath, pairs):
+    """Replaces some term by another in file contents.
+
+    :param str filepath:
+    :param tuple[tuple[str, str]] pairs: (search, replace) tuples.
+
+    """
+    with fileinput.input(files=filepath, inplace=True) as f:
+        for line in f:
+            for (search, replace) in pairs:
+                sys.stdout.write(line.replace(search, replace))
+
+
 def run_command(command):
     """Runs a command in a shell process.
 
@@ -52,7 +84,9 @@ def run_command(command):
     data = []
 
     out, _ = prc.communicate()
-    out = out.decode('utf-8')
+
+    if isinstance(out, bytes):
+        out = out.decode('utf-8')
 
     has_error = prc.returncode
 
