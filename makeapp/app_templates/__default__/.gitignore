@@ -1,3 +1,4 @@
+{% block contents %}
 .project
 .pydevproject
 .idea
@@ -7,3 +8,4 @@ __pycache__
 *.pyo
 *.egg-info
 docs/_build/
+{% endblock %}
