@@ -66,7 +66,8 @@ def replace_infile(filepath, pairs):
     with fileinput.input(files=filepath, inplace=True) as f:
         for line in f:
             for (search, replace) in pairs:
-                sys.stdout.write(line.replace(search, replace))
+                line = line.replace(search, replace)
+            sys.stdout.write(line)
 
 
 def check_command(command, hint):
