@@ -69,6 +69,22 @@ def replace_infile(filepath, pairs):
                 sys.stdout.write(line.replace(search, replace))
 
 
+def check_command(command, hint):
+    """Checks whether a command is available.
+    If not - raises an exception.
+
+    :param str command:
+    :param str hint:
+
+    """
+    try:
+        run_command('type %s' % command)
+
+    except CommandError:
+        raise CommandError(
+            "Unable to find '%s' command. Check %s is installed and available." % (command, hint))
+
+
 def run_command(command):
     """Runs a command in a shell process.
 
