@@ -42,11 +42,13 @@ Scaffold a new application:
     $ makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
 
 
-This will create a decent application skeleton (``setup.py``, docs, tests, etc.) and initialize Git repository.
+This will create a decent application skeleton using the default skeleton template (``setup.py``, docs, tests, etc.)
+and initialize Git repository.
 
 ``makeapp`` bundles some commonly used templates for apps using: ``pytest``, ``click``, ``Django``, etc.
 
-Complete list of featured templates can be found in the documentation.
+Multiple templates can be used together. Complete list of featured templates can be found in the documentation.
+User-made templates are also supported.
 
 
 Application publishing
