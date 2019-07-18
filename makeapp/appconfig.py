@@ -20,7 +20,6 @@ class Config(object):
     """Base for application template configuration."""
 
     parent_template = None
-    title = None
 
     def __init__(self, app_template):
         """
@@ -29,7 +28,6 @@ class Config(object):
         """
         self.app_template = app_template
         self.logger = app_template.maker.logger
-        self.title = self.title or app_template.name
 
         settings = OrderedDict()
 
@@ -52,7 +50,7 @@ class Config(object):
         settings_gathered = OrderedDict()
         advertise_template = True
 
-        for setting_name, descriptor in settings_conf.items():
+        for setting_name, settings_obj in settings_conf.items():
 
             current_value = settings_current.get(setting_name)
 
@@ -67,8 +65,10 @@ class Config(object):
                     advertise_template = False
 
                 current_value = click.prompt(
-                    '%s (%s)' % (descriptor.title, setting_name),
-                    default=descriptor.default)
+                    '%s (%s)' % (settings_obj.title, setting_name),
+                    default=settings_obj.default,
+                    type=settings_obj.type,
+                )
 
                 settings_gathered[setting_name] = current_value
 
