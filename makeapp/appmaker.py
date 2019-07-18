@@ -1,285 +1,25 @@
 import logging
 import os
 import re
-import sys
 from collections import OrderedDict
 from datetime import date
+
+import requests
+
+from .apptemplate import TemplateFile, AppTemplate
+from .exceptions import AppMakerException
+from .helpers.vcs import VcsHelper
+from .rendering import Renderer
+from .utils import chdir, configure_logging, PYTHON_VERSION, PY2
 
 try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
 
-import requests
-
-from jinja2 import Environment, FileSystemLoader, _compat
-
-from .helpers.vcs import VcsHelper
-from .exceptions import AppMakerException
-from .utils import chdir, configure_logging
-
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
-PYTHON_VERSION = sys.version_info
 BASE_PATH = os.path.dirname(__file__)
-TEMPLATE_CONFIG_NAME = 'makeappconf.py'
-
-
-class TemplateFile(object):
-    """Represents app template file info."""
-
-    __slots__ = ['template', 'path_full', 'path_rel']
-
-    def __init__(self, template, path_full, path_rel):
-        """
-        :param AppTemplate template:
-        :param str path_full:
-        :param str path_rel:
-
-        """
-        self.template = template
-        self.path_full = path_full
-        self.path_rel= path_rel
-
-    def __str__(self):
-        return self.path_full
-
-    @property
-    def parent_paths(self):
-        """A list of parent template paths."""
-        paths = []
-
-        path_rel = self.path_rel
-
-        parent = self.template
-
-        while True:
-            parent = parent.parent
-
-            if not parent:
-                break
-
-            path_full = os.path.join(parent.path, path_rel)
-
-            if os.path.exists(path_full):
-                # Check parent file exists in template.
-                paths.append(os.path.join(parent.name, path_rel))
-
-            if parent.is_default:
-                break
-
-        return paths
-
-
-class AppTemplate(object):
-    """Represents an application template."""
-
-    def __init__(self, maker, name, path, parent=None):
-        """
-
-        :param AppMaker maker:
-        :param str name:
-        :param str path:
-        :param AppTemplate parent:
-
-        """
-        self.maker = maker
-        self.name = name
-        self.path = path
-        self.parent = parent
-        self._config = self._read_config()
-        self._process_config()
-
-    def __str__(self):
-        return '%s: %s' % (self.name, self.path)
-
-    @property
-    def is_default(self):
-        """Whether current template is default (root)."""
-        return self.name == self.maker.template_default_name
-
-    def _read_config(self):
-        """Reads template config module data."""
-
-        module_fake_name = 'makeapp.config.%s' % self.name
-        config_path = os.path.join(self.path, TEMPLATE_CONFIG_NAME)
-
-        if os.path.exists(config_path):
-
-            if PYTHON_VERSION[0] == 2:
-                import imp
-                return imp.load_source(module_fake_name, config_path)
-
-            import importlib.util
-
-            spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-
-            return module
-
-        return None
-
-    def _process_config(self):
-        parent_names = getattr(self._config, 'parent_template', None)
-
-        if parent_names:
-
-            parent = self.parent
-
-            for parent_name in parent_names:
-                # Inject parents.
-                # Here actually may be a graph, but
-                # for now don't bother with it, just handle the simplest case.
-                app_template = self.contribute_to_maker(
-                    maker=self.maker,
-                    template=parent_name,
-                    parent=parent,
-                )
-                parent = app_template
-                self.parent = app_template
-
-    def run_config_hook(self, hook_name):
-        """Runs a hook function from app config template if defined there.
-        Returns `True` if a hook has been run.
-
-        :param hook_name:
-        :rtype: bool
-
-        """
-        hook_name = 'hook_%s' % hook_name
-        hook_func = getattr(self._config, hook_name, None)
-
-        if hook_func:
-            hook_func(app_template=self)
-            return True
-
-        return False
-
-    def get_files(self):
-        """Returns a mapping of relative filenames to TemplateFiles objects.
-
-        :rtype: OrderedDict
-        """
-        template_files = OrderedDict()
-
-        maker = self.maker
-        templates_path = self.path
-
-        for path, _, files in os.walk(templates_path):
-
-            for fname in files:
-
-                if fname == '__pycache__' or os.path.splitext(fname)[-1] == '.pyc' or fname == TEMPLATE_CONFIG_NAME:
-                    continue
-
-                full_path = os.path.join(path, fname)
-
-                rel_path = full_path.replace(templates_path, '').lstrip('/')
-
-                template_file = TemplateFile(
-                    template=self,
-                    path_full=full_path,
-                    path_rel=rel_path,
-                )
-
-                rel_path = rel_path.replace(maker.module_dir_marker, maker.settings['module_name'])
-                template_files[rel_path] = template_file
-
-        return template_files
-
-    @classmethod
-    def contribute_to_maker(cls, maker, template, parent):
-        """
-        :param AppMaker maker:
-        :param str template:
-        :param AppTemplate parent:
-        :rtype: AppTemplate
-
-        """
-        name, path = cls._find(
-            template,
-            search_paths=(
-                template,
-                os.path.join(maker.path_templates_current, template),
-                os.path.join(maker.path_templates_builtin, template),
-            )
-        )
-
-        app_template = AppTemplate(
-            maker=maker,
-            name=name,
-            path=path,
-            parent=parent,
-        )
-
-        maker.app_templates.append(app_template)
-
-        if app_template.is_default:
-            maker.app_template_default = app_template
-
-        return app_template
-
-    @classmethod
-    def _find(cls, name_or_path, search_paths):
-        """Searches a template by it's name or in path.
-
-        :param name_or_path:
-        :return: A tuple (template_name, template_path)
-        :param tuple search_paths:
-        :rtype: tuple[str, str]
-
-        """
-        for supposed_path in search_paths:
-            if '/' in supposed_path and os.path.exists(supposed_path):
-                path = os.path.abspath(supposed_path)
-                return path.split('/')[-1], path
-
-        raise AppMakerException(
-            'Unable to find application template %s. Searched \n%s' % (name_or_path, '\n  '.join(search_paths)))
-
-
-class DynamicParentTemplate(object):
-    """Represents jinja dynamic `parent_template` variable."""
-
-    def __init__(self, parents):
-        parents = parents[::-1]
-        self.parents = parents
-        self.parents_initial = parents[:]
-
-    @property
-    def current(self):
-
-        try:
-            current = self.parents.pop()
-
-        except IndexError:
-            # Mostly for template inheritance debug purposes.
-            raise IndexError('No more parents to pop. Initial parents: %s' % self.parents_initial)
-
-        return current
-
-    def __repr__(self):
-        return 'Namespace'  # hack
-
-
-class DynamicParentLoader(FileSystemLoader):
-    """Allows dynamic swapping of `parent_template` template context variable."""
-
-    def get_source(self, environment, template):
-
-        is_dynamic = isinstance(template, DynamicParentTemplate)
-
-        if is_dynamic:
-            template = '%s' % template.current
-
-        source, filename, uptodate = super(DynamicParentLoader, self).get_source(environment, template)
-
-        if is_dynamic:
-            # Prevent `parent_template` context variable caching.
-            uptodate = lambda: False
-
-        return source, filename, uptodate
 
 
 class AppMaker(object):
@@ -334,45 +74,6 @@ class AppMaker(object):
     app_template_default = None  # type: AppTemplate
     """Default (root) application template object. Populated at runtime."""
 
-    def render(self, filename):
-        """Renders file contents with settings as get_context.
-        
-        :param str|unicode|TemplateFile filename:
-        :rtype: str|unicode
-        """
-        path_builtin = self.path_templates_builtin
-        path_current = self.path_templates_current
-
-        env = Environment(
-            loader=DynamicParentLoader([
-                path_builtin,
-                path_current,
-                # self.path_templates_license,
-                '.',  # Use current working dir.
-                ]),
-            keep_trailing_newline=True,
-            trim_blocks=True,
-        )
-
-        context = self.context_mutator.get_context()
-
-        filename_ = '%s' % filename
-
-        with chdir(os.path.dirname(filename_)):
-            template = env.get_template(os.path.basename(filename_))
-
-        if isinstance(filename, TemplateFile):
-            # Let's compute template inheritance hierarchy for `parent_template`
-            # context dynamic variable.
-            parent_paths = filename.parent_paths
-
-            if parent_paths:
-                context['parent_template'] = DynamicParentTemplate(parent_paths)
-
-        rendered = template.render(**context)
-
-        return rendered
-
     def __init__(self, app_name, templates_to_use=None, templates_path=None, log_level=None):
         """Initializes app maker object.
 
@@ -399,7 +100,10 @@ class AppMaker(object):
 
         self.settings = self._init_settings(app_name)
 
-        self.context_mutator = ContextMutator(self)
+        self.renderer = Renderer(maker=self, paths=[
+            self.path_templates_builtin,
+            self.path_templates_current,
+        ])
 
     def _init_settings(self, app_name):
         """Initializes and returns base settings.
@@ -544,6 +248,22 @@ class AppMaker(object):
 
         return template_files
 
+    def _hook_run(self, hook_name):
+        """Runs the named hook for every app template.
+
+        Returns results dictionary indexed by app template objects.
+
+        :param str|unicode hook_name:
+        :rtype: OrderedDict
+
+        """
+        results = OrderedDict()
+
+        for app_template in self.app_templates:
+            results[app_template] = app_template.run_config_hook(hook_name)
+
+        return results
+
     def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None, remote_push=False):
         """Rolls out the application skeleton into `dest` path.
 
@@ -578,27 +298,25 @@ class AppMaker(object):
         if not os.path.exists(license_dest) or overwrite:
             self._create_file(license_dest, license_txt)
 
-        def run_hook(hook_name):
-            """Runs the named hook for every app template."""
-            with chdir(dest):
-                for app_template in self.app_templates:
-                    app_template.run_config_hook(hook_name)
-
-        run_hook('rollout_pre')
+        with chdir(dest):
+            self._hook_run('rollout_pre')
 
         files = self._get_template_files()
         for target, template_file in files.items():
             target = os.path.join(dest, target)
 
             if not os.path.exists(target) or overwrite:
+
                 prepend = None
+
                 if os.path.splitext(target)[1] == '.py':
                     # Prepend license text to source files if required.
                     prepend = license_src
 
                 self._copy_file(template_file, target, prepend)
 
-        run_hook('rollout_post')
+        with chdir(dest):
+            self._hook_run('rollout_post')
 
         if init_repository:
             self._vcs_init(
@@ -627,7 +345,7 @@ class AppMaker(object):
         :param contents:
 
         """
-        if _compat.PY2:
+        if PY2:
             contents = contents.encode('utf8')
 
         with open(path, 'w') as f:
@@ -652,7 +370,7 @@ class AppMaker(object):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        data = self.render(src)
+        data = self.renderer.render(src)
 
         if prepend_data is not None:
             data = prepend_data + data
@@ -675,11 +393,14 @@ class AppMaker(object):
         to place into source files.
 
         :return: Tuple (license_text, license_src_text)
+
         """
         def render(filename):
             path = os.path.join(self.path_templates_license, filename)
+
             if os.path.exists(path):
-                return self.render(path)
+                return self.renderer.render(path)
+
             return None
 
         license = self.settings['license']
@@ -795,37 +516,3 @@ class AppMaker(object):
 
         self._validate_setting('license', self.LICENSES.keys(), settings_base)
         self._validate_setting('vcs', self.VCS.keys(), settings_base)
-
-
-class ContextMutator(object):
-    """Mutator applying additional transformations to template get_context."""
-
-    def __init__(self, maker):
-        """
-        :param AppMaker maker:
-        """
-        self._maker = maker
-        self._context = maker.settings
-
-    def get_app_title_rst(self, continuation=''):
-        """Returns application title for RST."""
-        if continuation:
-            continuation = ' ' + continuation
-        title = self._context['app_name'] + continuation
-        title = '%s\n%s' % (title, '=' * len(title))
-        return title
-
-    def get_context(self):
-        maker = self._maker
-        context = dict(self._context)
-
-        license_tuple = maker.LICENSES.get(context['license'], maker.LICENSES[maker.default_license])
-
-        context.update({
-            'get_app_title_rst': self.get_app_title_rst,
-            'license_title': license_tuple[0],
-            'license_title_pypi': license_tuple[1],
-            'python_version_major': context['python_version'].split('.')[0],
-            'module_name_capital': context['module_name'].capitalize(),
-        })
-        return context
