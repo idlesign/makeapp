@@ -185,7 +185,7 @@ class AppMaker(object):
         if target is not None:
             for name, val in settings.items():
                 if val is not None:
-                    target = target.replace('{{ %s }}' % name, val)
+                    target = str(target).replace('{{ %s }}' % name, str(val))
 
         if strip_unknown:
             target = re.sub(RE_UNKNOWN_MARKER, '', target)
@@ -407,20 +407,52 @@ class AppMaker(object):
 
         return render(license), render('%s_src' % license)
 
-    @classmethod
-    def get_template_vars(cls):
+    def get_template_vars(self):
         """Returns known template variables.
         
         :rtype: list 
         """
-        return AppMaker.BASE_SETTINGS.keys()
+        items = set(AppMaker.BASE_SETTINGS.keys())
+
+        for app_template in self.app_templates:
+            items.update(app_template.config.settings.keys())
+
+        return items
+
+    def update_settings_complex(self, config=None, dictionary=None):
+        """Updates current settings using multiple sources,
+
+        :param str|unicode config:
+        :param dict dictionary:
+
+        """
+        # Try to read settings from default file.
+        self.update_settings_from_file()
+
+        # Try to read settings from user supplied configuration file.
+        self.update_settings_from_file(config)
+
+        # Settings from command line override all the previous.
+        self.update_settings_from_dict(dictionary)
+
+        # Add template specific files.
+        self.update_settings_from_app_templates()
+
+    def update_settings_from_app_templates(self):
+        """Updates current settings using app templates."""
+        self._hook_run('configure')
 
     def update_settings_from_dict(self, dict_):
         """Updates settings dict with contents from a given dict.
         
-        :param dict dict_:  
+        :param dict dict_:
+
         """
+        if not dict_:
+            return
+
         settings = {}
+
         for key in self.get_template_vars():
             val = dict_.get(key)
             if val is not None:

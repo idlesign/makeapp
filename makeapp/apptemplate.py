@@ -3,12 +3,17 @@ from collections import OrderedDict
 
 from .exceptions import AppMakerException
 from .utils import PYTHON_VERSION
+from .appconfig import Config
+
+if False:  # pragma: nocover
+    from .appmaker import AppMaker
 
 
 class AppTemplate(object):
     """Represents an application template."""
 
     config_filename = 'makeappconf.py'
+    config_attr = 'makeapp_config'
 
     def __init__(self, maker, name, path, parent=None):
         """
@@ -23,7 +28,7 @@ class AppTemplate(object):
         self.name = name
         self.path = path
         self.parent = parent
-        self._config = self._read_config()
+        self.config = self._read_config()
         self._process_config()
 
     def __str__(self):
@@ -35,8 +40,13 @@ class AppTemplate(object):
         return self.name == self.maker.template_default_name
 
     def _read_config(self):
-        """Reads template config module data."""
+        """Reads template's config.
 
+        If not found, dummy config object is returned.
+
+        :rtype: Config
+
+        """
         module_fake_name = 'makeapp.config.%s' % self.name
         config_path = os.path.join(self.path, self.config_filename)
 
@@ -52,12 +62,19 @@ class AppTemplate(object):
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
-            return module
+            config = getattr(module, self.config_attr, None)  # type: type(Config)
 
-        return None
+            if not issubclass(config, Config):
+                raise AppMakerException(
+                    'Unable to load config class for "%" template. '
+                    'Make sure "%s" file has "%s" attribute having value of AppConfig heir.')
+
+            return config(app_template=self)
+
+        return Config(app_template=self)
 
     def _process_config(self):
-        parent_names = getattr(self._config, 'parent_template', None)
+        parent_names = self.config.parent_template
 
         if parent_names:
 
@@ -84,10 +101,10 @@ class AppTemplate(object):
 
         """
         hook_name = 'hook_%s' % hook_name
-        hook_func = getattr(self._config, hook_name, None)
+        hook_func = getattr(self.config, hook_name, None)
 
         if hook_func:
-            hook_func(app_template=self)
+            hook_func()
             return True
 
         return False

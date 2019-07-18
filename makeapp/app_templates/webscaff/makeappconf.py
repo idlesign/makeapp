@@ -2,20 +2,29 @@ import os
 import shutil
 from functools import partial
 
-from makeapp.utils import run_command, temp_dir, replace_infile, check_command
+from makeapp.appconfig import Config, ConfigSetting, temp_dir, replace_infile, check_command, run_command
 
-parent_template = ['pytest']
 
-COMMAND_VENV = 'virtualenv'
 join = os.path.join  # Short alias
 
 
-class PostRollout(object):
+class WebscaffConfig(Config):
 
-    def __init__(self, app_template):
-        self.logger = app_template.maker.logger
+    command_venv = 'virtualenv'
 
-        module_name = app_template.maker.settings['module_name']
+    parent_template = ['pytest']
+
+    host = ConfigSetting(title='Remote host')
+
+    def hook_rollout_pre(self):
+        super(WebscaffConfig, self).hook_rollout_pre()
+
+        check_command(self.command_venv, 'virtual environment creation script')
+
+    def hook_rollout_post(self):
+        super(WebscaffConfig, self).hook_rollout_post()
+
+        module_name = self.app_template.maker.settings['module_name']
         self.module_name = module_name
 
         self.dir_project = os.getcwd()
@@ -49,7 +58,7 @@ class PostRollout(object):
     def prepare_venv(self):
         self.logger.info('Bootstrapping virtual environment for project ...')
 
-        run_command('%s -p python3 venv/' % COMMAND_VENV)
+        run_command('%s -p python3 venv/' % self.command_venv)
         run_command('. venv/bin/activate && pip install -r %s/requirements.txt' % self.module_name)
 
     def prepare_django_files(self):
@@ -97,8 +106,4 @@ class PostRollout(object):
         run_command('%s startapp core %s' % (command_django_admin, dir_app))
 
 
-def hook_rollout_pre(app_template):
-    check_command(COMMAND_VENV, 'virtual environment creation script')
-
-
-hook_rollout_post = PostRollout
+makeapp_config = WebscaffConfig

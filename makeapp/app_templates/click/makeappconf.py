@@ -1,2 +1,9 @@
+from makeapp.appconfig import Config
 
-parent_template = ['console']
+
+class ClickConfig(Config):
+
+    parent_template = ['console']
+
+
+makeapp_config = ClickConfig
