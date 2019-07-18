@@ -7,9 +7,13 @@ import tempfile
 from contextlib import contextmanager
 from subprocess import Popen, PIPE, STDOUT
 
+from jinja2 import _compat
+
 from .exceptions import CommandError
 
 LOG = logging.getLogger(__name__)
+PYTHON_VERSION = sys.version_info
+PY2 = _compat.PY2
 
 
 def configure_logging(level=None, logger=None, format='%(message)s'):
