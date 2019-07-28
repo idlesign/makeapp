@@ -16,4 +16,4 @@ current_env = import_by_environment(
 
 IN_PRODUCTION = current_env == 'production'
 
-print('Environment type: %s' % current_env)
+print('# Environment type: %s' % current_env)
