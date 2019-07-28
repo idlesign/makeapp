@@ -54,13 +54,14 @@ class AppTemplate(object):
 
             if PYTHON_VERSION[0] == 2:
                 import imp
-                return imp.load_source(module_fake_name, config_path)
+                module = imp.load_source(module_fake_name, config_path)
 
-            import importlib.util
+            else:
+                import importlib.util
 
-            spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+                spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
 
             config = getattr(module, self.config_attr, None)  # type: type(Config)
 
