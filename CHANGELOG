@@ -4,9 +4,8 @@ makeapp changelog
 
 Unreleased
 ----------
-+ Added 'webscaff' project template.
++ Added experimental 'webscaff' project template.
 + Added support for configuration files in app templates.
-* 'parent_template' config var naw expects parents list.
 * Django app template now for Django>=1.8 and Python>=3.5.
 * Fixed multiple template inheritance.
 
