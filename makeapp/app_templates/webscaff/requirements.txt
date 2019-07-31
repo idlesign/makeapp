@@ -2,5 +2,5 @@
 
 Django>=2.2.0
 envbox>=1.1.0
-uwsgi>=2.0.18
+pyuwsgi>=2.0.18
 uwsgiconf>=0.15.2
