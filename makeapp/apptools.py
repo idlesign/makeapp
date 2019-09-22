@@ -269,13 +269,13 @@ class ChangelogData(DataContainer):
         :param tuple new_version:
         :rtype: str|unicode
         """
-        version_str = 'v%s [%s]' % (
-            '.'.join(map(str, new_version)),
-            datetime.now().strftime('%Y-%m-%d')
-        )
+        version_str = 'v%s' % ('.'.join(map(str, new_version)))
+        version_with_date = '%s [%s]' % (version_str, datetime.now().strftime('%Y-%m-%d'))
 
-        self.file_helper.line_replace(version_str)
-        self.file_helper.line_replace('-' * len(version_str), offset=1)
+        replace = self.file_helper.line_replace
+
+        replace(version_with_date)
+        replace('-' * len(version_with_date), offset=1)
 
         return version_str
 
