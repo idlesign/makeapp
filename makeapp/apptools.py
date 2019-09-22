@@ -1,15 +1,16 @@
 from __future__ import unicode_literals
-import os
+
 import logging
+import os
+from datetime import datetime
 
 from setuptools import find_packages
 
-from .helpers.vcs import VcsHelper
-from .helpers.files import FileHelper
-from .helpers.dist import DistHelper
 from .exceptions import ProjectorExeption
+from .helpers.dist import DistHelper
+from .helpers.files import FileHelper
+from .helpers.vcs import VcsHelper
 from .utils import chdir
-
 
 LOG = logging.getLogger(__name__)
 
@@ -98,7 +99,7 @@ class PackageData(DataContainer):
             raise ProjectorExeption('Version line not found in init file')
 
         fake_locals = {}
-        exec (init_file[version_line_idx], {}, fake_locals)
+        exec(init_file[version_line_idx], {}, fake_locals)
 
         version = fake_locals[version_str]
         if not isinstance(version, tuple):
@@ -268,7 +269,10 @@ class ChangelogData(DataContainer):
         :param tuple new_version:
         :rtype: str|unicode
         """
-        version_str = 'v%s' % '.'.join(map(str, new_version))
+        version_str = 'v%s [%s]' % (
+            '.'.join(map(str, new_version)),
+            datetime.now().strftime('%Y-%m-%d')
+        )
 
         self.file_helper.line_replace(version_str)
         self.file_helper.line_replace('-' * len(version_str), offset=1)
@@ -331,7 +335,6 @@ class Project(object):
     def __init__(self, project_path=None):
         """
         :param str|unicode project_path: Application root (containing setup.py) path.
-        :param bool dry_run: Do not commit changes to filesystem.
         """
         self.project_path = project_path or os.getcwd()
         self.package = None  # type: PackageData
@@ -364,7 +367,6 @@ class Project(object):
 
             else:
                 'tests' in packages and packages.remove('tests')
-
 
         LOG.debug('Found packages: %s', packages)
 

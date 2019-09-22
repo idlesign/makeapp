@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
++ Changelogs now will contain version release dates.
+
+
 v1.2.0
 ------
 + Added experimental 'webscaff' project template.
