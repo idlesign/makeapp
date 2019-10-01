@@ -4,3 +4,9 @@ remotes: {{ webscaff_host }}
 project:
     name: {{ module_name }}
     repo: {{ vcs_remote }}
+{% if webscaff_domain %}
+    domain: {{ webscaff_domain }}
+{% endif %}
+{% if webscaff_email %}
+    email: {{ webscaff_email }}
+{% endif %}

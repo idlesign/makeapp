@@ -1,39 +1,41 @@
+from pathlib import Path
+
+from envbox import get_environment
 from uwsgiconf.config import configure_uwsgi
+from uwsgiconf.presets.nice import PythonSection
 
 
 def get_configurations():
 
-    from pathlib import Path
-    from envbox import get_environment
-    from uwsgiconf.presets.nice import PythonSection
+    project = '{{ module_name }}'
+    domain = '{{ webscaff_domain }}'
 
-    section = PythonSection(
-
-        wsgi_module='%s' % (Path(__file__).absolute().parent / 'wsgi.py'),
-        log_dedicated=True,
-        ignore_write_errors=True,
-        owner='{{ module_name }}',
-        process_prefix='{{ module_name }}',
-
-    )
-    networking = section.networking
-
-    sockets = [
-        networking.sockets.http(':80'),
-    ]
+    dir_runtime = Path('../runtime/').absolute()
 
     environ = get_environment()
-    settings = environ.getmany('{{ module_name }}_HTTPS_'.upper())
 
-    https_cert = settings.get('CERT')
-    https_key = settings.get('KEY')
+    developer_mode = environ.is_development
 
-    if https_cert and https_key:
-        sockets.append(
-            networking.sockets.https(':443', cert=https_cert, key=https_key)
-        )
+    section = PythonSection.bootstrap(
+        'http://:%s' % 8000 if developer_mode else 80,
 
-    networking.register_socket(sockets)
+        wsgi_module='%s.wsgi' % project,
+        process_prefix='[%s] ' % project,
+
+        log_dedicated=True,
+        ignore_write_errors=True,
+        touch_reload=str(dir_runtime / 'reloader'),
+        owner=project if developer_mode else None,
+    )
+
+    section.spooler.add(str(dir_runtime / 'spool'))
+
+    if not developer_mode and domain:
+        webroot = str(dir_runtime / 'certbot')
+        section.configure_certbot_https(domain=domain, webroot=webroot)
+
+    section.configure_maintenance_mode(
+        str(dir_runtime / 'maintenance'), section.get_bundled_static_path('503.html'))
 
     return section
 

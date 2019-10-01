@@ -15,6 +15,8 @@ class WebscaffConfig(Config):
 
     parent_template = ['pytest']
 
+    domain = ConfigSetting(title='Domain name', default='')
+    email = ConfigSetting(title='Admin email')
     host = ConfigSetting(title='Remote host')
 
     def hook_rollout_pre(self):
@@ -53,7 +55,8 @@ class WebscaffConfig(Config):
             shutil.move(join(self.dir_package_root, name), self.dir_project)
 
         move_up('conf')
-        move_up('dump')
+        move_up('dumps')
+        move_up('runtime')
         move_up('wscaff.yml')
 
     def prepare_venv(self):
@@ -103,7 +106,6 @@ class WebscaffConfig(Config):
 
         # Create basic app.
         dir_app = join(dir_package, 'core')
-        os.mkdir(dir_app)
         run_command('%s startapp core %s' % (command_django_admin, dir_app))
 
 

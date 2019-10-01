@@ -5,5 +5,6 @@
 conf/
 venv/
 dumps/
+runtime/
 settings_production.py
 {% endblock %}

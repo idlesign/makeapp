@@ -14,7 +14,3 @@ INTERNAL_IPS = [
     '127.0.0.1',
     '[::1]',
 ]
-
-ADMINS = (
-    ('me', 'me@some.where'),
-)
