@@ -5,6 +5,7 @@ makeapp changelog
 Unreleased
 ----------
 + Changelogs now will contain version release dates.
+* Fixed 'VcsHelper.add_tag' on Py3.
 
 
 v1.2.0

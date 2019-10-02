@@ -4,8 +4,8 @@ from tempfile import NamedTemporaryFile
 
 from jinja2 import _compat
 
-from ..utils import run_command
 from ..exceptions import ProjectorExeption, CommandError
+from ..utils import run_command
 
 
 class VcsHelper(object):
@@ -86,7 +86,7 @@ class VcsHelper(object):
         """
         overwrite = '-f' if overwrite else ''
 
-        if _compat.PY2:
+        if isinstance(description, _compat.string_types):
             description = description.encode('utf8')
 
         with NamedTemporaryFile() as f:
