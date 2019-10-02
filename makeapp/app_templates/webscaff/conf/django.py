@@ -10,7 +10,7 @@ ALLOWED_HOSTS = [
     # domain names your is service available at.
     '{{ webscaff_host }}',
 {% if webscaff_domain %}
-    '{{ webscaff_domain }}',
+    PROJECT_DOMAIN,
 {% endif %}
 
 ]
