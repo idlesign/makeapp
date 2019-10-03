@@ -18,6 +18,7 @@ class WebscaffConfig(Config):
     domain = ConfigSetting(title='Domain name', default='')
     email = ConfigSetting(title='Admin email')
     host = ConfigSetting(title='Remote host')
+    db_password = ConfigSetting(title='Database password')
 
     def hook_rollout_pre(self):
         super(WebscaffConfig, self).hook_rollout_pre()

@@ -20,3 +20,19 @@ ADMINS = (
     ('Administrator', '{{ webscaff_email }}'),
 )
 {% endif %}
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': PROJECT_NAME,
+        'USER': PROJECT_NAME,
+        'PASSWORD': '{{ webscaff_db_password }}',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+
+
+STATIC_ROOT = str(PROJECT_DIR_RUNTIME / 'static')
+MEDIA_ROOT = str(PROJECT_DIR_RUNTIME / 'media')
