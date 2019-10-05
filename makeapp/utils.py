@@ -120,6 +120,6 @@ def run_command(command):
         data.append(item)
 
     if has_error:
-        raise CommandError('Command `%s` failed: %s' % (command, '\n'.join(data).encode('utf8')))
+        raise CommandError('Command `%s` failed: %s' % (command, '\n'.join(data)))
 
     return data
