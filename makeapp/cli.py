@@ -117,6 +117,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
         remote_address=remote_address,
         remote_push=remote_push,
     )
+    click.secho('Done', fg='green')
 
 
 @entry_point.command()
@@ -148,12 +149,15 @@ def release(increment, debug):
         if click.confirm('Publish to remotes?', default=True):
             project.publish()
 
+    click.secho('Done', fg='green')
+
 
 @entry_point.command()
 @click.argument('description', nargs=-1)
 def change(description):
     """Fixates a change adding a message to a changelog."""
     Project().add_change(description)
+    click.secho('Done', fg='green')
 
 
 def main():
