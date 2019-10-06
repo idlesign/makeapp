@@ -8,15 +8,40 @@ if False:  # pragma: nocover
     from .apptemplate import AppTemplate
 
 
+class ConfigMeta(type):
+
+    def __new__(cls, name, bases, dict_):
+        new_type = type.__new__(cls, name, bases, dict_)
+
+        for key, val in dict_.items():
+            if isinstance(val, ConfigSetting):
+                val.name = key
+
+        return new_type
+
+
 class ConfigSetting(object):
+
+    name = None  # Runtime bound by metaclass.
 
     def __init__(self, title, default=None, type=None):
         self.title = title
         self.default = default
         self.type = type
 
+    def __get__(self, instance, owner):
+        """Allows convenient IDE-friendly access from Config
+        heirs to settings defined in them.
 
-class Config(object):
+        :param Config instance:
+        :param type(Config) owner:
+
+        """
+        app_template = instance.app_template
+        return app_template.maker.settings['%s_%s' % (app_template.name, self.name)]
+
+
+class Config(_compat.with_metaclass(ConfigMeta)):
     """Base for application template configuration."""
 
     parent_template = None
@@ -41,12 +66,12 @@ class Config(object):
         """Executed on rollout configuration."""
 
         settings_conf = self.settings
-        app_template = self.app_template
-        settings_current = app_template.maker.settings
 
         if not settings_conf:
             return
 
+        app_template = self.app_template
+        settings_current = app_template.maker.settings
         settings_gathered = OrderedDict()
         advertise_template = True
 

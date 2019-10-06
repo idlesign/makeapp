@@ -95,7 +95,7 @@ class AppMaker(object):
 
         self.logger.debug('Templates path: %s', self.path_templates_current)
 
-        self.app_templates = []
+        self.app_templates = []  # type: list[AppTemplate]
         self._init_app_templates(templates_to_use)
 
         self.settings = self._init_settings(app_name)
