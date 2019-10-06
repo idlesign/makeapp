@@ -66,6 +66,48 @@ class WebscaffConfig(Config):
         run_command('%s -p python3 venv/' % self.command_venv)
         run_command('. venv/bin/activate && pip install -r %s/requirements.txt' % self.module_name)
 
+    def prepare_django_settings_base(self, dir_tmp):
+
+        module_name = self.module_name
+        dir_package = self.dir_package
+
+        source_file = join(dir_tmp, module_name, 'settings.py')
+        replace_infile(
+            source_file,
+            pairs=(
+                # Add basic project-related settings.
+                (
+                    'import os',
+                    
+                    'import os\n'
+                    'from pathlib import Path\n\n'
+                    "PROJECT_NAME = '%(module)s'\n"
+                    "PROJECT_DOMAIN = '%(domain)s'\n"
+                    "PROJECT_DIR_ROOT = Path('/srv') / PROJECT_NAME\n"
+                    "PROJECT_DIR_RUNTIME = PROJECT_DIR_ROOT / 'runtime'\n" % {
+                        'module': module_name,
+                        'domain': self.domain,
+                    },
+                ),
+                #  Reset debug.
+                (
+                    'DEBUG = True',
+
+                    'DEBUG = False',
+                ),
+                # Add core application.
+                (
+                    "    'django.contrib.staticfiles',",
+
+                    "    'django.contrib.staticfiles',\n\n"
+                    "    'uwsgiconf.contrib.django.uwsgify',\n\n"
+                    "    '%(module)s.core',\n" % {
+                        'module': module_name,
+                    },
+                 ),
+            ))
+        shutil.move(source_file, join(dir_package, 'settings', 'settings_base.py'))
+
     def prepare_django_files(self):
         self.logger.info('Bootstrapping Django project and basic application ...')
 
@@ -90,18 +132,7 @@ class WebscaffConfig(Config):
             replace(source_file)
             shutil.move(source_file, join(dir_package, 'wsgi.py'))
 
-            source_file = join(dir_tmp, module_name, 'settings.py')
-            replace_infile(
-                source_file,
-                pairs=(
-                    ('DEBUG = True', 'DEBUG = False'),
-                    # Add core application.
-                    ("    'django.contrib.staticfiles',",
-                     "    'django.contrib.staticfiles',\n\n"
-                     "    'uwsgiconf.contrib.django.uwsgify',\n\n"
-                     "    '%(module)s.core',\n" % {'module': module_name}),
-                ))
-            shutil.move(source_file, join(dir_package, 'settings', 'settings_base.py'))
+            self.prepare_django_settings_base(dir_tmp)
 
             shutil.move(join(dir_tmp, module_name, 'urls.py'), join(dir_package, 'urls.py'))
 
