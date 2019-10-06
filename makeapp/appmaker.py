@@ -105,6 +105,8 @@ class AppMaker(object):
             self.path_templates_current,
         ])
 
+        self._hook_run('rollout_init')
+
     def _init_settings(self, app_name):
         """Initializes and returns base settings.
         
