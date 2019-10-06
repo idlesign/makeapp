@@ -27,9 +27,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': PROJECT_NAME,
         'USER': PROJECT_NAME,
-        'PASSWORD': '{{ webscaff_db_password }}',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        # We'll use Unix domain sockets, so we omit PASSWORD, HOST, PORT
     }
 }
 

@@ -15,10 +15,9 @@ class WebscaffConfig(Config):
 
     parent_template = ['pytest']
 
-    domain = ConfigSetting(title='Domain name', default='')
-    email = ConfigSetting(title='Admin email')
-    host = ConfigSetting(title='Remote host')
-    db_password = ConfigSetting(title='Database password')
+    domain = ConfigSetting(title='Domain Name', default='')
+    email = ConfigSetting(title='Admin E-mail')
+    host = ConfigSetting(title='Remote Host IP')
 
     def hook_rollout_pre(self):
         super(WebscaffConfig, self).hook_rollout_pre()

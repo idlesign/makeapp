@@ -16,6 +16,7 @@ def get_configurations():
 
     section = PythonSection.bootstrap(
         'http://:%s' % (80 if in_production else 8000),
+        allow_shared_sockets=in_production,
 
         wsgi_module='%s.wsgi' % project,
         process_prefix='[%s] ' % project,
@@ -32,7 +33,7 @@ def get_configurations():
 
     if in_production and domain:
         webroot = str(dir_runtime / 'certbot')
-        section.configure_certbot_https(domain=domain, webroot=webroot)
+        section.configure_certbot_https(domain=domain, webroot=webroot, allow_shared_sockets=True)
 
     section.configure_maintenance_mode(
         str(dir_runtime / 'maintenance'), section.get_bundled_static_path('503.html'))
