@@ -11,18 +11,31 @@ join = os.path.join  # Short alias
 
 class WebscaffConfig(Config):
 
-    command_venv = 'virtualenv'
-
     parent_template = ['pytest']
 
     domain = ConfigSetting(title='Domain Name', default='')
     email = ConfigSetting(title='Admin E-mail')
     host = ConfigSetting(title='Remote Host IP')
 
-    def hook_rollout_pre(self):
-        super(WebscaffConfig, self).hook_rollout_pre()
+    def hook_rollout_init(self):
+        super(WebscaffConfig, self).hook_rollout_init()
 
-        check_command(self.command_venv, 'virtual environment creation script')
+        required = [
+            'python3-dev',
+            'python3-pip',
+            'python3-venv',
+            'python3-wheel',
+
+            # For source builds.
+            'build-essential',
+            'libpcre3-dev', 'libssl-dev',  # for uWSGI with SSL and routing support
+
+            'libpq-dev',
+        ]
+
+        self.print_banner(
+            "You're about to rollout 'webscaff' skeleton.\n"
+            "Please make sure the following system packages are installed:\n  %s" % ' '.join(required))
 
     def hook_rollout_post(self):
         super(WebscaffConfig, self).hook_rollout_post()
@@ -62,7 +75,7 @@ class WebscaffConfig(Config):
     def prepare_venv(self):
         self.logger.info('Bootstrapping virtual environment for project ...')
 
-        run_command('%s -p python3 venv/' % self.command_venv)
+        run_command('python3 -m venv venv/')
         run_command('. venv/bin/activate && pip install -r %s/requirements.txt' % self.module_name)
 
     def prepare_django_settings_base(self, dir_tmp):
