@@ -1,8 +1,9 @@
 from collections import OrderedDict
+from time import sleep
 
 import click
 
-from .utils import run_command, check_command, temp_dir, replace_infile, _compat  # exposed as API
+from .utils import _compat  # exposed as API
 
 if False:  # pragma: nocover
     from .apptemplate import AppTemplate
@@ -98,6 +99,21 @@ class Config(_compat.with_metaclass(ConfigMeta)):
                 settings_gathered[setting_name] = current_value
 
         app_template.maker.update_settings(settings_gathered)
+
+    def print_banner(self, text):
+        """Prints out a banner with the given text.
+
+        :param str text:
+
+        """
+        max_line_len = max(map(len, text.splitlines()))
+        text = text + '\n' + '=' * max_line_len + '\n'
+
+        self.logger.warning(text)
+        sleep(1)
+
+    def hook_rollout_init(self):
+        """Executed on skeleton rollout initialization."""
 
     def hook_rollout_pre(self):
         """Executed before application skeleton rollout."""
