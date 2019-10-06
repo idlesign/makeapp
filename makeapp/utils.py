@@ -87,7 +87,7 @@ def check_command(command, hint):
 
     except CommandError:
         raise CommandError(
-            "Unable to find '%s' command. Check %s is installed and available." % (command, hint))
+            "Failed to execute '%s' command. Check %s is installed and available." % (command, hint))
 
 
 def run_command(command):
