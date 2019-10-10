@@ -1,10 +1,11 @@
 from __future__ import absolute_import
+
 import os
 import shutil
 from functools import partial
 
-from makeapp.appconfig import Config, ConfigSetting, temp_dir, replace_infile, check_command, run_command
-
+from makeapp.appconfig import Config, ConfigSetting
+from makeapp.utils import temp_dir, replace_infile, run_command
 
 join = os.path.join  # Short alias
 
@@ -68,8 +69,7 @@ class WebscaffConfig(Config):
             shutil.move(join(self.dir_package_root, name), self.dir_project)
 
         move_up('conf')
-        move_up('dumps')
-        move_up('runtime')
+        move_up('state')
         move_up('wscaff.yml')
 
     def prepare_venv(self):
@@ -95,8 +95,12 @@ class WebscaffConfig(Config):
                     'from pathlib import Path\n\n'
                     "PROJECT_NAME = '%(module)s'\n"
                     "PROJECT_DOMAIN = '%(domain)s'\n"
-                    "PROJECT_DIR_ROOT = Path('/srv') / PROJECT_NAME\n"
-                    "PROJECT_DIR_RUNTIME = PROJECT_DIR_ROOT / 'runtime'\n" % {
+                    "PROJECT_DIR_APP = Path('/srv') / PROJECT_NAME\n"
+                    "PROJECT_DIR_STATE = Path('/var/lib') / PROJECT_NAME\n"
+                    "PROJECT_DIR_RUN = Path('/run') / PROJECT_NAME\n"
+                    "PROJECT_DIR_LOG = Path('/var/log') / PROJECT_NAME\n"
+                    "PROJECT_DIR_CACHE = Path('/var/cache') / PROJECT_NAME\n"
+                    "" % {
                         'module': module_name,
                         'domain': self.domain,
                     },

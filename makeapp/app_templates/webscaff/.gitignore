@@ -4,7 +4,6 @@
 {{ super() }}
 conf/
 venv/
-dumps/
-runtime/
+state/
 settings_production.py
 {% endblock %}

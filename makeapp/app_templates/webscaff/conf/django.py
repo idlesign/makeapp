@@ -32,5 +32,13 @@ DATABASES = {
 }
 
 
-STATIC_ROOT = str(PROJECT_DIR_RUNTIME / 'static')
-MEDIA_ROOT = str(PROJECT_DIR_RUNTIME / 'media')
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': str(PROJECT_DIR_CACHE),
+    }
+}
+
+
+STATIC_ROOT = str(PROJECT_DIR_STATE / 'static')
+MEDIA_ROOT = str(PROJECT_DIR_STATE / 'media')

@@ -11,8 +11,7 @@ def get_configurations():
     project = settings.PROJECT_NAME
     domain = settings.PROJECT_DOMAIN
 
-    dir_project = settings.PROJECT_DIR_ROOT
-    dir_runtime = settings.PROJECT_DIR_RUNTIME
+    dir_state = settings.PROJECT_DIR_STATE
 
     section = PythonSection.bootstrap(
         'http://:%s' % (80 if in_production else 8000),
@@ -23,20 +22,20 @@ def get_configurations():
 
         log_dedicated=True,
         ignore_write_errors=True,
-        touch_reload=str(dir_runtime / 'reloader'),
+        touch_reload=str(dir_state / 'reloader'),
         owner=project if in_production else None,
     )
 
-    section.main_process.change_dir(str(dir_project))
+    section.main_process.change_dir(str(dir_state))
 
-    section.spooler.add(str(dir_runtime / 'spool'))
+    section.spooler.add(str(dir_state / 'spool'))
 
     if in_production and domain:
-        webroot = str(dir_runtime / 'certbot')
+        webroot = str(dir_state / 'certbot')
         section.configure_certbot_https(domain=domain, webroot=webroot, allow_shared_sockets=True)
 
     section.configure_maintenance_mode(
-        str(dir_runtime / 'maintenance'), section.get_bundled_static_path('503.html'))
+        str(dir_state / 'maintenance'), section.get_bundled_static_path('503.html'))
 
     return section
 
