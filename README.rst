@@ -99,4 +99,4 @@ To enable bash completion for ``makeapp`` command append the following line into
 Documentation
 -------------
 
-http://makeapp.readthedocs.org/
+https://makeapp.readthedocs.org/
