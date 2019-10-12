@@ -1,0 +1,48 @@
+# Place into:   /etc/systemd/system/{{ module_name }}.service
+# Setup:        sudo systemctl enable $PWD/{{ module_name }}.service
+# Start:        sudo systemctl start {{ module_name }}.service
+# Stop:         sudo systemctl stop {{ module_name }}.service
+# Restart:      sudo systemctl restart {{ module_name }}.service
+# Status:       systemctl status {{ module_name }}.service
+# Journal:      journalctl -fu {{ module_name }}.service
+
+[Unit]
+Description={{ module_name }} webscaff service
+Wants=network-online.target
+After=network-online.target
+
+
+[Service]
+ExecStart=/usr/bin/{{ module_name }}
+Restart=on-failure
+KillSignal=SIGTERM
+Type=notify
+NotifyAccess=all
+
+CPUAccounting=yes
+MemoryAccounting=yes
+IOAccounting=yes
+IPAccounting=yes
+PrivateTmp=yes
+RemoveIPC=yes
+TasksAccounting=yes
+
+ProtectSystem=strict
+ProtectHome=read-only
+
+#DynamicUser=yes
+User={{ module_name }}
+Group={{ module_name }}
+
+# /run/
+RuntimeDirectory={{ module_name }}
+# /var/lib/
+StateDirectory={{ module_name }}
+# /var/log/
+LogsDirectory={{ module_name }}
+# /var/cache/
+CacheDirectory={{ module_name }}
+
+
+[Install]
+WantedBy=multi-user.target
