@@ -359,7 +359,6 @@ class AppMaker(object):
         """Copies a file from `src` to `dest` replacing settings markers
         with the given settings values, optionally prepending some data.
 
-        :param str|unicode template_name: source file
         :param TemplateFile src: source file
         :param str|unicode dest: destination file
         :param str|unicode prepend_data: data to prepend to dest file contents
@@ -378,6 +377,10 @@ class AppMaker(object):
             data = prepend_data + data
 
         self._create_file(dest, data)
+
+        # Copy permissions.
+        mode = os.stat(src.path_full).st_mode
+        os.chmod(dest, mode)
 
     def get_settings_string(self):
         """Returns settings string."""
