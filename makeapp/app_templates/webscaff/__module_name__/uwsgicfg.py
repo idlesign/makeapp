@@ -12,10 +12,12 @@ def get_configurations():
     domain = settings.PROJECT_DOMAIN
 
     dir_state = settings.PROJECT_DIR_STATE
+    dir_spool = dir_state / 'spool'
+    dir_runtime = settings.PROJECT_DIR_RUNTIME
 
     section = PythonSection.bootstrap(
         'http://:%s' % (80 if in_production else 8000),
-        allow_shared_sockets=in_production,
+        allow_shared_sockets=False,
 
         wsgi_module='%s.wsgi' % project,
         process_prefix='[%s] ' % project,
@@ -23,16 +25,16 @@ def get_configurations():
         log_dedicated=True,
         ignore_write_errors=True,
         touch_reload=str(dir_state / 'reloader'),
-        owner=project if in_production else None,
     )
-
+    section.set_runtime_dir(str(dir_runtime.parent))
     section.main_process.change_dir(str(dir_state))
 
-    section.spooler.add(str(dir_state / 'spool'))
+    if dir_spool.exists():
+        section.spooler.add(str(dir_spool))
 
     if in_production and domain:
         webroot = str(dir_state / 'certbot')
-        section.configure_certbot_https(domain=domain, webroot=webroot, allow_shared_sockets=True)
+        section.configure_certbot_https(domain=domain, webroot=webroot, allow_shared_sockets=False)
 
     section.configure_maintenance_mode(
         str(dir_state / 'maintenance'), section.get_bundled_static_path('503.html'))

@@ -13,11 +13,13 @@ After=network-online.target
 
 
 [Service]
-ExecStart=/usr/bin/{{ module_name }}
+ExecStart=/usr/bin/{{ module_name }} uwsgi_run
 Restart=on-failure
 KillSignal=SIGTERM
 Type=notify
 NotifyAccess=all
+# Bind to priviledged ports.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 
 CPUAccounting=yes
 MemoryAccounting=yes
@@ -30,7 +32,6 @@ TasksAccounting=yes
 ProtectSystem=strict
 ProtectHome=read-only
 
-#DynamicUser=yes
 User={{ module_name }}
 Group={{ module_name }}
 

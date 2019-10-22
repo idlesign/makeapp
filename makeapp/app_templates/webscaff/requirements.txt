@@ -4,5 +4,5 @@ Django>=2.2.5
 envbox>=1.1.0
 psycopg2>=2.8.3
 uwsgi>=2.0.18
-uwsgiconf>=0.19.0
+uwsgiconf>=0.19.1
 #git+git://github.com/idlesign/uwsgiconf@master#egg=uwsgiconf

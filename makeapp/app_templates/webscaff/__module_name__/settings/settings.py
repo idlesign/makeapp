@@ -10,8 +10,8 @@ from envbox import import_by_environment, get_environment
 
 
 current_env = import_by_environment(
-    # For production one can place `../runtime/environment` file with `production` as it contents.
-    get_environment(detectors_opts={'file': {'source': '/srv/{{ module_name }}/runtime/environ'}}))
+    # For production one can place `/var/lib/{{ module_name }}/environ` file with `production` as it contents.
+    get_environment(detectors_opts={'file': {'source': '/var/lib/{{ module_name }}/environ'}}))
 
 
 IN_PRODUCTION = current_env == 'production'

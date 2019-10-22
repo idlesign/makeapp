@@ -97,7 +97,7 @@ class WebscaffConfig(Config):
                     "PROJECT_DOMAIN = '%(domain)s'\n"
                     "PROJECT_DIR_APP = Path('/srv') / PROJECT_NAME\n"
                     "PROJECT_DIR_STATE = Path('/var/lib') / PROJECT_NAME\n"
-                    "PROJECT_DIR_RUN = Path('/run') / PROJECT_NAME\n"
+                    "PROJECT_DIR_RUNTIME = Path('/run') / PROJECT_NAME\n"
                     "PROJECT_DIR_LOG = Path('/var/log') / PROJECT_NAME\n"
                     "PROJECT_DIR_CACHE = Path('/var/cache') / PROJECT_NAME\n"
                     "" % {
