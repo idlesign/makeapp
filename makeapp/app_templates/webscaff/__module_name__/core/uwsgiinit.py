@@ -1,4 +1,4 @@
-from uwsgiconf.runtime.scheduling import register_cron, timer
+from uwsgiconf.runtime.scheduling import register_cron, register_timer
 from uwsgiconf.runtime.mules import Farm
 from uwsgiconf.runtime.spooler import Spooler
 

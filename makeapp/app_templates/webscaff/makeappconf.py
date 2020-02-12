@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import os
 import shutil
 from functools import partial
@@ -70,6 +68,7 @@ class WebscaffConfig(Config):
 
         move_up('conf')
         move_up('state')
+        move_up('tests')
         move_up('wscaff.yml')
 
     def prepare_venv(self):
@@ -91,19 +90,8 @@ class WebscaffConfig(Config):
                 (
                     'import os',
                     
-                    'import os\n'
-                    'from pathlib import Path\n\n'
-                    "PROJECT_NAME = '%(module)s'\n"
-                    "PROJECT_DOMAIN = '%(domain)s'\n"
-                    "PROJECT_DIR_APP = Path('/srv') / PROJECT_NAME\n"
-                    "PROJECT_DIR_STATE = Path('/var/lib') / PROJECT_NAME\n"
-                    "PROJECT_DIR_RUNTIME = Path('/run') / PROJECT_NAME\n"
-                    "PROJECT_DIR_LOG = Path('/var/log') / PROJECT_NAME\n"
-                    "PROJECT_DIR_CACHE = Path('/var/cache') / PROJECT_NAME\n"
-                    "" % {
-                        'module': module_name,
-                        'domain': self.domain,
-                    },
+                    'import os\n\n'
+                    'from .sub_paths import *\n\n'
                 ),
                 #  Reset debug.
                 (
