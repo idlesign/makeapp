@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.3.0 [2020-02-16]
+-------------------
 ! Dropped QA for Python 2.
 + Changelogs now will contain version release dates.
 + Default template tox config now includes Py3.8 env.
