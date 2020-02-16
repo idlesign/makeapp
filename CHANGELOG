@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+! Dropped support for Python 2.
 + Django. Template updated. Tests now rely on pytest-djangoapp.
 * Click. 'click' package set as required.
 * Fixed 'tests' install as package.

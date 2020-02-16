@@ -1,3 +1,4 @@
+import configparser
 import logging
 import os
 import re
@@ -10,13 +11,7 @@ from .apptemplate import TemplateFile, AppTemplate
 from .exceptions import AppMakerException
 from .helpers.vcs import VcsHelper
 from .rendering import Renderer
-from .utils import chdir, configure_logging, PYTHON_VERSION, PY2
-
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
-
+from .utils import chdir, configure_logging, PYTHON_VERSION
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 BASE_PATH = os.path.dirname(__file__)
@@ -110,7 +105,7 @@ class AppMaker(object):
     def _init_settings(self, app_name):
         """Initializes and returns base settings.
         
-        :param str|unicode app_name: 
+        :param str app_name:
         :rtype: OrderedDict 
         """
 
@@ -130,8 +125,8 @@ class AppMaker(object):
     def _get_templates_path_current(self, path):
         """Returns current templates path.
         
-        :param str|unicode|None path: 
-        :rtype: str|unicode 
+        :param str|None path:
+        :rtype: str
         """
         path_user_templates = os.path.join(self.path_user_confs, 'app_templates')
 
@@ -179,7 +174,7 @@ class AppMaker(object):
         :param target:
         :param strip_unknown: Strip unknown markers from the target.
         :param OrderedDict settings:
-        :rtype: str|unicode
+        :rtype: str
 
         """
         settings = settings or self.settings
@@ -255,7 +250,7 @@ class AppMaker(object):
 
         Returns results dictionary indexed by app template objects.
 
-        :param str|unicode hook_name:
+        :param str hook_name:
         :rtype: OrderedDict
 
         """
@@ -269,13 +264,13 @@ class AppMaker(object):
     def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None, remote_push=False):
         """Rolls out the application skeleton into `dest` path.
 
-        :param str|unicode dest: App skeleton destination path.
+        :param str dest: App skeleton destination path.
 
         :param bool overwrite: Whether to overwrite existing files.
 
         :param bool init_repository: Whether to initialize a repository.
 
-        :param str|unicode remote_address: Remote repository address to add to DVCS.
+        :param str remote_address: Remote repository address to add to DVCS.
 
         :param bool remote_push: Whether to push to remote.
 
@@ -347,9 +342,6 @@ class AppMaker(object):
         :param contents:
 
         """
-        if PY2:
-            contents = contents.encode('utf8')
-
         with open(path, 'w') as f:
             f.write(contents)
             if contents.endswith('\n'):
@@ -360,8 +352,8 @@ class AppMaker(object):
         with the given settings values, optionally prepending some data.
 
         :param TemplateFile src: source file
-        :param str|unicode dest: destination file
-        :param str|unicode prepend_data: data to prepend to dest file contents
+        :param str dest: destination file
+        :param str prepend_data: data to prepend to dest file contents
 
         """
         self.logger.info('Creating %s ...', dest)
@@ -427,7 +419,7 @@ class AppMaker(object):
     def update_settings_complex(self, config=None, dictionary=None):
         """Updates current settings using multiple sources,
 
-        :param str|unicode config:
+        :param str config:
         :param dict dictionary:
 
         """
@@ -503,11 +495,11 @@ class AppMaker(object):
         """Initializes an appropriate VCS repository in the given path.
         Optionally adds the given files.
 
-        :param str|unicode dest: Path to initialize VCS repository.
+        :param str dest: Path to initialize VCS repository.
 
         :param bool add_files: Whether to add files to commit automatically.
 
-        :param str|unicode remote_address: Remote repository address to add to DVCS.
+        :param str remote_address: Remote repository address to add to DVCS.
 
         :param bool remote_push: Whether to push to remote.
 

@@ -17,7 +17,7 @@ class FileHelper(object):
     def read_file(cls, fpath):
         """Reads a file from FS. Returns a lis of strings from it.
 
-        :param str|unicode fpath: File path
+        :param str fpath: File path
         :rtype: list
         """
         with io.open(fpath, encoding='utf-8') as f:
@@ -33,7 +33,7 @@ class FileHelper(object):
     def line_replace(self, value, offset=0):
         """Replaces a line in file.
 
-        :param str|unicode value: New line.
+        :param str value: New line.
         :param int offset: Offset from line_idx
         """
         target_idx = self.line_idx + offset
@@ -42,7 +42,7 @@ class FileHelper(object):
     def insert(self, value, offset=1):
         """Inserts a line (or many) into file.
 
-        :param str|unicode|list value: New line(s).
+        :param str|list value: New line(s).
         :param int offset: Offset from line_idx
         """
         target_idx = self.line_idx + offset
@@ -54,7 +54,7 @@ class FileHelper(object):
         """Generator. Yields lines after line_idx
 
         :param offset:
-        :rtype: str|unicode
+        :rtype: str
         """
         target_idx = self.line_idx + offset
         for line in self.contents[target_idx:]:

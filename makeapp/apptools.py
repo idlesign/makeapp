@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import os
 from datetime import datetime
@@ -60,7 +58,7 @@ class PackageData(DataContainer):
         """Return string representation for a given version.
         
         :param tuple version: 
-        :rtype: str|unicode 
+        :rtype: str
         """
         return '.'.join(map(str, version))
 
@@ -76,7 +74,7 @@ class PackageData(DataContainer):
     def get(cls, package_name):
         """Gathers information from a package,
 
-        :param str|unicode package_name:
+        :param str package_name:
         :rtype: PackageData
         """
         LOG.debug('Getting version from `%s` package ...', package_name)
@@ -150,7 +148,7 @@ class PackageData(DataContainer):
         """Bumps version number.
         Returns new version number tuple.
 
-        :param str|unicode increment: Version number chunk to increment  (major, minor, patch)
+        :param str increment: Version number chunk to increment  (major, minor, patch)
         :rtype: tuple
         """
         self.version_increment = increment
@@ -251,7 +249,7 @@ class ChangelogData(DataContainer):
             If any + entries `minor` is incremented.
 
         :return: major, minor, patch
-        :rtype: str|unicode
+        :rtype: str
         """
         supposed_chunk = 'patch'
 
@@ -267,7 +265,7 @@ class ChangelogData(DataContainer):
         Returns version number string as in changelog.
 
         :param tuple new_version:
-        :rtype: str|unicode
+        :rtype: str
         """
         version_str = 'v%s' % ('.'.join(map(str, new_version)))
         version_with_date = '%s [%s]' % (version_str, datetime.now().strftime('%Y-%m-%d'))
@@ -282,7 +280,7 @@ class ChangelogData(DataContainer):
     def add_change(self, description):
         """Adds change into changelog.
 
-        :param str|unicode description:
+        :param str description:
         """
         if not description:
             return
@@ -307,7 +305,7 @@ class ChangelogData(DataContainer):
     def get_version_summary(self):
         """Return version summary string.
         
-        :rtype: str|unicode 
+        :rtype: str
         """
         return '\n'.join(self.get_changes()).strip()
 
@@ -334,7 +332,7 @@ class Project(object):
 
     def __init__(self, project_path=None):
         """
-        :param str|unicode project_path: Application root (containing setup.py) path.
+        :param str project_path: Application root (containing setup.py) path.
         """
         self.project_path = project_path or os.getcwd()
         self.package = None  # type: PackageData
@@ -383,7 +381,7 @@ class Project(object):
     def get_release_info(self, increment=None):
         """Returns release info tuple as part of release preparation.
         
-        :param str|unicode increment: Version chunk to increment (major, minor, patch)
+        :param str increment: Version chunk to increment (major, minor, patch)
             If not set, will be deduced from changelog data.
             
         :rtype: tuple 
@@ -422,7 +420,7 @@ class Project(object):
     def add_change(self, descriptions, stage_modified=True):
         """Add a change description into changelog.
 
-        :param list|tuple|str|unicode descriptions: Single change description.
+        :param list|tuple|str descriptions: Single change description.
             Or multiple changes descriptions in list or tuple.
 
         :param bool stage_modified: Whether to stage modified files to commit.

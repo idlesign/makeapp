@@ -2,8 +2,6 @@ import os
 from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
-from jinja2 import _compat
-
 from ..exceptions import ProjectorExeption, CommandError
 from ..utils import run_command
 
@@ -36,7 +34,7 @@ class VcsHelper(object):
     def get(cls, vcs_path=None):
         """Returns an appropriate VCS helper object.
         
-        :param str|unicode vcs_path: Repository dir 
+        :param str vcs_path: Repository dir
         :rtype: VcsHelper 
         """
         vcs_path = vcs_path or os.getcwd()
@@ -80,13 +78,13 @@ class VcsHelper(object):
     def add_tag(self, name, description, overwrite=False):
         """Adds a tag.
 
-        :param str|unicode name: Tag name
-        :param str|unicode description: Additional description
+        :param str name: Tag name
+        :param str description: Additional description
         :param bool overwrite: Whether to overwrite tag if exists.
         """
         overwrite = '-f' if overwrite else ''
 
-        if isinstance(description, _compat.string_types):
+        if isinstance(description, str):
             description = description.encode('utf8')
 
         with NamedTemporaryFile() as f:
@@ -98,7 +96,7 @@ class VcsHelper(object):
     def add(self, filename=None):
         """Adds a file into a changelist.
 
-        :param str|unicode|list filename: If not provided all files in working tree are added.
+        :param str|list filename: If not provided all files in working tree are added.
         """
         filename = filename or []
         if isinstance(filename, list):
@@ -111,7 +109,7 @@ class VcsHelper(object):
     def commit(self, message):
         """Commits files added to changelist.
 
-        :param str|unicode message: Commit description.
+        :param str message: Commit description.
         """
         self.run_command("commit -m '%s'" % message.replace("'", "''"))
 
@@ -133,15 +131,15 @@ class VcsHelper(object):
     def add_remote(self, address, alias='origin'):
         """Adds a remote repository.
         
-        :param str|unicode address: 
-        :param str|unicode alias: 
+        :param str address:
+        :param str alias:
         """
         self.remote = address
 
     def push(self, upstream=None):
         """Pushes local changes and tags to remote.
         
-        :param str|unicode|bool upstream: Upstream alias. If True, default name is used. 
+        :param str|bool upstream: Upstream alias. If True, default name is used.
         """
         if upstream:
             if upstream is True:
@@ -163,8 +161,8 @@ class GitHelper(VcsHelper):
     def add_remote(self, address, alias='origin'):
         """Adds a remote repository.
 
-        :param str|unicode address: 
-        :param str|unicode alias: 
+        :param str address:
+        :param str alias:
         """
         super(GitHelper, self).add_remote(address, alias)
         self.run_command('remote add %s %s' % (alias, address))
@@ -172,7 +170,7 @@ class GitHelper(VcsHelper):
     def add(self, filename=None):
         """Adds a file into a changelist.
 
-        :param str|unicode filename: If not provided all files in working tree are added.
+        :param str filename: If not provided all files in working tree are added.
         """
         filename = filename or '.'
         super(GitHelper, self).add(filename)
@@ -191,7 +189,7 @@ class MercurialHelper(VcsHelper):
     def push(self, upstream=None):
         """Pushes local changes and tags to remote.
 
-        :param str|unicode|bool upstream: Upstream URL. If True, remote URL is used. 
+        :param str|bool upstream: Upstream URL. If True, remote URL is used.
         """
         if upstream is True and self.remote:
             upstream = self.remote

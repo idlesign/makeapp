@@ -3,7 +3,6 @@ from time import sleep
 
 import click
 
-from .utils import _compat  # exposed as API
 
 if False:  # pragma: nocover
     from .apptemplate import AppTemplate
@@ -42,7 +41,7 @@ class ConfigSetting(object):
         return app_template.maker.settings['%s_%s' % (app_template.name, self.name)]
 
 
-class Config(_compat.with_metaclass(ConfigMeta)):
+class Config(metaclass=ConfigMeta):
     """Base for application template configuration."""
 
     parent_template = None

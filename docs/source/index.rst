@@ -27,7 +27,7 @@ Requirements
    :alt: LBC Python 2
 
 
-1. Python 2.7+, 3.5+
+1. Python 3.6+
 
 
 Table of Contents

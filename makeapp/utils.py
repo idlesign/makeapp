@@ -7,13 +7,11 @@ import tempfile
 from contextlib import contextmanager
 from subprocess import Popen, PIPE, STDOUT
 
-from jinja2 import _compat
-
 from .exceptions import CommandError
 
 LOG = logging.getLogger(__name__)
 PYTHON_VERSION = sys.version_info
-PY2 = _compat.PY2
+
 
 
 def configure_logging(level=None, logger=None, format='%(message)s'):
@@ -21,7 +19,7 @@ def configure_logging(level=None, logger=None, format='%(message)s'):
 
     :param int level:
     :param logger:
-    :param str|unicode format:
+    :param str format:
 
     """
     logging.basicConfig(format=format, level=level if logger else None)
@@ -95,7 +93,7 @@ def run_command(command):
 
     Returns a list of strings gathered from a command.
 
-    :param str|unicode command:
+    :param str command:
     :raises: CommandError
     :rtype: list
     """

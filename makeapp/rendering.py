@@ -65,8 +65,8 @@ class Renderer(object):
     def render(self, filename):
         """Renders file contents with settings as get_context.
 
-        :param str|unicode|TemplateFile filename:
-        :rtype: str|unicode
+        :param str|TemplateFile filename:
+        :rtype: str
         """
         context = self.context_mutator.get_context()
 
