@@ -50,11 +50,8 @@ class Renderer:
     def __init__(self, maker, paths):
         self.context_mutator = ContextMutator(maker=maker)
 
-        paths = paths[:]
-        paths.extend([
-            # self.path_templates_license,
-            '.',  # Use current working dir.
-        ])
+        paths = list({}.fromkeys(paths).keys())  # Unique.
+        paths.insert(0, '.')  # Use current working dir.
 
         self.env = Environment(
             loader=DynamicParentLoader(paths),
@@ -84,7 +81,7 @@ class Renderer:
                 parent_template = DynamicParentTemplate(parent_paths)
 
             else:
-                parent_template = 'unset_for_%s' % filename.path_rel
+                parent_template = 'no-parent-for/%s' % filename.path_rel
 
             context['parent_template'] = parent_template
 
