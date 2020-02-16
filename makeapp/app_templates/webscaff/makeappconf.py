@@ -44,43 +44,31 @@ class WebscaffConfig(Config):
 
         self.dir_project = os.getcwd()
         self.dir_package_root = join(self.dir_project, module_name)
-        self.dir_package = join(self.dir_package_root, module_name)
 
         # Do things.
-        self.reorganize_package_dir()
         self.prepare_venv()
         self.prepare_django_files()
 
-        # Install into venv the package itself as last step so to not conflict
+        # Install into venv the package itself not to conflict
         # with Django's `startproject` command.
-        run_command('. venv/bin/activate && pip install -e %s/' % self.module_name)
+        run_command('. venv/bin/activate && pip install -e .')
 
-    def reorganize_package_dir(self):
-        """Moves a package directory into the same named subdirectory."""
-        self.logger.info('Building webscaff project directory ...')
-
-        with temp_dir() as dir_tmp:
-            run_command('mv * %(tmp)s && mv %(tmp)s %(inner)s' % {'tmp': dir_tmp, 'inner': self.module_name})
-
-        # Moving items into project root.
-        def move_up(name):
-            shutil.move(join(self.dir_package_root, name), self.dir_project)
-
-        move_up('conf')
-        move_up('state')
-        move_up('tests')
-        move_up('wscaff.yml')
+        # Initialize local sqlite DB.
+        run_command('venv/bin/%s migrate' % module_name)
 
     def prepare_venv(self):
         self.logger.info('Bootstrapping virtual environment for project ...')
 
         run_command('python3 -m venv venv/')
-        run_command('. venv/bin/activate && pip install -r %s/requirements.txt' % self.module_name)
+
+        cmd_install = '. venv/bin/activate && pip install -r '
+
+        run_command(cmd_install + 'requirements.txt')
+        run_command(cmd_install + 'tests/requirements.txt')
 
     def prepare_django_settings_base(self, dir_tmp):
 
         module_name = self.module_name
-        dir_package = self.dir_package
 
         source_file = join(dir_tmp, module_name, 'settings.py')
         replace_infile(
@@ -110,12 +98,12 @@ class WebscaffConfig(Config):
                     },
                  ),
             ))
-        shutil.move(source_file, join(dir_package, 'settings', 'base.py'))
+        shutil.move(source_file, join(self.dir_package_root, 'settings', 'base.py'))
 
     def prepare_django_files(self):
         self.logger.info('Bootstrapping Django project and basic application ...')
 
-        dir_package = self.dir_package
+        dir_package = self.dir_package_root
         module_name = self.module_name
 
         command_django_admin = './venv/bin/django-admin'
