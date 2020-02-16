@@ -7,6 +7,7 @@ Unreleased
 ! Dropped QA for Python 2.
 + Changelogs now will contain version release dates.
 + Default template tox config now includes Py3.8 env.
++ Updated Sphinx files.
 * Fixed 'VcsHelper.add_tag' on Py3.
 * Improved 'webscaff' template.
 * Now copying template file permissions to targets.
