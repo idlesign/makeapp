@@ -6,6 +6,7 @@ Unreleased
 ----------
 + Django. Template updated. Tests now rely on pytest-djangoapp.
 * Click. 'click' package set as required.
+* Fixed 'tests' install as package.
 
 
 v1.3.0 [2020-02-16]
