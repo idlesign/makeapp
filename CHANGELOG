@@ -7,6 +7,7 @@ Unreleased
 ! Dropped support for Python 2.
 + Django. Template updated. Tests now rely on pytest-djangoapp.
 * Click. 'click' package set as required.
+* Dropped QA for Python 3.5.
 * Fixed 'tests' install as package.
 
 
