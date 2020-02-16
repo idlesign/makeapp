@@ -1,7 +1,7 @@
 import pytest
 
 
-class TestApp(object):
+class TestApp:
 
     def test_method(self):
 

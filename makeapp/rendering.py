@@ -6,7 +6,7 @@ from .apptemplate import TemplateFile
 from .utils import chdir
 
 
-class ContextMutator(object):
+class ContextMutator:
     """Mutator applying additional transformations to template get_context."""
 
     def __init__(self, maker):
@@ -44,7 +44,7 @@ class ContextMutator(object):
         return context
 
 
-class Renderer(object):
+class Renderer:
     """Performs file rendering."""
 
     def __init__(self, maker, paths):
@@ -88,7 +88,7 @@ class Renderer(object):
         return rendered
 
 
-class DynamicParentTemplate(object):
+class DynamicParentTemplate:
     """Represents jinja dynamic `parent_template` variable."""
 
     def __init__(self, parents):

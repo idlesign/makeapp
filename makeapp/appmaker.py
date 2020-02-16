@@ -17,7 +17,7 @@ RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 BASE_PATH = os.path.dirname(__file__)
 
 
-class AppMaker(object):
+class AppMaker:
     """Scaffolding functionality is encapsulated in this class.
 
     Usage example:

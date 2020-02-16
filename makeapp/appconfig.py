@@ -20,7 +20,7 @@ class ConfigMeta(type):
         return new_type
 
 
-class ConfigSetting(object):
+class ConfigSetting:
 
     name = None  # Runtime bound by metaclass.
 

@@ -16,7 +16,7 @@ LOG = logging.getLogger(__name__)
 VERSION_NUMBER_CHUNKS = ('major', 'minor', 'patch')
 
 
-class DataContainer(object):
+class DataContainer:
     """Base for information gathering classes."""
 
     def __init__(self, file_helper):
@@ -327,7 +327,7 @@ class ChangelogData(DataContainer):
         super(ChangelogData, self).write()
 
 
-class Project(object):
+class Project:
     """Encapsulates application (project) related logic."""
 
     def __init__(self, project_path=None):

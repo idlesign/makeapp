@@ -9,7 +9,7 @@ if False:  # pragma: nocover
     from .appmaker import AppMaker
 
 
-class AppTemplate(object):
+class AppTemplate:
     """Represents an application template."""
 
     config_filename = 'makeappconf.py'
@@ -195,7 +195,7 @@ class AppTemplate(object):
             'Unable to find application template %s. Searched \n%s' % (name_or_path, '\n  '.join(search_paths)))
 
 
-class TemplateFile(object):
+class TemplateFile:
     """Represents app template file info."""
 
     __slots__ = ['template', 'path_full', 'path_rel']

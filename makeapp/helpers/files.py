@@ -5,7 +5,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-class FileHelper(object):
+class FileHelper:
     """Encapsulates file related functions."""
 
     def __init__(self, filepath, line_idx, contents):

@@ -6,7 +6,7 @@ from ..exceptions import ProjectorExeption, CommandError
 from ..utils import run_command
 
 
-class VcsHelper(object):
+class VcsHelper:
     """Base helper for VCS related actions."""
 
     TITLE = None

@@ -1,7 +1,7 @@
 from ..utils import run_command
 
 
-class DistHelper(object):
+class DistHelper:
     """Encapsulates Python distribution related logic."""
 
     @classmethod
