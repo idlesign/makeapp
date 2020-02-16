@@ -81,7 +81,12 @@ class Renderer:
             parent_paths = filename.parent_paths
 
             if parent_paths:
-                context['parent_template'] = DynamicParentTemplate(parent_paths)
+                parent_template = DynamicParentTemplate(parent_paths)
+
+            else:
+                parent_template = 'unset_for_%s' % filename.path_rel
+
+            context['parent_template'] = parent_template
 
         rendered = template.render(**context)
 
