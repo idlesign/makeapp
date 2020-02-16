@@ -93,6 +93,10 @@ def test_tpl_django(tmpdir, get_appmaker, assert_content):
 
         get_appmaker(templates=['django'])
 
+        assert_content(tmpdir, 'setup.py', [
+            "tests_require=['pytest']",
+        ])
+
         assert_content(tmpdir, 'dummy/config.py', [
             "name = 'dummy'",
             "verbose_name = _('Dummy')",
