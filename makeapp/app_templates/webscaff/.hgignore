@@ -5,5 +5,5 @@
 conf/
 venv/
 state/
-settings_production.py
+env_production.py
 {% endblock %}

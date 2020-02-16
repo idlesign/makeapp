@@ -110,7 +110,7 @@ class WebscaffConfig(Config):
                     },
                  ),
             ))
-        shutil.move(source_file, join(dir_package, 'settings', 'settings_base.py'))
+        shutil.move(source_file, join(dir_package, 'settings', 'base.py'))
 
     def prepare_django_files(self):
         self.logger.info('Bootstrapping Django project and basic application ...')
@@ -126,7 +126,7 @@ class WebscaffConfig(Config):
             # We'd replace settings module paths.
             replace = partial(
                 replace_infile,
-                pairs=(('%s.settings' % module_name, '%s.settings.settings' % module_name),))
+                pairs=(('%s.settings' % module_name, '%s.settings.auto' % module_name),))
 
             source_file = join(dir_tmp, 'manage.py')
             replace(source_file)
