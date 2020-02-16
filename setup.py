@@ -41,7 +41,11 @@ setup(
 
     setup_requires=['pytest-runner'] if 'test' in sys.argv else [],
     tests_require=['pytest'],
-    install_requires=['requests', 'click', 'jinja2'],
+    install_requires=[
+        'requests',
+        'click',
+        'jinja2<3.0'
+    ],
     entry_points={
         'console_scripts': ['makeapp = makeapp.cli:main'],
     },
