@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Click. 'click' package set as required.
+
+
 v1.3.0 [2020-02-16]
 -------------------
 ! Dropped QA for Python 2.
