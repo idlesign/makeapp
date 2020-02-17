@@ -39,6 +39,7 @@ def chdir(target_path):
     """
     curr_dir = os.getcwd()
     os.chdir(target_path)
+
     try:
         yield
 

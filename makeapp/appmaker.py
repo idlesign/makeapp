@@ -2,7 +2,6 @@ import configparser
 import logging
 import os
 import re
-from collections import OrderedDict
 from datetime import date
 from typing import List, Optional, Any, Dict, Set
 
@@ -38,34 +37,34 @@ class AppMaker:
     LICENSE_GPL3 = 'gpl3'
     LICENSE_BSD2CL = 'bsd2cl'
     LICENSE_BSD3CL = 'bsd3cl'
-    LICENSES = OrderedDict((
-        (LICENSE_NO, ('No License', 'Other/Proprietary License')),
-        (LICENSE_MIT, ('MIT License', 'OSI Approved :: MIT License')),
-        (LICENSE_APACHE, ('Apache v2 License', 'OSI Approved :: Apache Software License')),
-        (LICENSE_GPL2, ('GPL v2 License', 'OSI Approved :: GNU General Public License v2 (GPLv2)')),
-        (LICENSE_GPL3, ('GPL v3 License', 'OSI Approved :: GNU General Public License v3 (GPLv3)')),
-        (LICENSE_BSD2CL, ('BSD 2-Clause License', 'OSI Approved :: BSD License')),
-        (LICENSE_BSD3CL, ('BSD 3-Clause License', 'OSI Approved :: BSD License')),
-    ))
+    LICENSES = {
+        LICENSE_NO: ('No License', 'Other/Proprietary License'),
+        LICENSE_MIT: ('MIT License', 'OSI Approved :: MIT License'),
+        LICENSE_APACHE: ('Apache v2 License', 'OSI Approved :: Apache Software License'),
+        LICENSE_GPL2: ('GPL v2 License', 'OSI Approved :: GNU General Public License v2 (GPLv2)'),
+        LICENSE_GPL3: ('GPL v3 License', 'OSI Approved :: GNU General Public License v3 (GPLv3)'),
+        LICENSE_BSD2CL: ('BSD 2-Clause License', 'OSI Approved :: BSD License'),
+        LICENSE_BSD3CL: ('BSD 3-Clause License', 'OSI Approved :: BSD License'),
+    }
     default_license = LICENSE_BSD3CL
 
     VCS = VcsHelper.get_backends()
 
     default_vcs = list(VCS.keys())[0]
 
-    BASE_SETTINGS = OrderedDict((
-        ('app_name', None),
-        ('module_name', None),
-        ('description', 'Sample short description'),
-        ('author', '{{ app_name }} contributors'),
-        ('author_email', ''),
-        ('url', 'https://pypi.python.org/pypi/{{ app_name }}'),
-        ('year', str(date.today().year)),
-        ('license', default_license),
-        ('license_title', LICENSES[default_license][0]),
-        ('vcs', default_vcs),
-        ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
-    ))
+    BASE_SETTINGS = {
+        'app_name': None,
+        'module_name': None,
+        'description': 'Sample short description',
+        'author': '{{ app_name }} contributors',
+        'author_email': '',
+        'url': 'https://pypi.python.org/pypi/{{ app_name }}',
+        'year': str(date.today().year),
+        'license': default_license,
+        'license_title': LICENSES[default_license][0],
+        'vcs': default_vcs,
+        'python_version': '.'.join(map(str, PYTHON_VERSION[:2])),
+    }
 
     app_template_default: AppTemplate = None
     """Default (root) application template object. Populated at runtime."""
@@ -115,7 +114,7 @@ class AppMaker:
         :param app_name:
 
         """
-        settings = OrderedDict(self.BASE_SETTINGS)
+        settings = dict(self.BASE_SETTINGS)
         self.logger.debug('Initial settings: %s', settings)
 
         module_name = app_name.split('-', 1)[-1].replace('-', '_')
@@ -203,9 +202,9 @@ class AppMaker:
 
         self.logger.info('Checking `%s` name is available ...', app_name)
 
-        sites_registry = OrderedDict((
-            ('PyPI', 'https://pypi.python.org/pypi/' + app_name),
-        ))
+        sites_registry = {
+            'PyPI': 'https://pypi.python.org/pypi/' + app_name,
+        }
 
         name_available = True
 
@@ -233,14 +232,12 @@ class AppMaker:
         """
         configure_logging(verbosity_lvl, logger=self.logger, format=format)
 
-    def _get_template_files(self):
+    def _get_template_files(self) -> dict:
         """Returns a dictionary containing all source files paths [gathered from different
         templates], indexed by relative paths.
 
-        :return: OrderedDict
-
         """
-        template_files = OrderedDict()
+        template_files = {}
 
         for template in self.app_templates:
             template_files.update(template.get_files())
@@ -257,7 +254,7 @@ class AppMaker:
         :param hook_name:
 
         """
-        results = OrderedDict()
+        results = {}
 
         for app_template in self.app_templates:
             results[app_template] = app_template.run_config_hook(hook_name)

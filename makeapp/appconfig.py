@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from time import sleep
 from typing import Any, Type
 
@@ -56,7 +55,7 @@ class Config(metaclass=ConfigMeta):
         self.app_template = app_template
         self.logger = app_template.maker.logger
 
-        settings = OrderedDict()
+        settings = {}
 
         for key, val in self.__class__.__dict__.items():
             if isinstance(val, ConfigSetting):
@@ -74,7 +73,7 @@ class Config(metaclass=ConfigMeta):
 
         app_template = self.app_template
         settings_current = app_template.maker.settings
-        settings_gathered = OrderedDict()
+        settings_gathered = {}
         advertise_template = True
 
         for setting_name, settings_obj in settings_conf.items():

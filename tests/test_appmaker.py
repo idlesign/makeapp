@@ -88,7 +88,6 @@ def test_tpl_pytest(tmpdir, get_appmaker, assert_content):
         ])
 
 
-@pytest.mark.skip('temporarily')
 def test_tpl_django(tmpdir, get_appmaker, assert_content):
 
     with tmpdir.as_cwd():

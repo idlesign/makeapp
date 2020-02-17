@@ -1,5 +1,4 @@
 import os
-from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 from typing import Optional, List, Union
 
@@ -22,7 +21,7 @@ class VcsHelper:
     def get_backends(cls) -> dict:
         """Returns available backends."""
 
-        backends = OrderedDict()
+        backends = {}
 
         for backend in (GitHelper, MercurialHelper):
             backends[backend.COMMAND] = backend

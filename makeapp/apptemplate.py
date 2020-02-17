@@ -1,6 +1,5 @@
 import importlib.util
 import os
-from collections import OrderedDict
 from typing import Type, Dict, Tuple
 
 from .appconfig import Config
@@ -104,7 +103,7 @@ class AppTemplate:
     def get_files(self) -> Dict[str, 'TemplateFile']:
         """Returns a mapping of relative filenames to TemplateFiles objects."""
 
-        template_files = OrderedDict()
+        template_files = {}
 
         maker = self.maker
         templates_path = self.path
