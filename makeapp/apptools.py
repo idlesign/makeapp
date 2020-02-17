@@ -80,7 +80,7 @@ class PackageData(DataContainer):
         :param package_name:
 
         """
-        LOG.debug('Getting version from `%s` package ...', package_name)
+        LOG.debug(f'Getting version from `{package_name}` package ...')
 
         filepath = os.path.join(package_name, '__init__.py')
 
@@ -103,10 +103,11 @@ class PackageData(DataContainer):
         exec(init_file[version_line_idx], {}, fake_locals)
 
         version = fake_locals[version_str]
-        if not isinstance(version, tuple):
-            raise ProjectorExeption('Unsupported version format: %s', version)
 
-        LOG.info('Current version from package: `%s`', version)
+        if not isinstance(version, tuple):
+            raise ProjectorExeption(f'Unsupported version format: {version}')
+
+        LOG.info(f'Current version from package: `{version}`')
 
         result = PackageData(
             version=version,
@@ -124,9 +125,10 @@ class PackageData(DataContainer):
         increment = self.version_increment
 
         if increment not in VERSION_NUMBER_CHUNKS:
+
             raise ProjectorExeption(
-                'Unsupported version chunk to increment: `%s`. Should be one of: %s' %
-                (increment, VERSION_NUMBER_CHUNKS))
+                f'Unsupported version chunk to increment: `{increment}`. '
+                f'Should be one of: {VERSION_NUMBER_CHUNKS}')
 
         version_old = self.version_current
         version_next = []
@@ -157,9 +159,9 @@ class PackageData(DataContainer):
         version_current = self.version_current
         version_new = self.get_next_version()
 
-        LOG.info('Version `%s` bumped to `%s`', version_current, version_new)
+        LOG.info(f'Version `{version_current}` bumped to `{version_new}`')
 
-        self.file_helper.line_replace('%s = (%s)' % (self.VERSION_STR, ', '.join(map(str, version_new))))
+        self.file_helper.line_replace(f"{self.VERSION_STR} = ({', '.join(map(str, version_new))})")
 
         return version_new
 
@@ -186,7 +188,7 @@ class ChangelogData(DataContainer):
 
         filepath = cls.FILENAME_CHANGELOG
 
-        LOG.debug('Getting changelog from `%s` ...', os.path.basename(filepath))
+        LOG.debug(f'Getting changelog from `{os.path.basename(filepath)}` ...')
 
         if not os.path.isfile(filepath):
             raise ProjectorExeption('Changelog file not found')
@@ -206,7 +208,7 @@ class ChangelogData(DataContainer):
 
             if unreleased_entry_exists or line.startswith('v'):
                 version_line_idx = supposed_line_idx
-                LOG.info('Current version from changelog: `%s`', line)
+                LOG.info(f'Current version from changelog: `{line}`')
                 break
 
         if version_line_idx is None:
@@ -266,8 +268,8 @@ class ChangelogData(DataContainer):
         :param new_version:
 
         """
-        version_str = 'v%s' % ('.'.join(map(str, new_version)))
-        version_with_date = '%s [%s]' % (version_str, datetime.now().strftime('%Y-%m-%d'))
+        version_str = f"v{'.'.join(map(str, new_version))}"
+        version_with_date = f"{version_str} [{datetime.now().strftime('%Y-%m-%d')}]"
 
         replace = self.file_helper.line_replace
 
@@ -286,7 +288,7 @@ class ChangelogData(DataContainer):
             return
 
         if description[0] not in self.PREFIXES:
-            description = '* %s' % description
+            description = f'* {description}'
 
         self.file_helper.insert(description, offset=2)
 
@@ -317,7 +319,7 @@ class ChangelogData(DataContainer):
         def sorter(line):
             line = line.lower().replace('\'"`', '')
             priority = priorities.get(line[0], 3)
-            return '%s %s' % (priority, line)
+            return f'{priority} {line}'
 
         for line_offset, change in enumerate(sorted(self.get_changes(), key=sorter), 2):
             self.file_helper.line_replace(change, offset=line_offset)
@@ -346,7 +348,8 @@ class Project:
     def _gather_data(self):
         """Gathers data relevant for project related functions."""
         project_path = self.project_path
-        LOG.debug('Gathering info from `%s` directory ...', project_path)
+
+        LOG.debug(f'Gathering info from `{project_path}` directory ...')
 
         if not os.path.isfile('setup.py'):
             raise ProjectorExeption('No `setup.py` file found')
@@ -367,7 +370,7 @@ class Project:
             else:
                 'tests' in packages and packages.remove('tests')
 
-        LOG.debug('Found packages: %s', packages)
+        LOG.debug(f'Found packages: {packages}')
 
         main_package = packages[0]
 
@@ -414,7 +417,8 @@ class Project:
 
             LOG.debug('Commit VCS changes ...')
 
-            vcs.commit('Release %s' % next_version_str)
+            vcs.commit(f'Release {next_version_str}')
+
             vcs.add_tag(next_version_str, version_summary, overwrite=True)
 
     def add_change(self, descriptions: Union[List[str], Tuple[str, ...], str], *, stage_modified: bool = True):
@@ -445,9 +449,10 @@ class Project:
 
             changelog.write()
 
-            commit_message = '%s updated' % changelog.FILENAME_CHANGELOG
+            commit_message = f'{changelog.FILENAME_CHANGELOG} updated'
 
             files_to_stage = [changelog.filepath]
+
             if stage_modified:
                 files_to_stage.extend(self.vcs.get_modified())
 

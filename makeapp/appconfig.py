@@ -38,7 +38,8 @@ class ConfigSetting:
 
         """
         app_template = instance.app_template
-        return app_template.maker.settings['%s_%s' % (app_template.name, self.name)]
+
+        return app_template.maker.settings[f'{app_template.name}_{self.name}']
 
 
 class Config(metaclass=ConfigMeta):
@@ -58,8 +59,9 @@ class Config(metaclass=ConfigMeta):
         settings = {}
 
         for key, val in self.__class__.__dict__.items():
+
             if isinstance(val, ConfigSetting):
-                settings['%s_%s' % (app_template.name, key)] = val
+                settings[f'{app_template.name}_{key}'] = val
 
         self.settings = settings
 
@@ -84,14 +86,13 @@ class Config(metaclass=ConfigMeta):
 
                 if advertise_template:
                     click.secho(
-                        "Gathering settings for '%s' application template ..." %
-                        app_template.name,
+                        f"Gathering settings for '{app_template.name}' application template ...",
                         fg='blue'
                     )
                     advertise_template = False
 
                 current_value = click.prompt(
-                    '%s (%s)' % (settings_obj.title, setting_name),
+                    f'{settings_obj.title} ({setting_name})',
                     default=settings_obj.default,
                     type=settings_obj.type,
                 )

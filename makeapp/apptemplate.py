@@ -32,7 +32,7 @@ class AppTemplate:
         self._process_config()
 
     def __str__(self):
-        return '%s: %s' % (self.name, self.path)
+        return f'{self.name}: {self.path}'
 
     @property
     def is_default(self):
@@ -45,7 +45,8 @@ class AppTemplate:
         If not found, dummy config object is returned.
 
         """
-        module_fake_name = 'makeapp.config.%s' % self.name
+        module_fake_name = f'makeapp.config.{self.name}'
+
         config_path = os.path.join(self.path, self.config_filename)
 
         if os.path.exists(config_path):
@@ -58,8 +59,9 @@ class AppTemplate:
 
             if not issubclass(config, Config):
                 raise AppMakerException(
-                    'Unable to load config class for "%" template. '
-                    'Make sure "%s" file has "%s" attribute having value of AppConfig heir.')
+                    f"Unable to load config class for '{self.name}' template. "
+                    f"Make sure '{config_path}' file has '{self.config_attr}' "
+                    'attribute having value of AppConfig heir.')
 
             return config(app_template=self)
 
@@ -91,7 +93,7 @@ class AppTemplate:
         :param hook_name:
 
         """
-        hook_name = 'hook_%s' % hook_name
+        hook_name = f'hook_{hook_name}'
         hook_func = getattr(self.config, hook_name, None)
 
         if hook_func:
@@ -177,7 +179,8 @@ class AppTemplate:
                 return path.split('/')[-1], path
 
         raise AppMakerException(
-            'Unable to find application template %s. Searched \n%s' % (name_or_path, '\n  '.join(search_paths)))
+            f"Unable to find application template {name_or_path}. "
+            "Searched \n%s" % '\n  '.join(search_paths))
 
 
 class TemplateFile:

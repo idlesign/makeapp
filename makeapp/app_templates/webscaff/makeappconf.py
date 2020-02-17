@@ -34,7 +34,7 @@ class WebscaffConfig(Config):
 
         self.print_banner(
             "You're about to rollout 'webscaff' skeleton.\n"
-            "Please make sure the following system packages are installed:\n  %s" % ' '.join(required))
+            f"Please make sure the following system packages are installed:\n  {' '.join(required)}")
 
     def hook_rollout_post(self):
         super().hook_rollout_post()
@@ -54,7 +54,7 @@ class WebscaffConfig(Config):
         run_command('. venv/bin/activate && pip install -e .')
 
         # Initialize local sqlite DB.
-        run_command('venv/bin/%s migrate' % module_name)
+        run_command(f'venv/bin/{module_name} migrate')
 
     def prepare_venv(self):
         self.logger.info('Bootstrapping virtual environment for project ...')
@@ -105,12 +105,12 @@ class WebscaffConfig(Config):
         command_django_admin = './venv/bin/django-admin'
 
         with temp_dir() as dir_tmp:
-            run_command('%s startproject %s %s' % (command_django_admin, module_name, dir_tmp))
+            run_command(f'{command_django_admin} startproject {module_name} {dir_tmp}')
 
             # We'd replace settings module paths.
             replace = partial(
                 replace_infile,
-                pairs={'%s.settings' % module_name: '%s.settings.auto' % module_name})
+                pairs={f'{module_name}.settings': f'{module_name}.settings.auto'})
 
             source_file = join(dir_tmp, 'manage.py')
             replace(source_file)
@@ -126,7 +126,7 @@ class WebscaffConfig(Config):
 
         # Create basic app.
         dir_app = join(dir_package, 'core')
-        run_command('%s startapp core %s' % (command_django_admin, dir_app))
+        run_command(f'{command_django_admin} startapp core {dir_app}')
 
 
 makeapp_config = WebscaffConfig

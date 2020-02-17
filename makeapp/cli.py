@@ -93,7 +93,10 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     # Print out current settings.
     click.secho(app_maker.get_settings_string(), fg='green')
 
-    if click.confirm('Do you want to check that `%s` application name is not already in use?' % app_name, default=True):
+    if click.confirm(
+        f'Do you want to check that `{app_name}` application name is not already in use?',
+        default=True
+    ):
         if not app_maker.check_app_name_is_available():
             sys.exit(1)
 
@@ -139,8 +142,8 @@ def release(increment, debug):
         click.secho('No changes found in changelog. Please add changes before release', fg='red', err=True)
         sys.exit(1)
 
-    click.secho('Version current: %s' % project.package.version_current_str, fg='blue')
-    click.secho('Version next: %s' % project.package.version_next_str, fg='green')
+    click.secho(f'Version current: {project.package.version_current_str}', fg='blue')
+    click.secho(f'Version next: {project.package.version_next_str}', fg='green')
     click.secho(version_summary)
 
     if click.confirm('Commit changes?', default=True):

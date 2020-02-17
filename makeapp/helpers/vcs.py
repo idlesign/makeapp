@@ -38,8 +38,9 @@ class VcsHelper:
         vcs_path = vcs_path or os.getcwd()
 
         helper = None
+
         for helper_cls in cls.get_backends().values():
-            if os.path.exists(os.path.join(vcs_path, '.%s' % helper_cls.COMMAND)):
+            if os.path.exists(os.path.join(vcs_path, f'.{helper_cls.COMMAND}')):
                 helper = helper_cls()
                 break
 
@@ -47,7 +48,7 @@ class VcsHelper:
 
     def run_command(self, command):
         """Basic command runner to implement."""
-        return run_command('%s %s' % (self.COMMAND, command))
+        return run_command(f'{self.COMMAND} {command}')
 
     def init(self):
         """Initializes a repository."""
@@ -69,8 +70,10 @@ class VcsHelper:
     def check(self):
         """Performs basic vcs check."""
         data = self.run_command('branch')
-        if '* %s' % self.MASTER not in ''.join(data):
-            raise ProjectorExeption('VCS needs to be initialized and branch set to `%s`' % self.MASTER)
+
+        if f'* {self.MASTER}' not in ''.join(data):
+            raise ProjectorExeption(
+                f'VCS needs to be initialized and branch set to `{self.MASTER}`')
 
     def add_tag(self, name: str, description: str, *, overwrite: bool = False):
         """Adds a tag.
@@ -89,7 +92,7 @@ class VcsHelper:
             f.write(description)
             f.flush()
 
-            self.run_command('tag %s %s -F %s' % (name, overwrite, f.name))
+            self.run_command(f'tag {name} {overwrite} -F {f.name}')
 
     def add(self, filename: Union[List[str], str] = None):
         """Adds a file into a changelist.
@@ -103,7 +106,7 @@ class VcsHelper:
 
         filename = filename.strip() or ''
 
-        self.run_command('add %s' % filename)
+        self.run_command(f'add {filename}')
 
     def commit(self, message: str):
         """Commits files added to changelist.
@@ -148,7 +151,7 @@ class VcsHelper:
             if upstream is True:
                 upstream = self.UPSTREAM
 
-            self.run_command('push -u %s %s' % (upstream, self.MASTER))
+            self.run_command(f'push -u {upstream} {self.MASTER}')
 
         else:
             self.run_command('push')
@@ -170,7 +173,8 @@ class GitHelper(VcsHelper):
 
         """
         super().add_remote(address, alias=alias)
-        self.run_command('remote add %s %s' % (alias, address))
+
+        self.run_command(f'remote add {alias} {address}')
 
     def add(self, filename: str = None):
         """Adds a file into a changelist.
@@ -179,6 +183,7 @@ class GitHelper(VcsHelper):
 
         """
         filename = filename or '.'
+
         super().add(filename)
 
 

@@ -94,7 +94,7 @@ class AppMaker:
         self.user_settings_config = os.path.join(self.path_user_confs, 'makeapp.conf')
         self.path_templates_current = self._get_templates_path_current(templates_path)
 
-        self.logger.debug('Templates path: %s', self.path_templates_current)
+        self.logger.debug(f'Templates path: {self.path_templates_current}')
 
         self.app_templates: List[AppTemplate] = []
         self._init_app_templates(templates_to_use)
@@ -115,7 +115,7 @@ class AppMaker:
 
         """
         settings = dict(self.BASE_SETTINGS)
-        self.logger.debug('Initial settings: %s', settings)
+        self.logger.debug(f'Initial settings: {settings}')
 
         module_name = app_name.split('-', 1)[-1].replace('-', '_')
 
@@ -139,7 +139,7 @@ class AppMaker:
             path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_builtin
 
         if not os.path.exists(path):
-            raise AppMakerException("Templates path doesn't exist: %s" % path)
+            raise AppMakerException(f"Templates path doesn't exist: {path}")
 
         return path
 
@@ -170,7 +170,7 @@ class AppMaker:
                 parent=prev_template,
             )
 
-        self.logger.debug('Templates to use: %s', self.app_templates)
+        self.logger.debug(f'Templates to use: {self.app_templates}')
 
     def _replace_settings_markers(self, target: Any, strip_unknown: bool = False, settings: dict = None) -> str:
         """Replaces settings markers in `target` with current settings values
@@ -183,7 +183,9 @@ class AppMaker:
         settings = settings or self.settings
 
         if target is not None:
+
             for name, val in settings.items():
+
                 if val is not None:
                     target = str(target).replace('{{ %s }}' % name, str(val))
 
@@ -200,7 +202,7 @@ class AppMaker:
         """
         app_name = self.settings['app_name']
 
-        self.logger.info('Checking `%s` name is available ...', app_name)
+        self.logger.info(f'Checking `{app_name}` name is available ...')
 
         sites_registry = {
             'PyPI': 'https://pypi.python.org/pypi/' + app_name,
@@ -212,14 +214,14 @@ class AppMaker:
             response = requests.get(url)
 
             if response.status_code == 200:
-                self.logger.warning('Application name seems to be in use: %s - %s', label, url)
+                self.logger.warning(f'Application name seems to be in use: {label} - {url}')
                 name_available = False
                 break
 
         if name_available:
             self.logger.info(
-                'Application name `%s` seems to be available (no mention found at: %s)',
-                self.settings['app_name'], ', '.join(sites_registry.keys()))
+                f"Application name `{self.settings['app_name']}` seems "
+                f"to be available (no mention found at: {', '.join(sites_registry)})")
 
         return name_available
 
@@ -242,7 +244,7 @@ class AppMaker:
         for template in self.app_templates:
             template_files.update(template.get_files())
 
-        self.logger.debug('Template files: %s', template_files.keys())
+        self.logger.debug(f'Template files: {template_files}')
 
         return template_files
 
@@ -282,7 +284,7 @@ class AppMaker:
         :param remote_push: Whether to push to remote.
 
         """
-        self.logger.info('Application target path: %s', dest)
+        self.logger.info(f'Application target path: {dest}')
 
         # Make remote available for hooks.
         self.settings['vcs_remote'] = remote_address
@@ -294,7 +296,9 @@ class AppMaker:
             pass
 
         if os.path.exists(dest) and overwrite:
-            self.logger.warning('Target path already exists: %s. Conflict files will be overwritten.', dest)
+            self.logger.warning(
+                f'Target path already exists: {dest}. '
+                f'Conflict files will be overwritten.')
 
         license_txt, license_src = self._get_license_data()
         license_src = self._comment_out(license_src)
@@ -367,7 +371,7 @@ class AppMaker:
         :param prepend_data: data to prepend to dest file contents
 
         """
-        self.logger.info('Creating %s ...', dest)
+        self.logger.info(f'Creating {dest} ...')
 
         dirname = os.path.dirname(dest)
 
@@ -391,8 +395,8 @@ class AppMaker:
             'Settings to be used: \n%s' % '\n'.join(
                 ['    %s: %s' % (k, v) for k, v in sorted(self.settings.items(), key=lambda kv: kv[0])]
             ),
-            'Chosen license: %s' % self.LICENSES[self.settings['license']][0],
-            'Chosen VCS: %s' % self.VCS[self.settings['vcs']].TITLE
+            f"Chosen license: {self.LICENSES[self.settings['license']][0]}",
+            f"Chosen VCS: {self.VCS[self.settings['vcs']].TITLE}",
         ]
         return '\n'.join(lines)
 
@@ -413,7 +417,7 @@ class AppMaker:
 
         license = self.settings['license']
 
-        return render(license), render('%s_src' % license)
+        return render(license), render(f'{license}_src')
 
     def get_template_vars(self) -> Set[str]:
         """Returns known template variables."""
@@ -490,13 +494,13 @@ class AppMaker:
             return
 
         if not config_exists and path is not None:
-            raise AppMakerException('Unable to find settings file: %s' % config_path)
+            raise AppMakerException(f'Unable to find settings file: {config_path}')
 
         cfg = configparser.ConfigParser()
         cfg.read(config_path)
 
         if not cfg.has_section('settings'):
-            raise AppMakerException('Unable to read settings from file: %s' % config_path)
+            raise AppMakerException(f'Unable to read settings from file: {config_path}')
 
         self.update_settings(dict(cfg.items('settings')))
 
@@ -517,7 +521,7 @@ class AppMaker:
 
         helper: VcsHelper = self.VCS[vcs]()
 
-        self.logger.info('Initializing %s repository ...', helper.TITLE)
+        self.logger.info(f'Initializing {helper.TITLE} repository ...')
 
         with chdir(dest):
             helper.init()
@@ -530,12 +534,15 @@ class AppMaker:
                     helper.commit('The beginning')
                     helper.push(upstream=True)
 
-    def _validate_setting(self, setting, variants, settings):
+    def _validate_setting(self, setting: str, variants: List[str], settings: dict):
         """Ensures that the given setting value is one from the given variants."""
         val = settings[setting]
+
         if val not in variants:
+
             raise AppMakerException(
-                'Unsupported value `%s` for `%s`. Acceptable variants [%s]' % (val, setting, variants))
+                f'Unsupported value `{val}` for `{setting}`. '
+                f'Acceptable variants [{variants}]')
 
     def update_settings(self, settings_new: dict, settings_base: dict = None):
         """Updates current settings dictionary with values from a given
@@ -552,5 +559,5 @@ class AppMaker:
         for name, val in settings_base.items():
             settings_base[name] = self._replace_settings_markers(val, settings=settings_base)
 
-        self._validate_setting('license', self.LICENSES.keys(), settings_base)
-        self._validate_setting('vcs', self.VCS.keys(), settings_base)
+        self._validate_setting('license', list(self.LICENSES), settings_base)
+        self._validate_setting('vcs', list(self.VCS), settings_base)

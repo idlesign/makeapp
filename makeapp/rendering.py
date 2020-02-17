@@ -28,7 +28,7 @@ class ContextMutator:
             continuation = ' ' + continuation
 
         title = self._context['app_name'] + continuation
-        title = '%s\n%s' % (title, '=' * len(title))
+        title = f"{title}\n{'=' * len(title)}"
 
         return title
 
@@ -81,7 +81,7 @@ class Renderer:
                 parent_template = DynamicParentTemplate(parent_paths)
 
             else:
-                parent_template = 'no-parent-for/%s' % filename.path_rel
+                parent_template = f'no-parent-for/{filename.path_rel}'
 
             context['parent_template'] = parent_template
 
@@ -89,7 +89,7 @@ class Renderer:
             template = self.env.get_template(f'{filename.template.name}/{filename.path_rel}')
 
         else:
-            filename_ = '%s' % filename
+            filename_ = f'{filename}'
 
             # Try to pick file by basename.
             with chdir(os.path.dirname(filename_)):
@@ -116,7 +116,7 @@ class DynamicParentTemplate:
 
         except IndexError:
             # Mostly for template inheritance debug purposes.
-            raise IndexError('No more parents to pop. Initial parents: %s' % self.parents_initial)
+            raise IndexError(f'No more parents to pop. Initial parents: {self.parents_initial}')
 
         return current
 
@@ -132,7 +132,7 @@ class DynamicParentLoader(FileSystemLoader):
         is_dynamic = isinstance(template, DynamicParentTemplate)
 
         if is_dynamic:
-            template = '%s' % template.current
+            template = f'{template.current}'
 
         source, filename, uptodate = super().get_source(environment, template)
 

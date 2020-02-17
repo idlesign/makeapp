@@ -7,7 +7,7 @@ class DistHelper:
     @classmethod
     def run_command(cls, command):
         """Basic command runner."""
-        return run_command('python setup.py %s' % command)
+        return run_command(f'python setup.py {command}')
 
     @classmethod
     def upload(cls):

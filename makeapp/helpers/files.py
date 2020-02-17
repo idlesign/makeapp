@@ -27,7 +27,9 @@ class FileHelper:
 
     def write(self):
         """Writes updated contents back to a file."""
-        LOG.debug('Writing `%s` ...', self.filepath)
+
+        LOG.debug(f'Writing `{self.filepath}` ...')
+
         with io.open(self.filepath, 'w', encoding='utf-8') as f:
             f.write('\n'.join(self.contents))
 

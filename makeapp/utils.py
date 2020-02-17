@@ -86,11 +86,12 @@ def check_command(command: str, hint: str):
 
     """
     try:
-        run_command('type %s' % command)
+        run_command(f'type {command}')
 
     except CommandError:
         raise CommandError(
-            "Failed to execute '%s' command. Check %s is installed and available." % (command, hint))
+            f"Failed to execute '{command}' command. "
+            f"Check {hint} is installed and available.")
 
 
 def run_command(command: str) -> List[str]:
@@ -104,7 +105,8 @@ def run_command(command: str) -> List[str]:
     """
     prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True)
 
-    LOG.debug('Run command: `%s` ...', command)
+    LOG.debug(f'Run command: `{command}` ...')
+
     data = []
 
     out, _ = prc.communicate()
@@ -123,6 +125,6 @@ def run_command(command: str) -> List[str]:
         data.append(item)
 
     if has_error:
-        raise CommandError('Command `%s` failed: %s' % (command, '\n'.join(data)))
+        raise CommandError(f"Command `{command}` failed: %s" % '\n'.join(data))
 
     return data
