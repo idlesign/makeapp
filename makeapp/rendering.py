@@ -67,11 +67,6 @@ class Renderer:
         """
         context = self.context_mutator.get_context()
 
-        filename_ = '%s' % filename
-
-        with chdir(os.path.dirname(filename_)):
-            template = self.env.get_template(os.path.basename(filename_))
-
         if isinstance(filename, TemplateFile):
             # Let's compute template inheritance hierarchy for `parent_template`
             # context dynamic variable.
@@ -84,6 +79,16 @@ class Renderer:
                 parent_template = 'no-parent-for/%s' % filename.path_rel
 
             context['parent_template'] = parent_template
+
+            # Use exact location.
+            template = self.env.get_template(f'{filename.template.name}/{filename.path_rel}')
+
+        else:
+            filename_ = '%s' % filename
+
+            # Try to pick file by basename.
+            with chdir(os.path.dirname(filename_)):
+                template = self.env.get_template(os.path.basename(filename_))
 
         rendered = template.render(**context)
 
