@@ -71,33 +71,29 @@ class WebscaffConfig(Config):
         module_name = self.module_name
 
         source_file = join(dir_tmp, module_name, 'settings.py')
+
         replace_infile(
             source_file,
-            pairs=(
+            pairs={
                 # Add basic project-related settings.
-                (
-                    'import os',
-                    
+                'import os':
+
                     'import os\n\n'
-                    'from .sub_paths import *\n\n'
-                ),
+                    'from .sub_paths import *\n\n',
+
                 #  Reset debug.
-                (
-                    'DEBUG = True',
+                'DEBUG = True':
 
                     'DEBUG = False',
-                ),
+
                 # Add core application.
-                (
-                    "    'django.contrib.staticfiles',",
+                "    'django.contrib.staticfiles',":
 
                     "    'django.contrib.staticfiles',\n\n"
                     "    'uwsgiconf.contrib.django.uwsgify',\n\n"
-                    "    '%(module)s.core',\n" % {
-                        'module': module_name,
-                    },
-                 ),
-            ))
+                    "    '%(module)s.core',\n" % {'module': module_name},
+            })
+
         shutil.move(source_file, join(self.dir_package_root, 'settings', 'base.py'))
 
     def prepare_django_files(self):
@@ -114,7 +110,7 @@ class WebscaffConfig(Config):
             # We'd replace settings module paths.
             replace = partial(
                 replace_infile,
-                pairs=(('%s.settings' % module_name, '%s.settings.auto' % module_name),))
+                pairs={'%s.settings' % module_name: '%s.settings.auto' % module_name})
 
             source_file = join(dir_tmp, 'manage.py')
             replace(source_file)

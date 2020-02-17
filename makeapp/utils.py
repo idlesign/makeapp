@@ -68,9 +68,12 @@ def replace_infile(filepath: str, pairs: Dict[str, str]):
 
     """
     with fileinput.input(files=filepath, inplace=True) as f:
+
         for line in f:
+
             for search, replace in pairs.items():
                 line = line.replace(search, replace)
+
             sys.stdout.write(line)
 
 
