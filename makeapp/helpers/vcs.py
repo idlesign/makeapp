@@ -1,6 +1,7 @@
 import os
 from collections import OrderedDict
 from tempfile import NamedTemporaryFile
+from typing import Optional, List, Union
 
 from ..exceptions import ProjectorExeption, CommandError
 from ..utils import run_command
@@ -18,11 +19,9 @@ class VcsHelper:
         self.remote = None
 
     @classmethod
-    def get_backends(cls):
-        """Returns available backends.
-        
-        :rtype: OrderedDict 
-        """
+    def get_backends(cls) -> dict:
+        """Returns available backends."""
+
         backends = OrderedDict()
 
         for backend in (GitHelper, MercurialHelper):
@@ -31,11 +30,11 @@ class VcsHelper:
         return backends
 
     @classmethod
-    def get(cls, vcs_path=None):
+    def get(cls, vcs_path: Optional[str] = None) -> 'VcsHelper':
         """Returns an appropriate VCS helper object.
         
-        :param str vcs_path: Repository dir
-        :rtype: VcsHelper 
+        :param vcs_path: Repository dir
+
         """
         vcs_path = vcs_path or os.getcwd()
 
@@ -55,13 +54,12 @@ class VcsHelper:
         """Initializes a repository."""
         return self.run_command('init -q')
 
-    def get_modified(self):
-        """Returns modified filepaths.
-        
-        :rtype: list 
-        """
+    def get_modified(self) -> List[str]:
+        """Returns modified filepaths."""
+
         lines = self.run_command('status -s')
         modified = []
+
         for line in lines:
             marker, filepath = line.split(' ', 1)
             if 'M' in marker:
@@ -75,12 +73,13 @@ class VcsHelper:
         if '* %s' % self.MASTER not in ''.join(data):
             raise ProjectorExeption('VCS needs to be initialized and branch set to `%s`' % self.MASTER)
 
-    def add_tag(self, name, description, overwrite=False):
+    def add_tag(self, name: str, description: str, *, overwrite: bool = False):
         """Adds a tag.
 
-        :param str name: Tag name
-        :param str description: Additional description
-        :param bool overwrite: Whether to overwrite tag if exists.
+        :param name: Tag name
+        :param description: Additional description
+        :param overwrite: Whether to overwrite tag if exists.
+
         """
         overwrite = '-f' if overwrite else ''
 
@@ -93,10 +92,11 @@ class VcsHelper:
 
             self.run_command('tag %s %s -F %s' % (name, overwrite, f.name))
 
-    def add(self, filename=None):
+    def add(self, filename: Union[List[str], str] = None):
         """Adds a file into a changelist.
 
-        :param str|list filename: If not provided all files in working tree are added.
+        :param filename: If not provided all files in working tree are added.
+
         """
         filename = filename or []
         if isinstance(filename, list):
@@ -106,10 +106,11 @@ class VcsHelper:
 
         self.run_command('add %s' % filename)
 
-    def commit(self, message):
+    def commit(self, message: str):
         """Commits files added to changelist.
 
-        :param str message: Commit description.
+        :param message: Commit description.
+
         """
         self.run_command("commit -m '%s'" % message.replace("'", "''"))
 
@@ -128,22 +129,26 @@ class VcsHelper:
             if self.get_remotes():
                 raise
 
-    def add_remote(self, address, alias='origin'):
+    def add_remote(self, address: str, *, alias: str = 'origin'):
         """Adds a remote repository.
         
-        :param str address:
-        :param str alias:
+        :param address:
+        :param alias:
+
         """
         self.remote = address
 
-    def push(self, upstream=None):
+    def push(self, *, upstream: Union[bool, str] = None):
         """Pushes local changes and tags to remote.
         
-        :param str|bool upstream: Upstream alias. If True, default name is used.
+        :param upstream: Upstream alias. If True, default name is used.
+
         """
         if upstream:
+
             if upstream is True:
                 upstream = self.UPSTREAM
+
             self.run_command('push -u %s %s' % (upstream, self.MASTER))
 
         else:
@@ -158,19 +163,21 @@ class GitHelper(VcsHelper):
     TITLE = 'Git'
     COMMAND = 'git'
 
-    def add_remote(self, address, alias='origin'):
+    def add_remote(self, address: str, *, alias: str = 'origin'):
         """Adds a remote repository.
 
-        :param str address:
-        :param str alias:
+        :param address:
+        :param alias:
+
         """
-        super(GitHelper, self).add_remote(address, alias)
+        super(GitHelper, self).add_remote(address, alias=alias)
         self.run_command('remote add %s %s' % (alias, address))
 
-    def add(self, filename=None):
+    def add(self, filename: str = None):
         """Adds a file into a changelist.
 
-        :param str filename: If not provided all files in working tree are added.
+        :param filename: If not provided all files in working tree are added.
+
         """
         filename = filename or '.'
         super(GitHelper, self).add(filename)
@@ -186,12 +193,13 @@ class MercurialHelper(VcsHelper):
         """Returns a list of remotes."""
         return []
 
-    def push(self, upstream=None):
+    def push(self, *, upstream: Union[bool, str] = None):
         """Pushes local changes and tags to remote.
 
-        :param str|bool upstream: Upstream URL. If True, remote URL is used.
+        :param upstream: Upstream URL. If True, remote URL is used.
+
         """
         if upstream is True and self.remote:
             upstream = self.remote
 
-        super(MercurialHelper, self).push(upstream)
+        super(MercurialHelper, self).push(upstream=upstream)

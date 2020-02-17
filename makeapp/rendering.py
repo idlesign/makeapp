@@ -1,17 +1,22 @@
 import os
+from typing import Union
 
 from jinja2 import Environment, FileSystemLoader
 
 from .apptemplate import TemplateFile
 from .utils import chdir
 
+if False:  # pragma: nocover
+    from .appmaker import AppMaker
+
 
 class ContextMutator:
     """Mutator applying additional transformations to template get_context."""
 
-    def __init__(self, maker):
+    def __init__(self, maker: 'AppMaker'):
         """
-        :param AppMaker maker:
+        :param maker:
+
         """
         self._maker = maker
         self._context = maker.settings
@@ -59,11 +64,11 @@ class Renderer:
             trim_blocks=True,
         )
 
-    def render(self, filename):
+    def render(self, filename: Union[str, TemplateFile]) -> str:
         """Renders file contents with settings as get_context.
 
-        :param str|TemplateFile filename:
-        :rtype: str
+        :param filename:
+
         """
         context = self.context_mutator.get_context()
 

@@ -6,6 +6,7 @@ import sys
 import tempfile
 from contextlib import contextmanager
 from subprocess import Popen, PIPE, STDOUT
+from typing import Generator, List, Optional, Dict
 
 from .exceptions import CommandError
 
@@ -13,13 +14,16 @@ LOG = logging.getLogger(__name__)
 PYTHON_VERSION = sys.version_info
 
 
-
-def configure_logging(level=None, logger=None, format='%(message)s'):
+def configure_logging(
+        level: Optional[int] = None,
+        logger: Optional[logging.Logger] = None,
+        format: str = '%(message)s'
+):
     """Switches on logging at a given level. For a given logger or globally.
 
-    :param int level:
+    :param level:
     :param logger:
-    :param str format:
+    :param format:
 
     """
     logging.basicConfig(format=format, level=level if logger else None)
@@ -43,12 +47,9 @@ def chdir(target_path):
 
 
 @contextmanager
-def temp_dir():
-    """Context manager to temporarily create a directory.
+def temp_dir() -> Generator[str, None, None]:
+    """Context manager to temporarily create a directory."""
 
-    :rtype: str
-
-    """
     dir_tmp = tempfile.mkdtemp(prefix='makeapp_')
 
     try:
@@ -58,26 +59,26 @@ def temp_dir():
         shutil.rmtree(dir_tmp, ignore_errors=True)
 
 
-def replace_infile(filepath, pairs):
+def replace_infile(filepath: str, pairs: Dict[str, str]):
     """Replaces some term by another in file contents.
 
-    :param str filepath:
-    :param tuple[tuple[str, str]] pairs: (search, replace) tuples.
+    :param filepath:
+    :param pairs: search -> replace.
 
     """
     with fileinput.input(files=filepath, inplace=True) as f:
         for line in f:
-            for (search, replace) in pairs:
+            for search, replace in pairs.items():
                 line = line.replace(search, replace)
             sys.stdout.write(line)
 
 
-def check_command(command, hint):
+def check_command(command: str, hint: str):
     """Checks whether a command is available.
     If not - raises an exception.
 
-    :param str command:
-    :param str hint:
+    :param command:
+    :param hint:
 
     """
     try:
@@ -88,14 +89,14 @@ def check_command(command, hint):
             "Failed to execute '%s' command. Check %s is installed and available." % (command, hint))
 
 
-def run_command(command):
+def run_command(command: str) -> List[str]:
     """Runs a command in a shell process.
 
     Returns a list of strings gathered from a command.
 
-    :param str command:
+    :param command:
     :raises: CommandError
-    :rtype: list
+
     """
     prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True)
 

@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from typing import Type, Dict, Tuple
 
 from .exceptions import AppMakerException
 from .utils import PYTHON_VERSION
@@ -15,13 +16,13 @@ class AppTemplate:
     config_filename = 'makeappconf.py'
     config_attr = 'makeapp_config'
 
-    def __init__(self, maker, name, path, parent=None):
+    def __init__(self, maker: 'AppMaker', name: str, path: str, parent: 'AppTemplate' = None):
         """
 
-        :param AppMaker maker:
-        :param str name:
-        :param str path:
-        :param AppTemplate parent:
+        :param maker:
+        :param name:
+        :param path:
+        :param parent:
 
         """
         self.maker = maker
@@ -39,12 +40,10 @@ class AppTemplate:
         """Whether current template is default (root)."""
         return self.name == self.maker.template_default_name
 
-    def _read_config(self):
+    def _read_config(self) -> Config:
         """Reads template's config.
 
         If not found, dummy config object is returned.
-
-        :rtype: Config
 
         """
         module_fake_name = 'makeapp.config.%s' % self.name
@@ -63,7 +62,7 @@ class AppTemplate:
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
 
-            config = getattr(module, self.config_attr, None)  # type: type(Config)
+            config: Type[Config] = getattr(module, self.config_attr, None)
 
             if not issubclass(config, Config):
                 raise AppMakerException(
@@ -93,12 +92,11 @@ class AppTemplate:
                 parent = app_template
                 self.parent = app_template
 
-    def run_config_hook(self, hook_name):
+    def run_config_hook(self, hook_name: str) -> bool:
         """Runs a hook function from app config template if defined there.
         Returns `True` if a hook has been run.
 
         :param hook_name:
-        :rtype: bool
 
         """
         hook_name = 'hook_%s' % hook_name
@@ -110,12 +108,9 @@ class AppTemplate:
 
         return False
 
-    def get_files(self):
-        """Returns a mapping of relative filenames to TemplateFiles objects.
+    def get_files(self) -> Dict[str, 'TemplateFile']:
+        """Returns a mapping of relative filenames to TemplateFiles objects."""
 
-        :rtype: OrderedDict
-
-        """
         template_files = OrderedDict()
 
         maker = self.maker
@@ -145,12 +140,11 @@ class AppTemplate:
         return template_files
 
     @classmethod
-    def contribute_to_maker(cls, maker, template, parent):
+    def contribute_to_maker(cls, maker: 'AppMaker', template: str, parent: 'AppTemplate') -> 'AppTemplate':
         """
-        :param AppMaker maker:
-        :param str template:
-        :param AppTemplate parent:
-        :rtype: AppTemplate
+        :param maker:
+        :param template:
+        :param parent:
 
         """
         name, path = cls._find(
@@ -177,18 +171,17 @@ class AppTemplate:
         return app_template
 
     @classmethod
-    def _find(cls, name_or_path, search_paths):
+    def _find(cls, name_or_path: str, search_paths: Tuple[str, ...]) -> Tuple[str, str]:
         """Searches a template by it's name or in path.
+        Returns a tuple (template_name, template_path)
 
         :param name_or_path:
-        :return: A tuple (template_name, template_path)
-        :param tuple search_paths:
-        :rtype: tuple[str, str]
+        :param search_paths:
 
         """
         for supposed_path in search_paths:
             if '/' in supposed_path and os.path.exists(supposed_path):
-                path = os.path.abspath(supposed_path)
+                path = str(os.path.abspath(supposed_path))
                 return path.split('/')[-1], path
 
         raise AppMakerException(
@@ -200,16 +193,16 @@ class TemplateFile:
 
     __slots__ = ['template', 'path_full', 'path_rel']
 
-    def __init__(self, template, path_full, path_rel):
+    def __init__(self, template: AppTemplate, path_full: str, path_rel: str):
         """
-        :param AppTemplate template:
-        :param str path_full:
-        :param str path_rel:
+        :param template:
+        :param path_full:
+        :param path_rel:
 
         """
         self.template = template
         self.path_full = path_full
-        self.path_rel= path_rel
+        self.path_rel = path_rel
 
     def __str__(self):
         return self.path_full

@@ -4,6 +4,7 @@ import os
 import re
 from collections import OrderedDict
 from datetime import date
+from typing import List, Optional, Any, Dict, Set
 
 import requests
 
@@ -66,14 +67,20 @@ class AppMaker:
         ('python_version', '.'.join(map(str, PYTHON_VERSION[:2]))),
     ))
 
-    app_template_default = None  # type: AppTemplate
+    app_template_default: AppTemplate = None
     """Default (root) application template object. Populated at runtime."""
 
-    def __init__(self, app_name, templates_to_use=None, templates_path=None, log_level=None):
+    def __init__(
+            self,
+            app_name: str,
+            templates_to_use: List[str] = None,
+            templates_path: str = None,
+            log_level: int = None
+    ):
         """Initializes app maker object.
 
         :param app_name: Application name
-        :param templates_to_use: Application names or paths to use for skeleton creation
+        :param templates_to_use: Templates names or paths to use for skeleton creation
         :param templates_path: A path where application skeleton templates reside
         :param log_level: Logging
 
@@ -90,7 +97,7 @@ class AppMaker:
 
         self.logger.debug('Templates path: %s', self.path_templates_current)
 
-        self.app_templates = []  # type: list[AppTemplate]
+        self.app_templates: List[AppTemplate] = []
         self._init_app_templates(templates_to_use)
 
         self.settings = self._init_settings(app_name)
@@ -102,13 +109,12 @@ class AppMaker:
 
         self._hook_run('rollout_init')
 
-    def _init_settings(self, app_name):
+    def _init_settings(self, app_name: str) -> dict:
         """Initializes and returns base settings.
         
-        :param str app_name:
-        :rtype: OrderedDict 
-        """
+        :param app_name:
 
+        """
         settings = OrderedDict(self.BASE_SETTINGS)
         self.logger.debug('Initial settings: %s', settings)
 
@@ -122,11 +128,11 @@ class AppMaker:
 
         return settings
 
-    def _get_templates_path_current(self, path):
+    def _get_templates_path_current(self, path: Optional[str]) -> str:
         """Returns current templates path.
         
-        :param str|None path:
-        :rtype: str
+        :param path:
+
         """
         path_user_templates = os.path.join(self.path_user_confs, 'app_templates')
 
@@ -138,11 +144,10 @@ class AppMaker:
 
         return path
 
-    def _init_app_templates(self, names_or_paths):
-        """Returns a list of application template objects.
+    def _init_app_templates(self, names_or_paths: List[str]):
+        """Initializes app templates.
         
-        :param list names_or_paths: 
-        :rtype: list[AppTemplate]
+        :param names_or_paths:
 
         """
         if not names_or_paths:
@@ -168,13 +173,12 @@ class AppMaker:
 
         self.logger.debug('Templates to use: %s', self.app_templates)
 
-    def _replace_settings_markers(self, target, strip_unknown=False, settings=None):
+    def _replace_settings_markers(self, target: Any, strip_unknown: bool = False, settings: dict = None) -> str:
         """Replaces settings markers in `target` with current settings values
 
         :param target:
         :param strip_unknown: Strip unknown markers from the target.
-        :param OrderedDict settings:
-        :rtype: str
+        :param settings:
 
         """
         settings = settings or self.settings
@@ -220,7 +224,7 @@ class AppMaker:
 
         return name_available
 
-    def configure_logging(self, verbosity_lvl=None, format='%(message)s'):
+    def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
         """Switches on logging at a given level.
 
         :param verbosity_lvl:
@@ -245,13 +249,12 @@ class AppMaker:
 
         return template_files
 
-    def _hook_run(self, hook_name):
+    def _hook_run(self, hook_name: str) -> Dict[AppTemplate, bool]:
         """Runs the named hook for every app template.
 
         Returns results dictionary indexed by app template objects.
 
-        :param str hook_name:
-        :rtype: OrderedDict
+        :param hook_name:
 
         """
         results = OrderedDict()
@@ -261,18 +264,25 @@ class AppMaker:
 
         return results
 
-    def rollout(self, dest, overwrite=False, init_repository=False, remote_address=None, remote_push=False):
+    def rollout(
+            self,
+            dest: str, *,
+            overwrite: bool = False,
+            init_repository: bool = False,
+            remote_address: str = None,
+            remote_push: bool = False
+    ):
         """Rolls out the application skeleton into `dest` path.
 
-        :param str dest: App skeleton destination path.
+        :param dest: App skeleton destination path.
 
-        :param bool overwrite: Whether to overwrite existing files.
+        :param overwrite: Whether to overwrite existing files.
 
-        :param bool init_repository: Whether to initialize a repository.
+        :param init_repository: Whether to initialize a repository.
 
-        :param str remote_address: Remote repository address to add to DVCS.
+        :param remote_address: Remote repository address to add to DVCS.
 
-        :param bool remote_push: Whether to push to remote.
+        :param remote_push: Whether to push to remote.
 
         """
         self.logger.info('Application target path: %s', dest)
@@ -282,6 +292,7 @@ class AppMaker:
 
         try:
             os.makedirs(dest)
+
         except OSError:
             pass
 
@@ -323,7 +334,7 @@ class AppMaker:
                 remote_push=remote_push)
 
     @staticmethod
-    def _comment_out(text):
+    def _comment_out(text: Optional[str]) -> Optional[str]:
         """Comments out (with #) the given data.
 
         :param text:
@@ -331,9 +342,10 @@ class AppMaker:
         """
         if text is None:
             return None
+
         return '#\n#%s\n' % text.replace('\n', '\n#')
 
-    def _create_file(self, path, contents):
+    def _create_file(self, path: str, contents: str):
         """Creates a file with the given contents in the given path.
         Settings markers found in contents will be replaced with
         the appropriate settings values.
@@ -343,17 +355,19 @@ class AppMaker:
 
         """
         with open(path, 'w') as f:
+
             f.write(contents)
+
             if contents.endswith('\n'):
                 f.write('\n')
 
-    def _copy_file(self, src, dest, prepend_data=None):
+    def _copy_file(self, src: TemplateFile, dest: str, prepend_data: str = None):
         """Copies a file from `src` to `dest` replacing settings markers
         with the given settings values, optionally prepending some data.
 
-        :param TemplateFile src: source file
-        :param str dest: destination file
-        :param str prepend_data: data to prepend to dest file contents
+        :param src: source file
+        :param dest: destination file
+        :param prepend_data: data to prepend to dest file contents
 
         """
         self.logger.info('Creating %s ...', dest)
@@ -404,11 +418,9 @@ class AppMaker:
 
         return render(license), render('%s_src' % license)
 
-    def get_template_vars(self):
-        """Returns known template variables.
-        
-        :rtype: list 
-        """
+    def get_template_vars(self) -> Set[str]:
+        """Returns known template variables."""
+
         items = set(AppMaker.BASE_SETTINGS.keys())
 
         for app_template in self.app_templates:
@@ -416,11 +428,11 @@ class AppMaker:
 
         return items
 
-    def update_settings_complex(self, config=None, dictionary=None):
+    def update_settings_complex(self, config: str = None, dictionary: dict = None):
         """Updates current settings using multiple sources,
 
-        :param str config:
-        :param dict dictionary:
+        :param config:
+        :param dictionary:
 
         """
         # Try to read settings from default file.
@@ -439,10 +451,10 @@ class AppMaker:
         """Updates current settings using app templates."""
         self._hook_run('configure')
 
-    def update_settings_from_dict(self, dict_):
+    def update_settings_from_dict(self, dict_: dict):
         """Updates settings dict with contents from a given dict.
         
-        :param dict dict_:
+        :param dict_:
 
         """
         if not dict_:
@@ -457,7 +469,7 @@ class AppMaker:
 
         self.update_settings(settings)
 
-    def update_settings_from_file(self, path=None):
+    def update_settings_from_file(self, path: str = None):
         """Updates settings dict with contents of configuration file.
 
         Config example:
@@ -491,22 +503,22 @@ class AppMaker:
 
         self.update_settings(dict(cfg.items('settings')))
 
-    def _vcs_init(self, dest, add_files=False, remote_address=None, remote_push=False):
+    def _vcs_init(self, dest: str, *, add_files: bool = False, remote_address: str = None, remote_push: bool = False):
         """Initializes an appropriate VCS repository in the given path.
         Optionally adds the given files.
 
-        :param str dest: Path to initialize VCS repository.
+        :param dest: Path to initialize VCS repository.
 
-        :param bool add_files: Whether to add files to commit automatically.
+        :param add_files: Whether to add files to commit automatically.
 
-        :param str remote_address: Remote repository address to add to DVCS.
+        :param remote_address: Remote repository address to add to DVCS.
 
-        :param bool remote_push: Whether to push to remote.
+        :param remote_push: Whether to push to remote.
 
         """
         vcs = self.settings['vcs']
 
-        helper = self.VCS[vcs]()  # type: VcsHelper
+        helper: VcsHelper = self.VCS[vcs]()
 
         self.logger.info('Initializing %s repository ...', helper.TITLE)
 
@@ -528,13 +540,13 @@ class AppMaker:
             raise AppMakerException(
                 'Unsupported value `%s` for `%s`. Acceptable variants [%s]' % (val, setting, variants))
 
-    def update_settings(self, settings_new, settings_base=None):
+    def update_settings(self, settings_new: dict, settings_base: dict = None):
         """Updates current settings dictionary with values from a given
         settings dictionary. Settings markers existing in settings dict will
         be replaced with previously calculated settings values.
 
-        :param dict settings_new:
-        :param OrderedDict settings_base:
+        :param settings_new:
+        :param settings_base:
         
         """
         settings_base = settings_base or self.settings

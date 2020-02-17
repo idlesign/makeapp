@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from time import sleep
+from typing import Any, Type
 
 import click
 
@@ -10,7 +11,7 @@ if False:  # pragma: nocover
 
 class ConfigMeta(type):
 
-    def __new__(cls, name, bases, dict_):
+    def __new__(cls, name: str, bases: tuple, dict_: dict):
         new_type = type.__new__(cls, name, bases, dict_)
 
         for key, val in dict_.items():
@@ -24,17 +25,17 @@ class ConfigSetting:
 
     name = None  # Runtime bound by metaclass.
 
-    def __init__(self, title, default=None, type=None):
+    def __init__(self, title: str, default: Any = None, type: Any = None):
         self.title = title
         self.default = default
         self.type = type
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance: 'Config', owner: Type['Config']) -> Any:
         """Allows convenient IDE-friendly access from Config
         heirs to settings defined in them.
 
-        :param Config instance:
-        :param type(Config) owner:
+        :param instance:
+        :param owner:
 
         """
         app_template = instance.app_template
@@ -46,10 +47,11 @@ class Config(metaclass=ConfigMeta):
 
     parent_template = None
 
-    def __init__(self, app_template):
+    def __init__(self, app_template: 'AppTemplate'):
         """
 
-        :param AppTemplate app_template:
+        :param app_template:
+
         """
         self.app_template = app_template
         self.logger = app_template.maker.logger
@@ -99,10 +101,10 @@ class Config(metaclass=ConfigMeta):
 
         app_template.maker.update_settings(settings_gathered)
 
-    def print_banner(self, text):
+    def print_banner(self, text: str):
         """Prints out a banner with the given text.
 
-        :param str text:
+        :param text:
 
         """
         max_line_len = max(map(len, text.splitlines()))
