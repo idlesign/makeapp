@@ -1,10 +1,10 @@
+import importlib.util
 import os
 from collections import OrderedDict
 from typing import Type, Dict, Tuple
 
-from .exceptions import AppMakerException
-from .utils import PYTHON_VERSION
 from .appconfig import Config
+from .exceptions import AppMakerException
 
 if False:  # pragma: nocover
     from .appmaker import AppMaker
@@ -51,16 +51,9 @@ class AppTemplate:
 
         if os.path.exists(config_path):
 
-            if PYTHON_VERSION[0] == 2:
-                import imp
-                module = imp.load_source(module_fake_name, config_path)
-
-            else:
-                import importlib.util
-
-                spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
+            spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
 
             config: Type[Config] = getattr(module, self.config_attr, None)
 

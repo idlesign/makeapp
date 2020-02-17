@@ -17,7 +17,7 @@ class WebscaffConfig(Config):
     host = ConfigSetting(title='Remote Host IP')
 
     def hook_rollout_init(self):
-        super(WebscaffConfig, self).hook_rollout_init()
+        super().hook_rollout_init()
 
         required = [
             'python3-dev',
@@ -37,7 +37,7 @@ class WebscaffConfig(Config):
             "Please make sure the following system packages are installed:\n  %s" % ' '.join(required))
 
     def hook_rollout_post(self):
-        super(WebscaffConfig, self).hook_rollout_post()
+        super().hook_rollout_post()
 
         module_name = self.app_template.maker.settings['module_name']
         self.module_name = module_name

@@ -170,7 +170,7 @@ class GitHelper(VcsHelper):
         :param alias:
 
         """
-        super(GitHelper, self).add_remote(address, alias=alias)
+        super().add_remote(address, alias=alias)
         self.run_command('remote add %s %s' % (alias, address))
 
     def add(self, filename: str = None):
@@ -180,7 +180,7 @@ class GitHelper(VcsHelper):
 
         """
         filename = filename or '.'
-        super(GitHelper, self).add(filename)
+        super().add(filename)
 
 
 class MercurialHelper(VcsHelper):
@@ -202,4 +202,4 @@ class MercurialHelper(VcsHelper):
         if upstream is True and self.remote:
             upstream = self.remote
 
-        super(MercurialHelper, self).push(upstream=upstream)
+        super().push(upstream=upstream)

@@ -51,7 +51,7 @@ class PackageData(DataContainer):
         :param version: Version number tuple
 
         """
-        super(PackageData, self).__init__(file_helper)
+        super().__init__(file_helper)
         self.version_current = version
         self.version_next = None
         self.version_increment = 'patch'
@@ -324,7 +324,7 @@ class ChangelogData(DataContainer):
 
     def write(self):
         self.sort_version_changes()
-        super(ChangelogData, self).write()
+        super().write()
 
 
 class Project:

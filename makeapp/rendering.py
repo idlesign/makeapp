@@ -134,7 +134,7 @@ class DynamicParentLoader(FileSystemLoader):
         if is_dynamic:
             template = '%s' % template.current
 
-        source, filename, uptodate = super(DynamicParentLoader, self).get_source(environment, template)
+        source, filename, uptodate = super().get_source(environment, template)
 
         if is_dynamic:
             # Prevent `parent_template` context variable caching.
