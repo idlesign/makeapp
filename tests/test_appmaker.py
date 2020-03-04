@@ -62,7 +62,7 @@ def test_tpl_click(tmpdir, get_appmaker, assert_content):
         get_appmaker(templates=['click'])
 
         assert_content(tmpdir, 'setup.py', [
-            "setup_requires=['click']",
+            "install_requires=['click']",
             "'console_scripts': ['dummy = dummy.cli:main'],",
         ])
 
