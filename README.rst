@@ -50,7 +50,14 @@ Scaffold a new application:
 This will create a decent application skeleton using the default skeleton template (``setup.py``, docs, tests, etc.)
 and initialize Git repository.
 
-``makeapp`` bundles some commonly used templates for apps using: ``pytest``, ``click``, ``Django``, etc.
+``makeapp`` bundles some commonly used templates for:
+
+* ``click`` powered app
+* ``pytest`` powered app
+* ``pytest`` plugin
+* ``Django`` app
+* ``webscaff`` project
+* etc.
 
 Multiple templates can be used together. Complete list of featured templates can be found in the documentation.
 User-made templates are also supported.

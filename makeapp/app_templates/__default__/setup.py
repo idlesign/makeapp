@@ -41,12 +41,13 @@ setup(
     include_package_data=True,
     zip_safe=False,
 
-    install_requires=[{% block install_requires %}{% endblock %}],
-    setup_requires=[{% block setup_requires %}{% endblock %}],
+    install_requires=[ {% block install_requires %}{% endblock %}
+    ],
 
-    entry_points={
-{% block entry_points %}
-{% endblock %}
+    setup_requires=[ {% block setup_requires %}{% endblock %}
+    ],
+
+    entry_points={ {% block entry_points %}{% endblock %}
     },
 
 {% block tests %}
@@ -54,13 +55,15 @@ setup(
 {% endblock %}
 
     classifiers=[
+{% block classifiers %}
         # As in https://pypi.python.org/pypi?:action=list_classifiers
         'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: {{ python_version_major }}',
         'Programming Language :: Python :: {{ python_version }}',
-        'License :: {{ license_title_pypi }}'
+        'License :: {{ license_title_pypi }}',
+{% endblock %}
     ],
 )
 

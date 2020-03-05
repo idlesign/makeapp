@@ -45,6 +45,15 @@ Use ``-t pytest`` command switch to rollout Python application which will
 use ``pytest`` instead of ``unittest`` for tests.
 
 
+pytest plugin
+~~~~~~~~~~~~~
+
+Template alias: ``pytestplugin``.
+
+Use ``-t pytestplugin`` command switch to rollout a sceleton for ``pytest`` plugin.
+
+
+
 Click console application
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -62,3 +71,4 @@ This template allows you to create a web-project (Django on uWSGI) structure alm
 on VPS (cloud) services via Webscaff https://github.com/idlesign/webscaff
 
 Use ``-t webscaff`` command switch to rollout Webscaff project.
+

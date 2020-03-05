@@ -62,7 +62,7 @@ def test_tpl_click(tmpdir, get_appmaker, assert_content):
         get_appmaker(templates=['click'])
 
         assert_content(tmpdir, 'setup.py', [
-            "install_requires=['click']",
+            "'click',",
             "'console_scripts': ['dummy = dummy.cli:main'],",
         ])
 
@@ -101,4 +101,24 @@ def test_tpl_django(tmpdir, get_appmaker, assert_content):
         assert_content(tmpdir, 'dummy/config.py', [
             "name = 'dummy'",
             "verbose_name = _('Dummy')",
+        ])
+
+
+def test_tpl_pytestplugin(tmpdir, get_appmaker, assert_content):
+
+    with tmpdir.as_cwd():
+
+        get_appmaker(templates=['pytestplugin'])
+
+        assert_content(tmpdir, 'setup.py', [
+            "'pytest11': ['dummy = dummy.entry'],",
+            "'Framework :: Pytest'",
+        ])
+
+        assert_content(tmpdir, 'dummy/entry.py', [
+            "return 'itworks'",
+        ])
+
+        assert_content(tmpdir, 'tests/test_module.py', [
+            "rename_me == 'itworks'",
         ])

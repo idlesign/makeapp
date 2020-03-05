@@ -4,7 +4,9 @@
 import sys
 {% endblock %}
 
-{% block setup_requires %}{{ super() }}] + (['pytest-runner'] if 'test' in sys.argv else []) + [{% endblock %}
+{% block setup_requires %}
+        {{ super() }}] + (['pytest-runner'] if 'test' in sys.argv else []) + [
+{% endblock %}
 
 {% block tests %}
 {{ super() }}
