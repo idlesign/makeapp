@@ -166,3 +166,7 @@ texinfo_documents = [
      author, '{{ app_name }}', '{{ description }}',
      'Miscellaneous'),
 ]
+
+
+# This allows mocking dependency imports for autodoc.
+autodoc_mock_imports = []
