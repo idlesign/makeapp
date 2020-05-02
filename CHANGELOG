@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.5.1 [2020-05-02]
+-------------------
 * Docs config extended with 'autodoc_mock_imports' hint.
 * Docs theme reverted from alabaster to default.
 
