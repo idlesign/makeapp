@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from datetime import date
+from pathlib import Path
 from typing import List, Optional, Any, Dict, Set
 
 import requests
@@ -101,10 +102,19 @@ class AppMaker:
 
         self.settings = self._init_settings(app_name)
 
-        self.renderer = Renderer(maker=self, paths=[
+        search_paths = [
             self.path_templates_builtin,
             self.path_templates_current,
-        ])
+        ]
+
+        # Support for user-supplied template directories.
+        for template in templates_to_use or []:
+            if '/' in template:
+                parent = str(Path(template).parent)
+                if parent not in search_paths:
+                    search_paths.append(parent)
+
+        self.renderer = Renderer(maker=self, paths=search_paths)
 
         self._hook_run('rollout_init')
 

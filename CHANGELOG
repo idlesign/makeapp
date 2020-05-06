@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Fixed handling directories passed as template names.
+
+
 v1.5.1 [2020-05-02]
 -------------------
 * Docs config extended with 'autodoc_mock_imports' hint.

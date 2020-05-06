@@ -44,6 +44,23 @@ def test_default(tmpdir, get_appmaker, assert_content):
         ])
 
 
+def test_tpl_userdefined(tmpdir, get_appmaker, assert_content):
+
+    with tmpdir.as_cwd():
+
+        userdefined = tmpdir.mkdtemp()
+
+        with open(userdefined / 'setup.py', 'w') as f:
+            f.write('{% extends parent_template %}\n'
+                "{% block install_requires %}{{ super() }}'some',{% endblock %}")
+
+        get_appmaker(templates=[str(userdefined)])
+
+        assert_content(tmpdir, 'setup.py', [
+            "install_requires=[ 'some'",
+        ])
+
+
 def test_tpl_console(tmpdir, get_appmaker, assert_content):
 
     with tmpdir.as_cwd():
