@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import sys
 import logging
+import sys
+from pathlib import Path
 
 import click
 
@@ -91,6 +92,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     )
 
     # Print out current settings.
+    click.secho(f'Directory for files: {Path(target_path).absolute()}', fg='green')
     click.secho(app_maker.get_settings_string(), fg='green')
 
     if click.confirm(
