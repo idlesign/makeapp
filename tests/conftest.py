@@ -45,3 +45,12 @@ def assert_content():
             assert line in contents
 
     return assert_content_
+
+
+@pytest.fixture
+def assert_cleanup():
+
+    def assert_cleanup_(tmpdir, filename):
+        assert not tmpdir.join(filename).exists()
+
+    return assert_cleanup_

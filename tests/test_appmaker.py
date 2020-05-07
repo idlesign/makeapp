@@ -105,7 +105,7 @@ def test_tpl_pytest(tmpdir, get_appmaker, assert_content):
         ])
 
 
-def test_tpl_django(tmpdir, get_appmaker, assert_content):
+def test_tpl_django(tmpdir, get_appmaker, assert_content, assert_cleanup):
 
     with tmpdir.as_cwd():
 
@@ -119,6 +119,8 @@ def test_tpl_django(tmpdir, get_appmaker, assert_content):
             "name = 'dummy'",
             "verbose_name = _('Dummy')",
         ])
+
+        assert_cleanup(tmpdir, 'tests')
 
 
 def test_tpl_pytestplugin(tmpdir, get_appmaker, assert_content):
