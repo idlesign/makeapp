@@ -4,7 +4,9 @@ makeapp changelog
 
 Unreleased
 ----------
++ CLI. Added '--no-prompt' option for 'new' command.
 + CLI. Print out target directory for 'new' command.
+* CLI. App name usage search in 'new' command now defaults to 'N'.
 
 
 v1.5.2 [2020-05-06]

@@ -48,10 +48,13 @@ def entry_point():
     '-o', '--overwrite_on_conflict', is_flag=True,
     help='Overwrite files on conflict')
 @click.option(
+    '--no-prompt', is_flag=True,
+    help='Do not prompt')
+@click.option(
     '-t', '--templates_to_use',
     help='Accepts comma separated list of application structures templates names or paths')
 @click.argument('custom_args', nargs=-1, type=click.UNPROCESSED)
-def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug, custom_args, **kwargs):
+def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug, custom_args, no_prompt, **kwargs):
     """Simplifies Python application rollout providing its basic structure."""
 
     def process_custom_args(args):
@@ -95,25 +98,29 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     click.secho(f'Directory for files: {Path(target_path).absolute()}', fg='green')
     click.secho(app_maker.get_settings_string(), fg='green')
 
-    if click.confirm(
-        f'Do you want to check that `{app_name}` application name is not already in use?',
-        default=True
-    ):
-        if not app_maker.check_app_name_is_available():
-            sys.exit(1)
-
-    click.confirm('Ready to rollout application skeleton. Proceed?', abort=True, default=True)
-
-    init_repo = click.confirm('Do you want to initialize a VCS repository in the application directory?', default=True)
-
+    init_repo = True
     remote_address = ''
     remote_push = False
 
-    if init_repo:
-        remote_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
+    if not no_prompt:
 
-        if remote_address:
-            remote_push = click.confirm('Do you want to commit and push files to remote?', default=False)
+        if click.confirm(
+            f'Do you want to check that `{app_name}` application name is not already in use?',
+            default=False
+        ):
+            if not app_maker.check_app_name_is_available():
+                sys.exit(1)
+
+        click.confirm('Ready to rollout application skeleton. Proceed?', abort=True, default=True)
+
+        init_repo = click.confirm(
+            'Do you want to initialize a VCS repository in the application directory?', default=True)
+
+        if init_repo:
+            remote_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
+
+            if remote_address:
+                remote_push = click.confirm('Do you want to commit and push files to remote?', default=False)
 
     app_maker.rollout(
         target_path,
