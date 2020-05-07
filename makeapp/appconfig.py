@@ -1,11 +1,12 @@
+from pathlib import Path
+from shutil import rmtree
 from time import sleep
-from typing import Any, Type
+from typing import Any, Type, List
 
 import click
 
-
 if False:  # pragma: nocover
-    from .apptemplate import AppTemplate
+    from .apptemplate import AppTemplate  # noqa
 
 
 class ConfigMeta(type):
@@ -45,7 +46,11 @@ class ConfigSetting:
 class Config(metaclass=ConfigMeta):
     """Base for application template configuration."""
 
-    parent_template = None
+    parent_template: List[str] = None
+    """Parent template names."""
+
+    cleanup: List[str] = None
+    """Paths to cleanup after rollout."""
 
     def __init__(self, app_template: 'AppTemplate'):
         """
@@ -121,3 +126,9 @@ class Config(metaclass=ConfigMeta):
 
     def hook_rollout_post(self):
         """Executed after application skeleton rollout."""
+        cleanup = self.cleanup or []
+
+        for path in cleanup:
+            path = Path(path).absolute()
+            self.logger.info(f'Cleanup {path} ...')
+            rmtree(path, ignore_errors=True)

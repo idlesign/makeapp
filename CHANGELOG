@@ -6,6 +6,7 @@ Unreleased
 ----------
 + CLI. Added '--no-prompt' option for 'new' command.
 + CLI. Print out target directory for 'new' command.
++ Introduced 'Config.cleanup' attribute to allow easy cleanups for templates.
 * CLI. App name usage search in 'new' command now defaults to 'N'.
 
 
