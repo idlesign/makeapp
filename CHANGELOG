@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Django app template improved.
+
+
 v1.6.0 [2020-05-07]
 -------------------
 + CLI. Added '--no-prompt' option for 'new' command.
