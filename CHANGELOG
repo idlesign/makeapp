@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.6.0 [2020-05-07]
+-------------------
 + CLI. Added '--no-prompt' option for 'new' command.
 + CLI. Print out target directory for 'new' command.
 + Introduced 'Config.cleanup' attribute to allow easy cleanups for templates.
