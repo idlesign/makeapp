@@ -108,7 +108,7 @@ Supported message prefixes:
 
   Increment: *patch*.
 
-* ``*`` - Minor change/improvement/fix. ``*`` prefix is added by default in none of the above mentioned prefixes found.
+* ``*`` - Minor change/improvement/fix. ``*`` prefix is added by default if none of the above mentioned prefixes found.
 
   Increment: *patch*.
 
