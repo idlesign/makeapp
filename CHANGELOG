@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.6.1 [2020-05-19]
+-------------------
 * Django app template improved.
 
 
