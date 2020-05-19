@@ -71,6 +71,8 @@ When you're ready to publish issue the following command while in project direct
 .. code-block:: bash
 
     $ makeapp release
+    ; Bump version number part manually: major, minor, patch
+    $ makeapp release --increment major
 
 
 This will automatically:
@@ -91,6 +93,24 @@ When you're ready to add another entry to your changelog use ``change`` command:
     $ makeapp change "+ New 'change' command implemented"
 
 This will also stage and commit all changed files.
+
+Supported message prefixes:
+
+* ``+`` - New feature / addition.
+
+  Increments *minor* part of version number on ``release`` command.
+
+* ``!`` - Important change/improvement/fix.
+
+  Increment: *patch* part.
+
+* ``-`` - Feature deprecation / removal
+
+  Increment: *patch*.
+
+* ``*`` - Minor change/improvement/fix. ``*`` prefix is added by default in none of the above mentioned prefixes found.
+
+  Increment: *patch*.
 
 
 Bash completion
