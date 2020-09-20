@@ -5,14 +5,6 @@ Quickstart
 Application scaffolding
 -----------------------
 
-Bundled layout skeletons:
-
-1. Python module (simple application);
-2. Console application.
-3. Django application.
-4. Pytest support template.
-
-
 Scaffold a new application:
 
 .. code-block:: bash
@@ -22,7 +14,6 @@ Scaffold a new application:
 
 This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.
 
-
 Get some help on command line switches:
 
 .. code-block:: bash
@@ -30,8 +21,11 @@ Get some help on command line switches:
     $ makeapp --help
 
 
-Note: This software can function both as a command line tool and as a Python module.
+.. note:: This software can function both as a command line tool and as a Python module.
 
+
+Settings in config
+~~~~~~~~~~~~~~~~~~
 
 Put some default settings into a config (not to mess with command line switches anymore):
 
@@ -43,7 +37,17 @@ Put some default settings into a config (not to mess with command line switches 
     author_email = librarian@discworld.wrld
     license = bsd3cl
     url = https://github.discworld.wrld/librarian/{{ app_name }}
-    vcs=git
+    vcs = git
+
+
+Settings in command line
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can also pass settings values via command line options. Use ``--no-prompt`` switch to automate scaffolding:
+
+.. code-block:: bash
+
+    makeapp new my_new_app -t webscaff  --no-prompt --webscaff_domain "example.com" --webscaff_email "me@example.com" --webscaff_host "93.184.216.34" --vcs_remote "git@example.com:me/my_new_app.git"
 
 
 Application publishing
