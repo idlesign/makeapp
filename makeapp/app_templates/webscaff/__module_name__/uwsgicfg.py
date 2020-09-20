@@ -28,7 +28,7 @@ def get_configurations() -> PythonSection:
         touch_reload=f"{dir_state / 'reloader'}",
         owner=project if in_production else None,
     )
-    section.set_runtime_dir(f'{settings.PROJECT_DIR_RUN}')
+    section.set_runtime_dir(f'{settings.PROJECT_DIR_RUN}'.replace(f'/{project}', ''))
     section.main_process.change_dir(f'{dir_state}')
     section.workers.set_reload_params(max_requests=10000)
 
