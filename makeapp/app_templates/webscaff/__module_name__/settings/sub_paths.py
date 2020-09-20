@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).absolute().parent.parent
 
 PROJECT_NAME = '{{ module_name }}'
-PROJECT_DOMAIN = '{{ webscaff_host }}'
+PROJECT_DOMAIN = '{{ webscaff_domain }}'
 
 PROJECT_DIR_STATE_LOCAL = BASE_DIR.parent / 'state'
 LOCAL_RUN = PROJECT_DIR_STATE_LOCAL.exists()
