@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+* Webscaff. Turn on HTTPS auto redirect.
 * Webscaff. Update template.
 
 

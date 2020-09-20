@@ -15,7 +15,7 @@ def get_configurations() -> PythonSection:
 
     section = PythonSection.bootstrap(
         f'http://:{80 if in_production else 8000}',
-        allow_shared_sockets=False,
+        allow_shared_sockets=in_production,
 
         wsgi_module=f'{project}.wsgi',
         process_prefix=f'[{project}] ',
@@ -35,10 +35,13 @@ def get_configurations() -> PythonSection:
     section.spooler.add(f"{dir_state / 'spool'}")
 
     if in_production and domain:
+
         section.configure_certbot_https(
             domain=domain,
             webroot=f"{dir_state / 'certbot'}",
             allow_shared_sockets=True)
+
+        section.configure_https_redirect()
 
     section.configure_maintenance_mode(
         f"{dir_state / 'maintenance'}", section.get_bundled_static_path('503.html'))
