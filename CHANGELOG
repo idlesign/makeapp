@@ -5,6 +5,7 @@ makeapp changelog
 Unreleased
 ----------
 * Django. Update template.
+* Webscaff. Update template.
 
 
 v1.6.1 [2020-05-19]

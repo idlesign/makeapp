@@ -76,9 +76,9 @@ class WebscaffConfig(Config):
             source_file,
             pairs={
                 # Add basic project-related settings.
-                'import os':
+                'from pathlib import Path':
 
-                    'import os\n\n'
+                    'from pathlib import Path\n\n'
                     'from .sub_paths import *\n\n',
 
                 #  Reset debug.
