@@ -99,7 +99,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     click.secho(app_maker.get_settings_string(), fg='green')
 
     init_repo = True
-    remote_address = ''
+    remote_address = app_maker.settings['vcs_remote'] or ''
     remote_push = False
 
     if not no_prompt:

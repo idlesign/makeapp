@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ CLI. Allow setting 'vcs_remote' option.
 * Django. Update template.
 * Webscaff. Update template.
 

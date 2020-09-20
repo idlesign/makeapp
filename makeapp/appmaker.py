@@ -64,6 +64,7 @@ class AppMaker:
         'license': default_license,
         'license_title': LICENSES[default_license][0],
         'vcs': default_vcs,
+        'vcs_remote': None,
         'python_version': '.'.join(map(str, PYTHON_VERSION[:2])),
     }
 
