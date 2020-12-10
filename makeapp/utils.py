@@ -94,12 +94,15 @@ def check_command(command: str, hint: str):
             f"Check {hint} is installed and available.")
 
 
-def run_command(command: str) -> List[str]:
+def run_command(command: str, *, err_msg: str = '') -> List[str]:
     """Runs a command in a shell process.
 
     Returns a list of strings gathered from a command.
 
     :param command:
+
+    :param err_msg: Message to show on error.
+
     :raises: CommandError
 
     """
@@ -125,6 +128,6 @@ def run_command(command: str) -> List[str]:
         data.append(item)
 
     if has_error:
-        raise CommandError(f"Command `{command}` failed: %s" % '\n'.join(data))
+        raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
 
     return data

@@ -1,5 +1,3 @@
-import pytest
-
 
 def test_default(tmpdir, get_appmaker, assert_content):
 
@@ -36,7 +34,7 @@ def test_default(tmpdir, get_appmaker, assert_content):
         ])
 
         assert_content(tmpdir, 'setup.cfg', [
-            'universal = 1',
+            'release =',
         ])
 
         assert_content(tmpdir, 'docs/source/conf.py', [
