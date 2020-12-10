@@ -5,11 +5,17 @@ from pathlib import Path
 
 import click
 
-from . import VERSION
-from .appmaker import AppMaker
-from .apptools import Project, VERSION_NUMBER_CHUNKS
-from .utils import configure_logging
 from .exceptions import MakeappException
+
+try:
+    from . import VERSION
+    from .appmaker import AppMaker
+    from .apptools import Project, VERSION_NUMBER_CHUNKS
+    from .utils import configure_logging
+
+except MakeappException as e:
+    click.secho(f'{e}', err=True, fg='red')
+    sys.exit()
 
 
 @click.group()
