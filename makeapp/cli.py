@@ -174,7 +174,10 @@ def change(description):
 
 
 def main():
-    entry_point(obj={})
+    try:
+        entry_point(obj={})
+    except MakeappException as e:
+        click.secho(f'{e}', err=True, fg='red')
 
 
 if __name__ == '__main__':
