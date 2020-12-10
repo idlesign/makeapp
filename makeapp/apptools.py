@@ -85,7 +85,7 @@ class PackageData(DataContainer):
         filepath = os.path.join(package_name, '__init__.py')
 
         if not os.path.isfile(filepath):
-            raise ProjectorExeption('Package `__init__` file not found')
+            raise ProjectorExeption("Package's `__init__` file is not found.")
 
         init_file = FileHelper.read_file(filepath)
 
@@ -97,7 +97,7 @@ class PackageData(DataContainer):
                 break
 
         if version_line_idx is None:
-            raise ProjectorExeption('Version line not found in init file')
+            raise ProjectorExeption('Version line not found in init file.')
 
         fake_locals = {}
         exec(init_file[version_line_idx], {}, fake_locals)
@@ -105,7 +105,7 @@ class PackageData(DataContainer):
         version = fake_locals[version_str]
 
         if not isinstance(version, tuple):
-            raise ProjectorExeption(f'Unsupported version format: {version}')
+            raise ProjectorExeption(f'Unsupported version format: {version}.')
 
         LOG.info(f'Current version from package: `{version}`')
 
@@ -128,7 +128,7 @@ class PackageData(DataContainer):
 
             raise ProjectorExeption(
                 f'Unsupported version chunk to increment: `{increment}`. '
-                f'Should be one of: {VERSION_NUMBER_CHUNKS}')
+                f'Should be one of: {VERSION_NUMBER_CHUNKS}.')
 
         version_old = self.version_current
         version_next = []
@@ -191,12 +191,12 @@ class ChangelogData(DataContainer):
         LOG.debug(f'Getting changelog from `{os.path.basename(filepath)}` ...')
 
         if not os.path.isfile(filepath):
-            raise ProjectorExeption('Changelog file not found')
+            raise ProjectorExeption('Changelog file not found.')
 
         changelog = FileHelper.read_file(filepath)
 
         if not changelog[1].startswith('=='):
-            raise ProjectorExeption('Unexpected changelog file format')
+            raise ProjectorExeption('Unexpected changelog file format.')
 
         unreleased_str = cls.UNRELEASED_STR
         unreleased_entry_exists = False
@@ -212,7 +212,7 @@ class ChangelogData(DataContainer):
                 break
 
         if version_line_idx is None:
-            raise ProjectorExeption('Version line not found in changelog')
+            raise ProjectorExeption('Version line not found in the changelog.')
 
         if not unreleased_entry_exists:
             # Add `Unreleased` entry.
@@ -352,7 +352,7 @@ class Project:
         LOG.debug(f'Gathering info from `{project_path}` directory ...')
 
         if not os.path.isfile('setup.py'):
-            raise ProjectorExeption('No `setup.py` file found')
+            raise ProjectorExeption('No `setup.py` file found in the current directory.')
 
         self.vcs.check()
 

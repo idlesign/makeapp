@@ -5,10 +5,11 @@ from pathlib import Path
 
 import click
 
-from makeapp import VERSION
-from makeapp.appmaker import AppMaker
-from makeapp.apptools import Project, VERSION_NUMBER_CHUNKS
-from makeapp.utils import configure_logging
+from . import VERSION
+from .appmaker import AppMaker
+from .apptools import Project, VERSION_NUMBER_CHUNKS
+from .utils import configure_logging
+from .exceptions import MakeappException
 
 
 @click.group()
@@ -67,7 +68,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
             if idx % 2:
 
                 if not arg.startswith('--'):
-                    raise ValueError('Additional options should go in pairs: --opt val')
+                    raise ValueError('Additional options should go in pairs: --opt val.')
 
                 key = arg.lstrip('-')
 

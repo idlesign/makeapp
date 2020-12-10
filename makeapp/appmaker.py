@@ -150,7 +150,7 @@ class AppMaker:
             path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_builtin
 
         if not os.path.exists(path):
-            raise AppMakerException(f"Templates path doesn't exist: {path}")
+            raise AppMakerException(f"Templates path doesn't exist: {path}.")
 
         return path
 
@@ -505,13 +505,13 @@ class AppMaker:
             return
 
         if not config_exists and path is not None:
-            raise AppMakerException(f'Unable to find settings file: {config_path}')
+            raise AppMakerException(f'Unable to find settings file: {config_path}.')
 
         cfg = configparser.ConfigParser()
         cfg.read(config_path)
 
         if not cfg.has_section('settings'):
-            raise AppMakerException(f'Unable to read settings from file: {config_path}')
+            raise AppMakerException(f'Unable to read settings from file: {config_path}.')
 
         self.update_settings(dict(cfg.items('settings')))
 
@@ -553,7 +553,7 @@ class AppMaker:
 
             raise AppMakerException(
                 f'Unsupported value `{val}` for `{setting}`. '
-                f'Acceptable variants [{variants}]')
+                f'Acceptable variants [{variants}].')
 
     def update_settings(self, settings_new: dict, settings_base: dict = None):
         """Updates current settings dictionary with values from a given

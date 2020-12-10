@@ -116,7 +116,7 @@ class DynamicParentTemplate:
 
         except IndexError:
             # Mostly for template inheritance debug purposes.
-            raise IndexError(f'No more parents to pop. Initial parents: {self.parents_initial}')
+            raise IndexError(f'No more parents to pop. Initial parents: {self.parents_initial}.')
 
         return current
 
