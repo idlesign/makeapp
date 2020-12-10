@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.8.0 [2020-12-10]
+-------------------
 + Added wheel module check.
 + CLI. Exception messages simplified.
 + Templates. Python 3.9 added to QA.
