@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ Templates. Python 3.9 added to QA.
 * Now aimed for Python 3+. Universal wheel build disabled.
 
 
