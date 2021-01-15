@@ -1,8 +1,8 @@
 # Don't forget to pin down these requirements to certain versions in your project.
 
-Django>=3.1.1
+Django>=3.1.5
 envbox>=1.2.0
 psycopg2>=2.8.6
 uwsgi>=2.0.19.1
-uwsgiconf[cli]>=0.21.0
+uwsgiconf[cli]>=0.22.0
 #git+git://github.com/idlesign/uwsgiconf@master#egg=uwsgiconf

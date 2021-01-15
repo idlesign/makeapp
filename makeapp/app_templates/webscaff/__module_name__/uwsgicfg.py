@@ -39,9 +39,10 @@ def get_configurations() -> PythonSection:
         section.configure_certbot_https(
             domain=domain,
             webroot=f"{dir_state / 'certbot'}",
-            allow_shared_sockets=True)
-
-        section.configure_https_redirect()
+            allow_shared_sockets=True,
+            # For initial certificate issuing we use HTTP w/o redirects.
+            http_redirect=True,
+        )
 
     section.configure_maintenance_mode(
         f"{dir_state / 'maintenance'}", section.get_bundled_static_path('503.html'))

@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Webscaff. Update template.
+
+
 v1.8.0 [2020-12-10]
 -------------------
 + Added wheel module check.
