@@ -5,6 +5,7 @@ makeapp changelog
 Unreleased
 ----------
 * Django app template improved: added 3.2 QA.
+* Now wheel package is checked only when required.
 
 
 v1.8.1 [2021-01-15]

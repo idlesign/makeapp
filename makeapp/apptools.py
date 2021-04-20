@@ -467,6 +467,8 @@ class Project:
         """Uploads project data to remote VCS and Python Package Index server."""
         LOG.info('Publishing application ...')
 
+        DistHelper.ensure()
+
         with chdir(self.project_path):
             self.vcs.push()
             DistHelper.upload()

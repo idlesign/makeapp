@@ -9,9 +9,12 @@ class DistHelper:
 
     check_command(python_bin, 'Python 3+')
 
-    run_command(
-        f'{python_bin} -m wheel version',
-        err_msg=f"Please install 'wheel' module to proceed: {python_bin} -m pip install wheel")
+    @classmethod
+    def ensure(cls):
+        """Ensures dist helper is functional."""
+        run_command(
+            f'{cls.python_bin} -m wheel version',
+            err_msg=f"Please install 'wheel' module to proceed: {cls.python_bin} -m pip install wheel")
 
     @classmethod
     def run_command(cls, command):
