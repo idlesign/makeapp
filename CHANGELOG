@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.8.3 [2021-05-22]
+-------------------
 * Webscaff. Updated to support Django 3.2 changes.
 
 
