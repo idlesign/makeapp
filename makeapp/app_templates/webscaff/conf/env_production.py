@@ -4,6 +4,7 @@ from .base import *
 
 DEBUG = False
 
+SECRET_KEY = 'django-insecure-update-it-with-a-proper-key'
 
 ALLOWED_HOSTS = [
     # Don't forget to put here all IPs and

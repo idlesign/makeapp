@@ -86,6 +86,9 @@ class WebscaffConfig(Config):
 
                     'DEBUG = False',
 
+                # Secure enough to be used in tests etc.
+                'django-insecure-': '',
+
                 # Add core application.
                 "    'django.contrib.staticfiles',":
 
@@ -127,6 +130,12 @@ class WebscaffConfig(Config):
         # Create basic app.
         dir_app = join(dir_package, 'core')
         run_command(f'{command_django_admin} startapp core {dir_app}')
+        replace_infile(
+            join(dir_app, 'apps.py'),
+            {
+                "'core'": f"'{module_name}.core'",  # Adapt for Django 3.2+
+            }
+        )
 
 
 makeapp_config = WebscaffConfig
