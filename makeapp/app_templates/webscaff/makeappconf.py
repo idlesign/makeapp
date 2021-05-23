@@ -54,6 +54,7 @@ class WebscaffConfig(Config):
         run_command('. venv/bin/activate && pip install -e .')
 
         # Initialize local sqlite DB.
+        run_command(f'venv/bin/{module_name} makemigrations')
         run_command(f'venv/bin/{module_name} migrate')
 
     def prepare_venv(self):
@@ -84,7 +85,8 @@ class WebscaffConfig(Config):
                 #  Reset debug.
                 'DEBUG = True':
 
-                    'DEBUG = False',
+                    'DEBUG = False\n\n'
+                    "AUTH_USER_MODEL = 'core.User'",
 
                 # Secure enough to be used in tests etc.
                 'django-insecure-': '',
@@ -134,6 +136,15 @@ class WebscaffConfig(Config):
             join(dir_app, 'apps.py'),
             {
                 "'core'": f"'{module_name}.core'",  # Adapt for Django 3.2+
+            }
+        )
+        replace_infile(
+            join(dir_app, 'models.py'),
+            {
+                'from django.db import models':
+                    "from django.contrib.auth.models import AbstractUser\n"
+                    "from django.db import models\n\n"
+                    "class User(AbstractUser): pass"
             }
         )
 
