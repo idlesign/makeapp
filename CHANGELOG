@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Django. Template improved.
+
+
 v1.8.4 [2021-05-23]
 -------------------
 * Webscaff. Switch to use a custom user model.
