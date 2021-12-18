@@ -2,16 +2,13 @@ makeapp
 =======
 https://github.com/idlesign/makeapp
 
-|release| |lic| |ci| |coverage|
+|release| |lic| |coverage|
 
 .. |release| image:: https://img.shields.io/pypi/v/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
 
 .. |lic| image:: https://img.shields.io/pypi/l/makeapp.svg
     :target: https://pypi.python.org/pypi/makeapp
-
-.. |ci| image:: https://img.shields.io/travis/idlesign/makeapp/master.svg
-    :target: https://travis-ci.org/idlesign/makeapp
 
 .. |coverage| image:: https://img.shields.io/coveralls/idlesign/makeapp/master.svg
     :target: https://coveralls.io/r/idlesign/makeapp
