@@ -18,6 +18,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Setup Git
+      run: |
+        git config --global user.email "atotest@example.com"
+        git config --global user.name "auto tester"
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
