@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
+* Django app template improved: added 4.0 QA; switched from Travis to GitHub Actions.
 * Django. Template improved.
 
 

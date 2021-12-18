@@ -2,5 +2,5 @@
 
 {% block body %}
 {{ super() }}
-default_app_config = '{{ module_name }}.config.{{ module_name_capital }}Config'
+default_app_config = '{{ module_name }}.apps.{{ module_name_capital }}Config'
 {% endblock %}
