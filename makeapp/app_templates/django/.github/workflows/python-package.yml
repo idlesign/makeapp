@@ -25,6 +25,7 @@ jobs:
           - python-version: 3.6
             django-version: 4.0
 
+{% raw %}
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }} & Django ${{ matrix.django-version }}
@@ -37,6 +38,7 @@ jobs:
     - name: Run tests
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
+{% endraw %}
       run: |
         coverage run --source={{ module_name }} setup.py test
         coveralls --service=github

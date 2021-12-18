@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
+* Django app template fix for GitHub Actions config.
+
+
 v1.8.5 [2021-12-18]
 -------------------
 * Django app template improved: added 4.0 QA; switched from Travis to GitHub Actions.

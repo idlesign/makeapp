@@ -113,7 +113,7 @@ def test_tpl_django(tmpdir, get_appmaker, assert_content, assert_cleanup):
             "tests_require=['pytest', 'pytest-djangoapp>=",
         ])
 
-        assert_content(tmpdir, 'dummy/config.py', [
+        assert_content(tmpdir, 'dummy/apps.py', [
             "name = 'dummy'",
             "verbose_name = _('Dummy')",
         ])
