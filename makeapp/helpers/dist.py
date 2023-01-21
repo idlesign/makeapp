@@ -1,12 +1,12 @@
 from shutil import rmtree
 
-from ..utils import run_command, check_command, PYTHON_VERSION
+from ..utils import run_command, check_command
 
 
 class DistHelper:
     """Encapsulates Python distribution related logic."""
 
-    python_bin: str = 'python' if PYTHON_VERSION[0] == 3 else 'python3'
+    python_bin: str = 'python3'
     """Name of python binary that'll be used for commands run."""
 
     check_command(python_bin, 'Python 3+')

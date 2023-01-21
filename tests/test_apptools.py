@@ -43,9 +43,9 @@ def test_git(tmpdir, get_appmaker, assert_content, monkeypatch):
         project.publish()
 
         assert issued_commands == [
-            'python -m wheel version',
+            'python3 -m wheel version',
             'git push',
             'git push --tags',
-            'python setup.py clean --all sdist bdist_wheel',
+            'python3 setup.py clean --all sdist bdist_wheel',
             'twine upload dist/*'
         ]

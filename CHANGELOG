@@ -5,6 +5,7 @@ makeapp changelog
 Unreleased
 ----------
 + Switched to 'twine' for package publishing.
+* Switched to 'python3' binary.
 
 
 v1.8.6 [2021-12-18]
