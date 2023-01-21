@@ -4,6 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
++ App templates updated.
 + Switched to 'twine' for package publishing.
 * Switched to 'python3' binary.
 
