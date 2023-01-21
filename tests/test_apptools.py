@@ -4,7 +4,7 @@ from makeapp.helpers.vcs import VcsHelper
 from makeapp.apptools import Project
 
 
-def test_git(tmpdir, get_appmaker, assert_content):
+def test_git(tmpdir, get_appmaker, assert_content, monkeypatch):
 
     with tmpdir.as_cwd():
 
@@ -32,3 +32,20 @@ def test_git(tmpdir, get_appmaker, assert_content):
         assert summary == '! warn.\n+ add.\n+ Basic functionality.\n* change.\n* fix1.'
 
         project.release(version, summary)
+
+        issued_commands = []
+
+        def dummy_communicate(self, *args, **kwargs):
+            issued_commands.append(self.args)
+            return b'', b''
+
+        monkeypatch.setattr('makeapp.utils.Popen.communicate', dummy_communicate)
+        project.publish()
+
+        assert issued_commands == [
+            'python -m wheel version',
+            'git push',
+            'git push --tags',
+            'python setup.py clean --all sdist bdist_wheel',
+            'twine upload dist/*'
+        ]

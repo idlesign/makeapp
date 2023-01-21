@@ -2,6 +2,11 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
++ Switched to 'twine' for package publishing.
+
+
 v1.8.6 [2021-12-18]
 -------------------
 * Django app template fix for GitHub Actions config.

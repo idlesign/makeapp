@@ -45,6 +45,7 @@ setup(
         'requests',
         'click',
         'jinja2<3.0',
+        'twine',
         'wheel',
     ],
     entry_points={

@@ -1,3 +1,5 @@
+from shutil import rmtree
+
 from ..utils import run_command, check_command, PYTHON_VERSION
 
 
@@ -24,4 +26,13 @@ class DistHelper:
     @classmethod
     def upload(cls):
         """Builds a package and uploads it to PyPI."""
-        cls.run_command('clean --all sdist bdist_wheel upload')
+
+        rmtree('dist/', ignore_errors=True)  # cleanup
+
+        cls.run_command('clean --all sdist bdist_wheel')
+
+        # setuptools 'upload' essentially has become broken
+        # https://github.com/python/cpython/issues/89753
+        # https://github.com/pypa/distutils/issues/25
+        # using twine instead
+        run_command('twine upload dist/*')
