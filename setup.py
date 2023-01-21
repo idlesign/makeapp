@@ -45,6 +45,7 @@ setup(
         'requests',
         'click',
         'jinja2<3.0',
+        'markupsafe<=2.0.1',  # pin down for jinja
         'twine',
         'wheel',
     ],
