@@ -40,10 +40,10 @@ def entry_point():
     '-d', '--description',
     help='Short application description')
 @click.option(
-    '-l', '--license', type=click.Choice(AppMaker.LICENSES.keys()), default=AppMaker.default_license,
+    '-l', '--license', type=click.Choice(AppMaker.LICENSES.keys()),
     help='License to use')
 @click.option(
-    '-vcs', '--vcs', type=click.Choice(AppMaker.VCS.keys()), default=AppMaker.default_vcs,
+    '-vcs', '--vcs', type=click.Choice(AppMaker.VCS.keys()),
     help='VCS type to initialize a repo')
 @click.option(
     '-f', '--configuration_file', type=click.Path(exists=True, dir_okay=False),
