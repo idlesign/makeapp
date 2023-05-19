@@ -140,8 +140,14 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
 
 
 @entry_point.command()
-@click.option('--increment', help='Version number chunk to increment', type=click.Choice(VERSION_NUMBER_CHUNKS))
-@click.option('--debug', help='Show debug messages while processing', is_flag=True)
+@click.option(
+    '-i', '--increment',
+    help='Version number chunk to increment', type=click.Choice(VERSION_NUMBER_CHUNKS)
+)
+@click.option(
+    '--debug',
+    help='Show debug messages while processing', is_flag=True
+)
 def release(increment, debug):
     """Performs new application version release."""
 
