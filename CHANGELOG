@@ -4,7 +4,7 @@ makeapp changelog
 
 Unreleased
 ----------
-+ Added '-i' shortcut for '--increment' option of 'release' command.
+* Added '-i' shortcut for '--increment' option of 'release' command.
 * Fix license and vcs options handling for 'new' command (closes #5).
 
 
