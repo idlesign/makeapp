@@ -2,8 +2,8 @@ makeapp changelog
 =================
 
 
-Unreleased
-----------
+v1.9.1 [2023-05-19]
+-------------------
 * Added '-i' shortcut for '--increment' option of 'release' command.
 * Fix license and vcs options handling for 'new' command (closes #5).
 
