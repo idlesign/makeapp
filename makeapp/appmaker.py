@@ -571,4 +571,7 @@ class AppMaker:
             settings_base[name] = self._replace_settings_markers(val, settings=settings_base)
 
         self._validate_setting('license', list(self.LICENSES), settings_base)
+        
+        settings_base['license_title'] = self.LICENSES[settings_base['license']][0]
+        
         self._validate_setting('vcs', list(self.VCS), settings_base)
