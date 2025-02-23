@@ -64,10 +64,10 @@ def test_venv(tmpdir, get_appmaker, assert_content):
 
         project.venv_init()
         assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
-            'executable ='
+            'version ='
         ])
 
         project.venv_init(reset=True)
         assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
-            'executable ='
+            'version ='
         ])

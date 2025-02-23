@@ -42,7 +42,7 @@ def test_default(tmpdir, get_appmaker, assert_content):
         ])
 
         assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
-            'executable ='
+            'version ='
         ])
 
 
