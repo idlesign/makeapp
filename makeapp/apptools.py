@@ -459,9 +459,11 @@ class Project:
             if stage_modified:
                 files_to_stage.extend(self.vcs.get_modified())
 
-                if len(descriptions) == 1:
-                    # Set a description as a commit message.
-                    commit_message = descriptions[0].strip(changelog.PREFIXES)
+                # Set a description as a commit message.
+                commit_message = '\n'.join(
+                    description.strip(changelog.PREFIXES)
+                    for description in descriptions
+                )
 
             self.vcs.add(files_to_stage)
             self.vcs.commit(commit_message)
