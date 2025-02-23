@@ -216,7 +216,7 @@ class AppMaker:
         self.logger.info(f'Checking `{app_name}` name is available ...')
 
         sites_registry = {
-            'PyPI': 'https://pypi.python.org/pypi/' + app_name,
+            'PyPI': f'https://pypi.org/simple/{app_name}/',
         }
 
         name_available = True
