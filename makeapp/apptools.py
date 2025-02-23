@@ -9,6 +9,7 @@ from .exceptions import ProjectorExeption
 from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.vcs import VcsHelper
+from .helpers.venvs import VenvHelper
 from .utils import chdir
 
 LOG = logging.getLogger(__name__)
@@ -337,10 +338,12 @@ class Project:
         :param project_path: Application root (containing setup.py) path.
 
         """
-        self.project_path = project_path or os.getcwd()
+        project_path = project_path or os.getcwd()
+        self.project_path = project_path
         self.package: Optional[PackageData] = None
         self.changelog: Optional[ChangelogData] = None
         self.vcs = VcsHelper.get(project_path)
+        self.venv = VenvHelper(project_path)
 
         with chdir(self.project_path):
             self._gather_data()
@@ -472,3 +475,7 @@ class Project:
         with chdir(self.project_path):
             self.vcs.push()
             DistHelper.upload()
+
+    def venv_init(self, *, reset: bool = False):
+        LOG.info(f'Initializing virtual environment [{reset=}] ...')
+        self.venv.initialize(reset=reset)

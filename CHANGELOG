@@ -2,6 +2,13 @@ makeapp changelog
 =================
 
 
+Unreleased
+----------
++ Added virtual environment creation on project rollout.
++ CLI. Added  command.
+* Fixed package name availability check.
+
+
 v1.9.1 [2023-05-19]
 -------------------
 * Added '-i' shortcut for '--increment' option of 'release' command.

@@ -11,6 +11,7 @@ import requests
 from .apptemplate import TemplateFile, AppTemplate
 from .exceptions import AppMakerException
 from .helpers.vcs import VcsHelper
+from .helpers.venvs import VenvHelper
 from .rendering import Renderer
 from .utils import chdir, configure_logging, PYTHON_VERSION
 
@@ -276,9 +277,11 @@ class AppMaker:
 
     def rollout(
             self,
-            dest: str, *,
+            dest: str,
+            *,
             overwrite: bool = False,
             init_repository: bool = False,
+            init_venv: bool = False,
             remote_address: str = None,
             remote_push: bool = False
     ):
@@ -289,6 +292,8 @@ class AppMaker:
         :param overwrite: Whether to overwrite existing files.
 
         :param init_repository: Whether to initialize a repository.
+
+        :param init_venv: Whether to initialize a virtual environment.
 
         :param remote_address: Remote repository address to add to DVCS.
 
@@ -338,12 +343,15 @@ class AppMaker:
         with chdir(dest):
             self._hook_run('rollout_post')
 
-        if init_repository:
-            self._vcs_init(
-                dest,
-                add_files=bool(files.keys()),
-                remote_address=remote_address,
-                remote_push=remote_push)
+            if init_venv:
+                VenvHelper(dest).initialize()
+
+            if init_repository:
+                self._vcs_init(
+                    dest,
+                    add_files=bool(files.keys()),
+                    remote_address=remote_address,
+                    remote_push=remote_push)
 
     @staticmethod
     def _comment_out(text: Optional[str]) -> Optional[str]:

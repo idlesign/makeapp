@@ -106,6 +106,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     click.secho(app_maker.get_settings_string(), fg='green')
 
     init_repo = True
+    init_venv = True
     remote_address = app_maker.settings['vcs_remote'] or ''
     remote_push = False
 
@@ -129,10 +130,14 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
             if remote_address:
                 remote_push = click.confirm('Do you want to commit and push files to remote?', default=False)
 
+        init_venv = click.confirm(
+            'Do you want to initialize a virtual environment in the application directory?', default=True)
+
     app_maker.rollout(
         target_path,
         overwrite=overwrite_on_conflict,
         init_repository=init_repo,
+        init_venv=init_venv,
         remote_address=remote_address,
         remote_push=remote_push,
     )
@@ -183,6 +188,17 @@ def change(description):
     """Fixates a change adding a message to a changelog."""
     Project().add_change(description)
     click.secho('Done', fg='green')
+
+
+@entry_point.group()
+def venv():
+    """Virtual environment related commands."""
+
+
+@venv.command()
+def reset():
+    """Remove old virtual environment and generate a new one."""
+    Project().venv_init(reset=True)
 
 
 def main():

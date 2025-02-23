@@ -49,3 +49,25 @@ def test_git(tmpdir, get_appmaker, assert_content, monkeypatch):
             'python3 setup.py clean --all sdist bdist_wheel',
             'twine upload dist/*'
         ]
+
+
+def test_venv(tmpdir, get_appmaker, assert_content):
+
+    with tmpdir.as_cwd():
+
+        get_appmaker()
+
+        vcs = VcsHelper.get()
+        vcs.commit('initial')
+
+        project = Project()
+
+        project.venv_init()
+        assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
+            'executable ='
+        ])
+
+        project.venv_init(reset=True)
+        assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
+            'executable ='
+        ])

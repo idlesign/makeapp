@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture
 def get_appmaker():
 
-    def get_appmaker_(app_name='dummy', templates=None, *, rollout=True):
+    def get_appmaker_(app_name='dummy', templates=None, *, rollout=True, init_venv=False):
 
         from makeapp.appmaker import AppMaker
 
@@ -26,6 +26,7 @@ def get_appmaker():
                 '.',
                 overwrite=True,
                 init_repository=True,
+                init_venv=init_venv,
                 remote_address='some@some.com',
                 remote_push=False,
             )

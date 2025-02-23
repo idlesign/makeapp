@@ -6,7 +6,7 @@ def test_default(tmpdir, get_appmaker, assert_content):
 
     with tmpdir.as_cwd():
 
-        app_maker = get_appmaker()
+        app_maker = get_appmaker(init_venv=True)
 
         settings_str = app_maker.get_settings_string()
 
@@ -39,6 +39,10 @@ def test_default(tmpdir, get_appmaker, assert_content):
 
         assert_content(tmpdir, 'docs/source/conf.py', [
             'from dummy import VERSION_STR',
+        ])
+
+        assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
+            'executable ='
         ])
 
 
