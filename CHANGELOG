@@ -6,6 +6,8 @@ Unreleased
 ----------
 + Added virtual environment creation on project rollout.
 + CLI. Added  command.
+* Added QA for Py 3.11, 3.12.
+* Dropped QA for Py 3.7, 3.8.
 * Fixed package name availability check.
 
 

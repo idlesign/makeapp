@@ -21,7 +21,7 @@ Description
 Requirements
 ------------
 
-1. Python 3.7+
+1. Python 3.9+
 
 
 Table of Contents
