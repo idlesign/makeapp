@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Optional, List, Union
 
 from ..exceptions import ProjectorExeption, CommandError
 from ..utils import run_command
@@ -30,7 +29,7 @@ class VcsHelper:
         return backends
 
     @classmethod
-    def get(cls, vcs_path: Optional[str] = None) -> 'VcsHelper':
+    def get(cls, vcs_path: str | None = None) -> 'VcsHelper':
         """Returns an appropriate VCS helper object.
         
         :param vcs_path: Repository dir
@@ -55,7 +54,7 @@ class VcsHelper:
         """Initializes a repository."""
         return self.run_command('init -q')
 
-    def get_modified(self) -> List[str]:
+    def get_modified(self) -> list[str]:
         """Returns modified filepaths."""
 
         lines = self.run_command('status -s')
@@ -141,7 +140,7 @@ class VcsHelper:
         """
         self.remote = address
 
-    def push(self, *, upstream: Union[bool, str] = None):
+    def push(self, *, upstream: bool | str = None):
         """Pushes local changes and tags to remote.
         
         :param upstream: Upstream alias. If True, default name is used.
@@ -198,7 +197,7 @@ class MercurialHelper(VcsHelper):
         """Returns a list of remotes."""
         return []
 
-    def push(self, *, upstream: Union[bool, str] = None):
+    def push(self, *, upstream: bool | str = None):
         """Pushes local changes and tags to remote.
 
         :param upstream: Upstream URL. If True, remote URL is used.

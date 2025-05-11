@@ -9,7 +9,7 @@ from configparser import ConfigParser
 from contextlib import contextmanager
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
-from typing import Generator, List, Optional, Dict
+from typing import Generator
 
 from .exceptions import CommandError
 
@@ -18,8 +18,8 @@ PYTHON_VERSION = sys.version_info
 
 
 def configure_logging(
-        level: Optional[int] = None,
-        logger: Optional[logging.Logger] = None,
+        level: int | None = None,
+        logger: logging.Logger | None = None,
         format: str = '%(message)s'
 ):
     """Switches on logging at a given level. For a given logger or globally.
@@ -78,7 +78,7 @@ def temp_dir() -> Generator[str, None, None]:
         shutil.rmtree(dir_tmp, ignore_errors=True)
 
 
-def replace_infile(filepath: str, pairs: Dict[str, str]):
+def replace_infile(filepath: str, pairs: dict[str, str]):
     """Replaces some term by another in file contents.
 
     :param filepath:

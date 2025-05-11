@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # install makeapp from sources for local development
-# venv python is in ~/.local/share/uv/tools/makeapp/bin/python
 cd ../
+# venv will be in current directory and in ~/.local/share/uv/tools/makeapp/
 uv tool install -e .
+uv sync

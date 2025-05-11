@@ -1,12 +1,12 @@
 from pathlib import Path
 from shutil import rmtree
 from time import sleep
-from typing import Any, Type, List
+from typing import Any, TYPE_CHECKING
 
 import click
 
-if False:  # pragma: nocover
-    from .apptemplate import AppTemplate  # noqa
+if TYPE_CHECKING:
+    from .apptemplate import AppTemplate
 
 
 class ConfigMeta(type):
@@ -30,7 +30,7 @@ class ConfigSetting:
         self.default = default
         self.type = type
 
-    def __get__(self, instance: 'Config', owner: Type['Config']) -> Any:
+    def __get__(self, instance: 'Config', owner: type['Config']) -> Any:
         """Allows convenient IDE-friendly access from Config
         heirs to settings defined in them.
 
@@ -46,10 +46,10 @@ class ConfigSetting:
 class Config(metaclass=ConfigMeta):
     """Base for application template configuration."""
 
-    parent_template: List[str] = None
+    parent_template: list[str] = None
     """Parent template names."""
 
-    cleanup: List[str] = None
+    cleanup: list[str] = None
     """Paths to cleanup after rollout."""
 
     def __init__(self, app_template: 'AppTemplate'):

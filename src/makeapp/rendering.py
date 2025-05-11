@@ -1,12 +1,12 @@
 import os
-from typing import Union
+from typing import TYPE_CHECKING
 
 from jinja2 import Environment, FileSystemLoader
 
 from .apptemplate import TemplateFile
 from .utils import chdir
 
-if False:  # pragma: nocover
+if TYPE_CHECKING:
     from .appmaker import AppMaker
 
 
@@ -64,7 +64,7 @@ class Renderer:
             trim_blocks=True,
         )
 
-    def render(self, filename: Union[str, TemplateFile]) -> str:
+    def render(self, filename: str | TemplateFile) -> str:
         """Renders file contents with settings as get_context.
 
         :param filename:

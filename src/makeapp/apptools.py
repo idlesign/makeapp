@@ -2,7 +2,6 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Tuple, List, Optional, Union
 
 from .exceptions import ProjectorExeption
 from .helpers.dist import DistHelper
@@ -45,7 +44,7 @@ class PackageData(DataContainer):
 
     VERSION_STR = 'VERSION'
 
-    def __init__(self, file_helper: FileHelper, version: Tuple[int, ...]):
+    def __init__(self, file_helper: FileHelper, version: tuple[int, ...]):
         """
         :param file_helper:
         :param version: Version number tuple
@@ -57,7 +56,7 @@ class PackageData(DataContainer):
         self.version_increment = 'patch'
 
     @classmethod
-    def get_version_str(cls, version: Tuple[int, ...]) -> str:
+    def get_version_str(cls, version: tuple[int, ...]) -> str:
         """Return string representation for a given version.
         
         :param version:
@@ -114,7 +113,7 @@ class PackageData(DataContainer):
         )
         return result
 
-    def get_next_version(self) -> Tuple[int, ...]:
+    def get_next_version(self) -> tuple[int, ...]:
         """Calculates and returns next version number tuple."""
 
         increment = self.version_increment
@@ -142,7 +141,7 @@ class PackageData(DataContainer):
 
         return version_next
 
-    def version_bump(self, increment: str = 'patch') -> Tuple[int, ...]:
+    def version_bump(self, increment: str = 'patch') -> tuple[int, ...]:
         """Bumps version number.
         Returns new version number tuple.
 
@@ -255,7 +254,7 @@ class ChangelogData(DataContainer):
                 break
         return supposed_chunk
 
-    def version_bump(self, new_version: Tuple[int, ...]) -> str:
+    def version_bump(self, new_version: tuple[int, ...]) -> str:
         """Bumps version number.
 
         Returns version number string as in changelog.
@@ -287,7 +286,7 @@ class ChangelogData(DataContainer):
 
         self.file_helper.insert(description, offset=2)
 
-    def get_changes(self) -> List[str]:
+    def get_changes(self) -> list[str]:
         """Returns a list of new version changes from a changelog."""
 
         changes = []
@@ -350,8 +349,8 @@ class Project:
         """
         project_path = project_path or os.getcwd()
         self.project_path = Path(project_path)
-        self.package: Optional[PackageData] = None
-        self.changelog: Optional[ChangelogData] = None
+        self.package: PackageData | None = None
+        self.changelog: ChangelogData | None = None
         self.vcs = VcsHelper.get(project_path)
         self.venv = VenvHelper(project_path)
 
@@ -393,7 +392,7 @@ class Project:
         with chdir(self.project_path):
             self.vcs.pull()
 
-    def get_release_info(self, increment: Optional[str] = None) -> Tuple[str, str]:
+    def get_release_info(self, increment: str | None = None) -> tuple[str, str]:
         """Returns release info tuple as part of release preparation.
         
         :param increment: Version chunk to increment (major, minor, patch)
@@ -432,7 +431,7 @@ class Project:
 
             vcs.add_tag(next_version_str, version_summary, overwrite=True)
 
-    def add_change(self, descriptions: Union[List[str], Tuple[str, ...], str], *, stage_modified: bool = True):
+    def add_change(self, descriptions: list[str] | tuple[str, ...] | str, *, stage_modified: bool = True):
         """Add a change description into changelog.
 
         :param descriptions: Single change description.

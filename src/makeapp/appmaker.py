@@ -4,7 +4,7 @@ import os
 import re
 from datetime import date
 from pathlib import Path
-from typing import List, Optional, Any, Dict, Set
+from typing import Any
 
 import requests
 
@@ -75,7 +75,7 @@ class AppMaker:
     def __init__(
             self,
             app_name: str,
-            templates_to_use: List[str] = None,
+            templates_to_use: list[str] = None,
             templates_path: str = None,
             log_level: int = None
     ):
@@ -99,7 +99,7 @@ class AppMaker:
 
         self.logger.debug(f'Templates path: {self.path_templates_current}')
 
-        self.app_templates: List[AppTemplate] = []
+        self.app_templates: list[AppTemplate] = []
         self._init_app_templates(templates_to_use)
 
         self.settings = self._init_settings(app_name)
@@ -139,7 +139,7 @@ class AppMaker:
 
         return settings
 
-    def _get_templates_path_current(self, path: Optional[str]) -> str:
+    def _get_templates_path_current(self, path: str | None) -> str:
         """Returns current templates path.
         
         :param path:
@@ -155,7 +155,7 @@ class AppMaker:
 
         return path
 
-    def _init_app_templates(self, names_or_paths: List[str]):
+    def _init_app_templates(self, names_or_paths: list[str]):
         """Initializes app templates.
         
         :param names_or_paths:
@@ -260,7 +260,7 @@ class AppMaker:
 
         return template_files
 
-    def _hook_run(self, hook_name: str) -> Dict[AppTemplate, bool]:
+    def _hook_run(self, hook_name: str) -> dict[AppTemplate, bool]:
         """Runs the named hook for every app template.
 
         Returns results dictionary indexed by app template objects.
@@ -354,7 +354,7 @@ class AppMaker:
                     remote_push=remote_push)
 
     @staticmethod
-    def _comment_out(text: Optional[str]) -> Optional[str]:
+    def _comment_out(text: str | None) -> str | None:
         """Comments out (with #) the given data.
 
         :param text:
@@ -438,7 +438,7 @@ class AppMaker:
 
         return render(license), render(f'{license}_src')
 
-    def get_template_vars(self) -> Set[str]:
+    def get_template_vars(self) -> set[str]:
         """Returns known template variables."""
 
         items = set(AppMaker.BASE_SETTINGS.keys())
@@ -552,7 +552,7 @@ class AppMaker:
                     helper.commit('The beginning')
                     helper.push(upstream=True)
 
-    def _validate_setting(self, setting: str, variants: List[str], settings: dict):
+    def _validate_setting(self, setting: str, variants: list[str], settings: dict):
         """Ensures that the given setting value is one from the given variants."""
         val = settings[setting]
 

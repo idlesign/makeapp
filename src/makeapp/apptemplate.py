@@ -1,11 +1,11 @@
 import importlib.util
 import os
-from typing import Type, Dict, Tuple
+from typing import Type, TYPE_CHECKING
 
 from .appconfig import Config
 from .exceptions import AppMakerException
 
-if False:  # pragma: nocover
+if TYPE_CHECKING:
     from .appmaker import AppMaker
 
 
@@ -102,7 +102,7 @@ class AppTemplate:
 
         return False
 
-    def get_files(self) -> Dict[str, 'TemplateFile']:
+    def get_files(self) -> dict[str, 'TemplateFile']:
         """Returns a mapping of relative filenames to TemplateFiles objects."""
 
         template_files = {}
@@ -165,8 +165,8 @@ class AppTemplate:
         return app_template
 
     @classmethod
-    def _find(cls, name_or_path: str, search_paths: Tuple[str, ...]) -> Tuple[str, str]:
-        """Searches a template by it's name or in path.
+    def _find(cls, name_or_path: str, search_paths: tuple[str, ...]) -> tuple[str, str]:
+        """Searches a template by its name or in path.
         Returns a tuple (template_name, template_path)
 
         :param name_or_path:

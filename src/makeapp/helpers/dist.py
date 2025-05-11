@@ -9,11 +9,6 @@ class DistHelper:
     check_command('uv', hint='uv')
 
     @classmethod
-    def ensure(cls):
-        """Ensures dist helper is functional."""
-        cls.upload()
-
-    @classmethod
     def run_command_uv(cls, command: str, *, env: dict = None) -> list[str]:
         """Basic command runner."""
         return run_command(f'uv {command}', env=env)

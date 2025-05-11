@@ -1,7 +1,7 @@
 import io
 import logging
 from pathlib import Path
-from typing import List, Union
+from typing import Generator
 
 LOG = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class FileHelper:
         self.contents = contents
 
     @classmethod
-    def read_file(cls, fpath: str | Path) -> List[str]:
+    def read_file(cls, fpath: str | Path) -> list[str]:
         """Reads a file from FS. Returns a lis of strings from it.
 
         :param fpath: File path
@@ -44,7 +44,7 @@ class FileHelper:
         target_idx = self.line_idx + offset
         self.contents[target_idx] = value
 
-    def insert(self, value: Union[List[str], str], offset: int = 1):
+    def insert(self, value: list[str] | str, offset: int = 1):
         """Inserts a line (or many) into file.
 
         :param value: New line(s).
@@ -58,7 +58,7 @@ class FileHelper:
 
         self.contents[target_idx:target_idx] = value
 
-    def iter_after(self, offset: int) -> str:
+    def iter_after(self, offset: int) -> Generator[str, None, None]:
         """Generator. Yields lines after line_idx
 
         :param offset:
