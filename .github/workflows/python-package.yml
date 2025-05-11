@@ -17,13 +17,13 @@ jobs:
         python-version: [3.9, "3.10", 3.11, 3.12]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup Git
       run: |
         git config --global user.email "atotest@example.com"
         git config --global user.name "auto tester"
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install deps
@@ -33,5 +33,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
       run: |
-        coverage run --source=makeapp setup.py test
+        coverage run --source=makeapp -m pytest
         coveralls --service=github

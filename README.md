@@ -1,21 +1,12 @@
-makeapp
-=======
+# makeapp
+
 https://github.com/idlesign/makeapp
 
-|release| |lic| |coverage|
+[![PyPI - Version](https://img.shields.io/pypi/v/makeapp)](https://pypi.python.org/pypi/makeapp)
+[![License](https://img.shields.io/pypi/l/makeapp)](https://pypi.python.org/pypi/makeapp)
+[![Coverage](https://img.shields.io/coverallsCoverage/github/idlesign/makeapp)](https://coveralls.io/r/idlesign/makeapp)
 
-.. |release| image:: https://img.shields.io/pypi/v/makeapp.svg
-    :target: https://pypi.python.org/pypi/makeapp
-
-.. |lic| image:: https://img.shields.io/pypi/l/makeapp.svg
-    :target: https://pypi.python.org/pypi/makeapp
-
-.. |coverage| image:: https://img.shields.io/coveralls/idlesign/makeapp/master.svg
-    :target: https://coveralls.io/r/idlesign/makeapp
-
-
-Description
-------------
+## Description
 
 *Simplifies Python application rollout and publishing.*
 
@@ -28,15 +19,13 @@ Description
 * Publish your application to remotes (VCS, PyPI) with single command.
 
 
-Application scaffolding
------------------------
+## Application scaffolding
 
 Scaffold a new application:
 
-.. code-block:: bash
-
-    $ makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
-
+``` bash
+makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
+```
 
 This will create a decent application skeleton using the default skeleton template (``setup.py``, docs, tests, etc.)
 and initialize Git repository.
@@ -54,17 +43,15 @@ Multiple templates can be used together. Complete list of featured templates can
 User-made templates are also supported.
 
 
-Application publishing
-----------------------
+## Application publishing
 
 When you're ready to publish issue the following command while in project directory (containing ``setup.py``):
 
-.. code-block:: bash
-
-    $ makeapp release
-    ; Bump version number part manually: major, minor, patch
-    $ makeapp release --increment major
-
+``` bash
+makeapp release
+; Bump version number part manually: major, minor, patch
+makeapp release --increment major
+```
 
 This will automatically:
 
@@ -74,14 +61,13 @@ This will automatically:
 * upload application package to PyPI
 
 
-Adding changes
---------------
+## Adding changes
 
 When you're ready to add another entry to your changelog use ``change`` command:
 
-.. code-block:: bash
-
-    $ makeapp change "+ New 'change' command implemented"
+``` bash
+makeapp change "+ New 'change' command implemented"
+```
 
 This will also stage and commit all changed files.
 
@@ -104,17 +90,14 @@ Supported message prefixes:
   Increment: *patch*.
 
 
-Bash completion
----------------
+## Bash completion
 
 To enable bash completion for ``makeapp`` command append the following line into your ``.bashrc``:
 
-.. code-block:: bash
+``` bash
+eval "$(_MAKEAPP_COMPLETE=source makeapp)"
+```
 
-    eval "$(_MAKEAPP_COMPLETE=source makeapp)"
+## Documentation
 
-
-Documentation
--------------
-
-https://makeapp.readthedocs.org/
+https://makeapp.readthedocs.io/

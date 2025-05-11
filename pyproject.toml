@@ -1,0 +1,42 @@
+[project]
+name = "makeapp"
+dynamic = ["version"]
+description = "Simplifies Python application rollout and publishing."
+authors = [
+    { name = "Igor Starikov", email = "idlesign@yandex.ru" }
+]
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+keywords = ["scaffolding", "development"]
+dependencies = [
+    "requests",
+    "click",
+    "jinja2<3.0",
+    "markupsafe<=2.0.1",  # pin down for jinja
+    "wheel",
+]
+
+[project.urls]
+Homepage = "https://github.com/idlesign/makeapp"
+Documentation = "https://makeapp.readthedocs.io/"
+
+[project.scripts]
+makeapp = "makeapp.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/makeapp/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/makeapp"]

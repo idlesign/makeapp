@@ -3,8 +3,6 @@ import os
 from datetime import datetime
 from typing import Tuple, List, Optional, Union
 
-from setuptools import find_packages
-
 from .exceptions import ProjectorExeption
 from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
