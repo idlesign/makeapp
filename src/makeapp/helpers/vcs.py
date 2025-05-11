@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Optional, List, Union
 
@@ -94,7 +95,7 @@ class VcsHelper:
 
             self.run_command(f'tag {name} {overwrite} -F {f.name}')
 
-    def add(self, filename: Union[List[str], str] = None):
+    def add(self, filename: list[str] | str | list[Path] | Path = None):
         """Adds a file into a changelist.
 
         :param filename: If not provided all files in working tree are added.
@@ -104,7 +105,7 @@ class VcsHelper:
         if isinstance(filename, list):
             filename = ' '.join(filename)
 
-        filename = filename.strip() or ''
+        filename = f'{filename}'.strip() or ''
 
         self.run_command(f'add {filename}')
 

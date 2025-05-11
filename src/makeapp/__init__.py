@@ -1,3 +1,3 @@
 
-VERSION = "1.9.1"
+VERSION = '1.9.1'
 """Application version number tuple."""

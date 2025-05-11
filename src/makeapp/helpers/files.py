@@ -1,5 +1,6 @@
 import io
 import logging
+from pathlib import Path
 from typing import List, Union
 
 LOG = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ class FileHelper:
         self.contents = contents
 
     @classmethod
-    def read_file(cls, fpath: str) -> List[str]:
+    def read_file(cls, fpath: str | Path) -> List[str]:
         """Reads a file from FS. Returns a lis of strings from it.
 
         :param fpath: File path

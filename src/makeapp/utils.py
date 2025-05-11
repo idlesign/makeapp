@@ -1,10 +1,13 @@
+import configparser
 import fileinput
 import logging
 import os
 import shutil
 import sys
 import tempfile
+from configparser import ConfigParser
 from contextlib import contextmanager
+from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
 from typing import Generator, List, Optional, Dict
 
@@ -28,6 +31,21 @@ def configure_logging(
     """
     logging.basicConfig(format=format, level=level if logger else None)
     logger and logger.setLevel(level or logging.INFO)
+
+
+def get_user_dir() -> Path:
+    """Returns the user's home directory."""
+    return Path(os.path.expanduser('~'))
+
+
+def read_ini(fpath: Path) -> ConfigParser:
+    """Read a .ini file.
+
+    :param fpath:
+    """
+    cfg = configparser.ConfigParser()
+    cfg.read(f'{fpath}')
+    return cfg
 
 
 @contextmanager
@@ -77,7 +95,7 @@ def replace_infile(filepath: str, pairs: Dict[str, str]):
             sys.stdout.write(line)
 
 
-def check_command(command: str, hint: str):
+def check_command(command: str, *, hint: str):
     """Checks whether a command is available.
     If not - raises an exception.
 
@@ -94,7 +112,7 @@ def check_command(command: str, hint: str):
             f"Check {hint} is installed and available.")
 
 
-def run_command(command: str, *, err_msg: str = '') -> List[str]:
+def run_command(command: str, *, err_msg: str = '', env: dict = None) -> list[str]:
     """Runs a command in a shell process.
 
     Returns a list of strings gathered from a command.
@@ -103,21 +121,20 @@ def run_command(command: str, *, err_msg: str = '') -> List[str]:
 
     :param err_msg: Message to show on error.
 
+    :param env: Environment variables to use.
+
     :raises: CommandError
 
     """
-    prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True)
+    if env:
+        env = dict(os.environ, **env)
+
+    prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True, env=env)
 
     LOG.debug(f'Run command: `{command}` ...')
 
     data = []
-
     out, _ = prc.communicate()
-
-    if isinstance(out, bytes):
-        out = out.decode('utf-8')
-
-    has_error = prc.returncode
 
     for item in out.splitlines():
         item = item.strip()
@@ -127,7 +144,7 @@ def run_command(command: str, *, err_msg: str = '') -> List[str]:
 
         data.append(item)
 
-    if has_error:
+    if prc.returncode:
         raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
 
     return data

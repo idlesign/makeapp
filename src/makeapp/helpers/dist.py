@@ -1,27 +1,22 @@
 from shutil import rmtree
 
-from ..utils import run_command, check_command
+from ..utils import run_command, check_command, get_user_dir, read_ini
 
 
 class DistHelper:
     """Encapsulates Python distribution related logic."""
 
-    python_bin: str = 'python3'
-    """Name of python binary that'll be used for commands run."""
-
-    check_command(python_bin, 'Python 3+')
+    check_command('uv', hint='uv')
 
     @classmethod
     def ensure(cls):
         """Ensures dist helper is functional."""
-        run_command(
-            f'{cls.python_bin} -m wheel version',
-            err_msg=f"Please install 'wheel' module to proceed: {cls.python_bin} -m pip install wheel")
+        cls.upload()
 
     @classmethod
-    def run_command(cls, command):
+    def run_command_uv(cls, command: str, *, env: dict = None) -> list[str]:
         """Basic command runner."""
-        return run_command(f'{cls.python_bin} setup.py {command}')
+        return run_command(f'uv {command}', env=env)
 
     @classmethod
     def upload(cls):
@@ -29,10 +24,14 @@ class DistHelper:
 
         rmtree('dist/', ignore_errors=True)  # cleanup
 
-        cls.run_command('clean --all sdist bdist_wheel')
+        pypirc_file = get_user_dir() / '.pypirc'
+        env_vars = None
 
-        # setuptools 'upload' essentially has become broken
-        # https://github.com/python/cpython/issues/89753
-        # https://github.com/pypa/distutils/issues/25
-        # using twine instead
-        run_command('twine upload dist/*')
+        if pypirc_file.exists():
+            cfg = read_ini(pypirc_file)
+            env_vars = {
+                'UV_PUBLISH_TOKEN': cfg['pypi']['password']
+            }
+
+        cls.run_command_uv('build')
+        cls.run_command_uv('publish', env=env_vars)

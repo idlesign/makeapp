@@ -19,7 +19,7 @@ except MakeappException as e:
 
 
 @click.group()
-@click.version_option(version='.'.join(map(str, VERSION)))
+@click.version_option(version=VERSION)
 def entry_point():
     """makeapp command line utilities."""
 
@@ -155,6 +155,10 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
 )
 def release(increment, debug):
     """Performs new application version release."""
+
+    from makeapp.helpers.dist import DistHelper
+    DistHelper.ensure()
+    return
 
     if debug:
         configure_logging(logging.DEBUG)

@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import Tuple, List, Optional, Union
 
 from .exceptions import ProjectorExeption
@@ -73,20 +74,16 @@ class PackageData(DataContainer):
         return self.get_version_str(self.version_next)
 
     @classmethod
-    def get(cls, package_name: str) -> 'PackageData':
+    def get(cls, *, package_path: Path) -> 'PackageData':
         """Gathers information from a package,
 
-        :param package_name:
+        :param package_path:
 
         """
-        LOG.debug(f'Getting version from `{package_name}` package ...')
+        LOG.debug(f'Getting version from `{package_path}` package ...')
 
-        filepath = os.path.join(package_name, '__init__.py')
-
-        if not os.path.isfile(filepath):
-            raise ProjectorExeption("Package's `__init__` file is not found.")
-
-        init_file = FileHelper.read_file(filepath)
+        path_init = package_path / '__init__.py'
+        init_file = FileHelper.read_file(path_init)
 
         version_str = cls.VERSION_STR
         version_line_idx = None
@@ -98,12 +95,11 @@ class PackageData(DataContainer):
         if version_line_idx is None:
             raise ProjectorExeption('Version line not found in init file.')
 
-        fake_locals = {}
-        exec(init_file[version_line_idx], {}, fake_locals)
+        version_line = init_file[version_line_idx]
+        version_str = version_line.partition('=')[-1].strip(' "\'').strip()
+        version = tuple(map(int, version_str.split('.')))
 
-        version = fake_locals[version_str]
-
-        if not isinstance(version, tuple):
+        if len(version) < 3:
             raise ProjectorExeption(f'Unsupported version format: {version}.')
 
         LOG.info(f'Current version from package: `{version}`')
@@ -111,7 +107,7 @@ class PackageData(DataContainer):
         result = PackageData(
             version=version,
             file_helper=FileHelper(
-                filepath=filepath,
+                filepath=path_init,
                 line_idx=version_line_idx,
                 contents=init_file
             )
@@ -160,7 +156,8 @@ class PackageData(DataContainer):
 
         LOG.info(f'Version `{version_current}` bumped to `{version_new}`')
 
-        self.file_helper.line_replace(f"{self.VERSION_STR} = ({', '.join(map(str, version_new))})")
+        version_new_str = '.'.join(map(str, version_new))
+        self.file_helper.line_replace(f"{self.VERSION_STR} = '{version_new_str}'")
 
         return version_new
 
@@ -198,7 +195,6 @@ class ChangelogData(DataContainer):
             raise ProjectorExeption('Unexpected changelog file format.')
 
         unreleased_str = cls.UNRELEASED_STR
-        unreleased_entry_exists = False
         version_line_idx = None
 
         for supposed_line_idx in (3, 4, 5):
@@ -331,13 +327,29 @@ class ChangelogData(DataContainer):
 class Project:
     """Encapsulates application (project) related logic."""
 
-    def __init__(self, project_path: str = None):
+    @classmethod
+    def find_packages(cls, where: Path, *, prefer: str) -> list[Path]:
+
+        candidate = where / prefer / '__init__.py'
+
+        if candidate.exists():
+            return [candidate.parent]
+
+        packages_found = [
+            obj
+            for obj in where.iterdir()
+            if obj.is_dir() and (obj / '__init__.py').exists() and 'tests' not in obj.name
+        ]
+
+        return packages_found
+
+    def __init__(self, project_path: Path = None):
         """
-        :param project_path: Application root (containing setup.py) path.
+        :param project_path: Application root (containing pyproject.toml) path.
 
         """
         project_path = project_path or os.getcwd()
-        self.project_path = project_path
+        self.project_path = Path(project_path)
         self.package: Optional[PackageData] = None
         self.changelog: Optional[ChangelogData] = None
         self.vcs = VcsHelper.get(project_path)
@@ -352,30 +364,28 @@ class Project:
 
         LOG.debug(f'Gathering info from `{project_path}` directory ...')
 
-        if not os.path.isfile('setup.py'):
-            raise ProjectorExeption('No `setup.py` file found in the current directory.')
+        marker_file = 'pyproject.toml'
+
+        if not os.path.isfile(marker_file):
+            raise ProjectorExeption(f'No `{marker_file}` file found in the current directory.')
 
         self.vcs.check()
 
-        packages = find_packages()
+        parent_dirname = project_path.parent.name
 
-        if len(packages) > 1:
-            # Try to narrow down packages list.
-            # todo Seems to be error prone on edge cases (with many packages).
-
-            parent_dirname = os.path.basename(project_path)
-
-            if parent_dirname in packages:
-                packages = [parent_dirname]
-
-            else:
-                'tests' in packages and packages.remove('tests')
+        packages = self.find_packages(project_path, prefer=parent_dirname)
+        if not packages:
+            # src layout
+            packages = self.find_packages(project_path / 'src', prefer=parent_dirname)
 
         LOG.debug(f'Found packages: {packages}')
 
-        main_package = packages[0]
+        if not packages:
+            raise ProjectorExeption('No package found.')
 
-        self.package = PackageData.get(main_package)
+        package = packages[0]
+
+        self.package = PackageData.get(package_path=package)
         self.changelog = ChangelogData.get()
 
     def pull(self):

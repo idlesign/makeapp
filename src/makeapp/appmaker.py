@@ -13,7 +13,7 @@ from .exceptions import AppMakerException
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
 from .rendering import Renderer
-from .utils import chdir, configure_logging, PYTHON_VERSION
+from .utils import chdir, configure_logging, PYTHON_VERSION, get_user_dir, read_ini
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 BASE_PATH = os.path.dirname(__file__)
@@ -90,7 +90,7 @@ class AppMaker:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.configure_logging(log_level)
 
-        self.path_user_confs = os.path.join(os.path.expanduser('~'), '.makeapp')
+        self.path_user_confs = os.path.join(get_user_dir(), '.makeapp')
         self.path_templates_builtin = os.path.join(BASE_PATH, 'app_templates')
         self.path_templates_license = os.path.join(BASE_PATH, 'license_templates')
 
@@ -515,8 +515,7 @@ class AppMaker:
         if not config_exists and path is not None:
             raise AppMakerException(f'Unable to find settings file: {config_path}.')
 
-        cfg = configparser.ConfigParser()
-        cfg.read(config_path)
+        cfg = read_ini(Path(config_path))
 
         if not cfg.has_section('settings'):
             raise AppMakerException(f'Unable to read settings from file: {config_path}.')
