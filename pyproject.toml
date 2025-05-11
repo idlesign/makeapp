@@ -40,3 +40,17 @@ path = "src/makeapp/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/makeapp"]
+
+[tool.coverage.report]
+include = [
+    "src/*",
+]
+omit = [
+    "*/app_templates/*",
+    "*/license_templates/*",
+    "*/cli.py",
+]
+exclude_also = [
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
