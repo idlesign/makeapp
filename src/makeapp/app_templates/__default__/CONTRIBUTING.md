@@ -1,22 +1,20 @@
-{{ get_app_title_rst('contributing') }}
+# contributing {{ app_name }}
 
 
-Submit issues
--------------
+## Submit issues
 
 If you spotted something weird in application behavior or want to propose a feature you are welcome.
 
 
-Write code
-----------
+## Write code
+
 If you are eager to participate in application development and to work on an existing issue (whether it should
 be a bugfix or a feature implementation), fork, write code, and make a pull request right from the forked project page.
 
 
-Spread the word
----------------
+## Spread the word
 
-If you have some tips and tricks or any other words that you think might be of interest for the others — publish it
+If you have some tips and tricks or any other words that you think might be of interest for the others --- publish it
 wherever you find convenient.
 
 

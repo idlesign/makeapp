@@ -1,24 +1,15 @@
-makeapp installation
-====================
-
+# makeapp installation
 
 Python ``pip`` package is required to install ``makeapp``.
 
 
-From sources
-------------
+## From sources
 
-Use the following command line to install ``makeapp`` from sources directory (containing setup.py):
+Use the following command line to install ``makeapp`` from sources directory (containing ``pyproject.toml``):
 
     pip install .
 
-or
-
-    python setup.py install
-
-
-From PyPI
----------
+## From PyPI
 
 Alternatively you can install ``makeapp`` from PyPI:
 
@@ -28,4 +19,3 @@ Alternatively you can install ``makeapp`` from PyPI:
 Use `-U` flag for upgrade:
 
     pip install -U makeapp
-

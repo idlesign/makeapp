@@ -1,4 +1,4 @@
-{{ get_app_title_rst('changelog') }}
+# {{ app_name }} changelog
 
 
 Unreleased
