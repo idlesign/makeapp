@@ -1,0 +1,70 @@
+[project]
+name = "{{ app_name }}"
+dynamic = ["version"]
+description = "{{ description }}"
+authors = [
+    { name = "{{ author }}", email = "{{ author_email }}" }
+]
+readme = "README.md"
+
+classifiers = [
+{% block classifiers %}
+    "Development Status :: 4 - Beta", #   3 - Alpha; 5 - Production/Stable
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: {{ python_version }}",
+{% endblock %}
+]
+
+license = "{{ license_ident }}"
+license-files = ["LICENSE"]
+
+requires-python = ">=3.10"
+dependencies = [
+{% block deps %}
+{% endblock %}
+]
+
+[project.urls]
+Homepage = "{{ url }}"
+
+[project.scripts]
+{% block scripts %}
+{% endblock %}
+
+{% block entry_points_custom %}{% endblock %}
+
+[project.optional-dependencies]
+{% block deps_opts %}
+{% endblock %}
+
+[dependency-groups]
+dev = [
+    {% block deps_dev %}
+    "pytest",
+    {% endblock %}
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/{{ package_name }}/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package_name }}"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.report]
+include = [
+    "src/*",
+]
+exclude_also = [
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

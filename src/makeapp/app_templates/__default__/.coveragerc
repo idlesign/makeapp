@@ -1,2 +1,2 @@
 [run]
-source = {{ module_name }}/
+source = {{ package_name }}/

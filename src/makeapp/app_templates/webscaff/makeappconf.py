@@ -39,11 +39,11 @@ class WebscaffConfig(Config):
     def hook_rollout_post(self):
         super().hook_rollout_post()
 
-        module_name = self.app_template.maker.settings['module_name']
-        self.module_name = module_name
+        package_name = self.app_template.maker.settings['package_name']
+        self.package_name = package_name
 
         self.dir_project = os.getcwd()
-        self.dir_package_root = join(self.dir_project, module_name)
+        self.dir_package_root = join(self.dir_project, package_name)
 
         # Do things.
         self.prepare_venv()
@@ -54,8 +54,8 @@ class WebscaffConfig(Config):
         run_command('. venv/bin/activate && pip install -e .')
 
         # Initialize local sqlite DB.
-        run_command(f'venv/bin/{module_name} makemigrations')
-        run_command(f'venv/bin/{module_name} migrate')
+        run_command(f'venv/bin/{package_name} makemigrations')
+        run_command(f'venv/bin/{package_name} migrate')
 
     def prepare_venv(self):
         self.logger.info('Bootstrapping virtual environment for project ...')
@@ -69,9 +69,9 @@ class WebscaffConfig(Config):
 
     def prepare_django_settings_base(self, dir_tmp):
 
-        module_name = self.module_name
+        package_name = self.package_name
 
-        source_file = join(dir_tmp, module_name, 'settings.py')
+        source_file = join(dir_tmp, package_name, 'settings.py')
 
         replace_infile(
             source_file,
@@ -96,7 +96,7 @@ class WebscaffConfig(Config):
 
                     "    'django.contrib.staticfiles',\n\n"
                     "    'uwsgiconf.contrib.django.uwsgify',\n\n"
-                    "    '%(module)s.core',\n" % {'module': module_name},
+                    "    '%(module)s.core',\n" % {'module': package_name},
             })
 
         shutil.move(source_file, join(self.dir_package_root, 'settings', 'base.py'))
@@ -105,29 +105,29 @@ class WebscaffConfig(Config):
         self.logger.info('Bootstrapping Django project and basic application ...')
 
         dir_package = self.dir_package_root
-        module_name = self.module_name
+        package_name = self.package_name
 
         command_django_admin = './venv/bin/django-admin'
 
         with temp_dir() as dir_tmp:
-            run_command(f'{command_django_admin} startproject {module_name} {dir_tmp}')
+            run_command(f'{command_django_admin} startproject {package_name} {dir_tmp}')
 
             # We'd replace settings module paths.
             replace = partial(
                 replace_infile,
-                pairs={f'{module_name}.settings': f'{module_name}.settings.auto'})
+                pairs={f'{package_name}.settings': f'{package_name}.settings.auto'})
 
             source_file = join(dir_tmp, 'manage.py')
             replace(source_file)
             shutil.move(source_file, join(dir_package, 'manage.py'))
 
-            source_file = join(dir_tmp, module_name, 'wsgi.py')
+            source_file = join(dir_tmp, package_name, 'wsgi.py')
             replace(source_file)
             shutil.move(source_file, join(dir_package, 'wsgi.py'))
 
             self.prepare_django_settings_base(dir_tmp)
 
-            shutil.move(join(dir_tmp, module_name, 'urls.py'), join(dir_package, 'urls.py'))
+            shutil.move(join(dir_tmp, package_name, 'urls.py'), join(dir_package, 'urls.py'))
 
         # Create basic app.
         dir_app = join(dir_package, 'core')
@@ -135,7 +135,7 @@ class WebscaffConfig(Config):
         replace_infile(
             join(dir_app, 'apps.py'),
             {
-                "'core'": f"'{module_name}.core'",  # Adapt for Django 3.2+
+                "'core'": f"'{package_name}.core'",  # Adapt for Django 3.2+
             }
         )
         replace_infile(

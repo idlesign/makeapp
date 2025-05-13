@@ -8,4 +8,4 @@ from django.shortcuts import render
 
 # @login_required
 # def index(request):
-#     return render(request, '{{ module_name }}/index.html', {})
+#     return render(request, '{{ package_name }}/index.html', {})

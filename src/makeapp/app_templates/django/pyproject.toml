@@ -1,0 +1,5 @@
+{% extends parent_template %}
+
+{% block deps_dev %}{{ super() }}
+    "pytest-djangoapp>=1.0.0",
+{% endblock %}

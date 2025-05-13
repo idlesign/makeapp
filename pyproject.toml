@@ -41,6 +41,11 @@ path = "src/makeapp/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/makeapp"]
 
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
 [tool.coverage.report]
 include = [
     "src/*",

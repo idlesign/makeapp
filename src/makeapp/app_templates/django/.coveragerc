@@ -1,3 +1,3 @@
 [run]
-include = {{ module_name }}/*
-omit = {{ module_name }}/migrations/*, {{ module_name }}/tests/*
+include = {{ package_name }}/*
+omit = {{ package_name }}/migrations/*, {{ package_name }}/tests/*

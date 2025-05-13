@@ -1,0 +1,9 @@
+{% extends parent_template %}
+
+{% block scripts %}{{ super() }}
+{{ package_name }} = "{{ package_name }}.manage:main",
+{% endblock %}
+
+{% block deps_dev %}{{ super() }}
+    "pytest-djangoapp>=1.0.0",
+{% endblock %}

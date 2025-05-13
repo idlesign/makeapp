@@ -3,14 +3,14 @@
 {% block imports %}
 import sys
 import argparse
-from {{ module_name }} import VERSION_STR
+from {{ package_name }} import VERSION_STR
 {% endblock %}
 
 
 {% block body %}
 def main():
 
-    arg_parser = argparse.ArgumentParser(prog='{{ module_name }}', description='{{ description }}')
+    arg_parser = argparse.ArgumentParser(prog='{{ package_name }}', description='{{ description }}')
     arg_parser.add_argument('--version', action='version', version=VERSION_STR)
 
     arg_parser.add_argument('arg1', help='arg1 help')

@@ -128,7 +128,7 @@ class AppTemplate:
                     path_rel=rel_path,
                 )
 
-                rel_path = rel_path.replace(maker.module_dir_marker, maker.settings['module_name'])
+                rel_path = rel_path.replace(maker.module_dir_marker, maker.settings['package_name'])
                 template_files[rel_path] = template_file
 
         return template_files

@@ -1,0 +1,13 @@
+{% extends parent_template %}
+
+
+{% block entry_points_custom %}{{ super() }}
+[project.entry-points.pytest11]
+{{ package_name }} = "{{ package_name }}.entry"
+{% endblock %}
+
+{% block classifiers %}{{ super() }}
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+{% endblock %}

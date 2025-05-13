@@ -28,13 +28,9 @@ def test_default(tmpdir, get_appmaker, assert_content):
             'Unreleased\n----------\n',
         ])
 
-        assert_content(tmpdir, 'setup.py', [
-            "author='The Librarian',",
-            "author_email='librarian@discworld.wrld',",
-        ])
-
-        assert_content(tmpdir, 'setup.cfg', [
-            'release =',
+        assert_content(tmpdir, 'pyproject.toml', [
+            'name = "The Librarian"',
+            'email = "librarian@discworld.wrld"',
         ])
 
         assert_content(tmpdir, 'docs/source/conf.py', [
@@ -45,6 +41,10 @@ def test_default(tmpdir, get_appmaker, assert_content):
             'version ='
         ])
 
+        assert_content(tmpdir, 'tests/test_module.py', [
+            'import pytest',
+        ])
+
 
 def test_tpl_userdefined(tmpdir, get_appmaker, assert_content):
 
@@ -52,14 +52,14 @@ def test_tpl_userdefined(tmpdir, get_appmaker, assert_content):
 
         userdefined = tmpdir.mkdtemp()
 
-        with open(userdefined / 'setup.py', 'w') as f:
-            f.write('{% extends parent_template %}\n'
-                "{% block install_requires %}{{ super() }}'some',{% endblock %}")
+        with open(userdefined / 'pyproject.toml', 'w') as f:
+            f.write('{% extends entry_points_custom %}\n'
+                "{% block install_requires %}{{ super() }}# some custom{% endblock %}")
 
         get_appmaker(templates=[str(userdefined)])
 
-        assert_content(tmpdir, 'setup.py', [
-            "install_requires=[ 'some'",
+        assert_content(tmpdir, 'pyproject.toml', [
+            '# some custom',
         ])
 
 
@@ -69,8 +69,8 @@ def test_tpl_console(tmpdir, get_appmaker, assert_content):
 
         get_appmaker(templates=['console'])
 
-        assert_content(tmpdir, 'setup.py', [
-            "'console_scripts': ['dummy = dummy.cli:main'],",
+        assert_content(tmpdir, 'pyproject.toml', [
+            'dummy = dummy.cli:main',
         ])
 
 
@@ -80,30 +80,9 @@ def test_tpl_click(tmpdir, get_appmaker, assert_content):
 
         get_appmaker(templates=['click'])
 
-        assert_content(tmpdir, 'setup.py', [
-            "'click',",
-            "'console_scripts': ['dummy = dummy.cli:main'],",
-        ])
-
-
-def test_tpl_pytest(tmpdir, get_appmaker, assert_content):
-
-    with tmpdir.as_cwd():
-
-        get_appmaker(templates=['pytest'])
-
-        assert_content(tmpdir, 'tests/test_module.py', [
-            'import pytest',
-        ])
-
-        assert_content(tmpdir, 'setup.py', [
-            "['pytest-runner']",
-            "tests_require=['pytest']",
-            "test_suite='tests'",
-        ])
-
-        assert_content(tmpdir, 'setup.cfg', [
-            'test = pytest',
+        assert_content(tmpdir, 'pyproject.toml', [
+            '"click"',
+            'dummy = dummy.cli:main',
         ])
 
 
@@ -113,8 +92,8 @@ def test_tpl_django(tmpdir, get_appmaker, assert_content, assert_cleanup):
 
         get_appmaker(templates=['django'])
 
-        assert_content(tmpdir, 'setup.py', [
-            "tests_require=['pytest', 'pytest-djangoapp>=",
+        assert_content(tmpdir, 'pyproject.toml', [
+            'pytest-djangoapp>=',
         ])
 
         assert_content(tmpdir, 'dummy/apps.py', [
@@ -131,8 +110,9 @@ def test_tpl_pytestplugin(tmpdir, get_appmaker, assert_content):
 
         get_appmaker(templates=['pytestplugin'])
 
-        assert_content(tmpdir, 'setup.py', [
-            "'pytest11': ['dummy = dummy.entry'],",
+        assert_content(tmpdir, 'pyproject.toml', [
+            'pytest11',
+            'dummy = dummy.entry',
             "'Framework :: Pytest'",
         ])
 

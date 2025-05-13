@@ -18,7 +18,7 @@
 import sys, os
 sys.path.insert(0, os.path.abspath('../../'))
 
-from {{ module_name }} import VERSION_STR
+from {{ package_name }} import VERSION_STR
 
 
 # -- General configuration ------------------------------------------------

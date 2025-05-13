@@ -39,14 +39,15 @@ class AppMaker:
     LICENSE_GPL3 = 'gpl3'
     LICENSE_BSD2CL = 'bsd2cl'
     LICENSE_BSD3CL = 'bsd3cl'
+    # https://spdx.github.io/spdx-spec/v2.2.2/SPDX-license-list/
     LICENSES = {
-        LICENSE_NO: ('No License', 'Other/Proprietary License'),
-        LICENSE_MIT: ('MIT License', 'OSI Approved :: MIT License'),
-        LICENSE_APACHE: ('Apache v2 License', 'OSI Approved :: Apache Software License'),
-        LICENSE_GPL2: ('GPL v2 License', 'OSI Approved :: GNU General Public License v2 (GPLv2)'),
-        LICENSE_GPL3: ('GPL v3 License', 'OSI Approved :: GNU General Public License v3 (GPLv3)'),
-        LICENSE_BSD2CL: ('BSD 2-Clause License', 'OSI Approved :: BSD License'),
-        LICENSE_BSD3CL: ('BSD 3-Clause License', 'OSI Approved :: BSD License'),
+        LICENSE_NO: ('No License', 'LicenseRef-Proprietary'),
+        LICENSE_MIT: ('MIT License', 'MIT'),
+        LICENSE_APACHE: ('Apache v2 License', 'Apache-2.0'),
+        LICENSE_GPL2: ('GPL v2 License', 'GPL-2.0-only'),
+        LICENSE_GPL3: ('GPL v3 License', 'GPL-3.0-only'),
+        LICENSE_BSD2CL: ('BSD 2-Clause License', 'BSD-2-Clause'),
+        LICENSE_BSD3CL: ('BSD 3-Clause License', 'BSD-3-Clause'),
     }
     default_license = LICENSE_BSD3CL
 
@@ -56,7 +57,7 @@ class AppMaker:
 
     BASE_SETTINGS = {
         'app_name': None,
-        'module_name': None,
+        'package_name': None,
         'description': 'Sample short description',
         'author': '{{ app_name }} contributors',
         'author_email': '',
@@ -64,6 +65,7 @@ class AppMaker:
         'year': str(date.today().year),
         'license': default_license,
         'license_title': LICENSES[default_license][0],
+        'license_ident': LICENSES[default_license][1],
         'vcs': default_vcs,
         'vcs_remote': None,
         'python_version': '.'.join(map(str, PYTHON_VERSION[:2])),
@@ -129,11 +131,11 @@ class AppMaker:
         settings = dict(self.BASE_SETTINGS)
         self.logger.debug(f'Initial settings: {settings}')
 
-        module_name = app_name.split('-', 1)[-1].replace('-', '_')
+        package_name = app_name.split('-', 1)[-1].replace('-', '_')
 
         self.update_settings({
             'app_name': app_name,
-            'module_name': module_name,
+            'package_name': package_name,
             'vcs_remote': None,
         }, settings)
 
@@ -578,7 +580,9 @@ class AppMaker:
             settings_base[name] = self._replace_settings_markers(val, settings=settings_base)
 
         self._validate_setting('license', list(self.LICENSES), settings_base)
-        
-        settings_base['license_title'] = self.LICENSES[settings_base['license']][0]
-        
+
+        license = self.LICENSES[settings_base['license']]
+        settings_base['license_title'] = license[0]
+        settings_base['license_ident'] = license[1]
+
         self._validate_setting('vcs', list(self.VCS), settings_base)

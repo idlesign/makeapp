@@ -1,18 +1,11 @@
-import unittest
+import pytest
 
 
-class TestApp(unittest.TestCase):
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
+class TestApp:
 
     def test_method(self):
-        self.assertTrue(True)
 
+        assert 1 == 1
 
-if __name__ == '__main__':
-    unittest.main()
-
+        with pytest.raises(Exception):
+            raise Exception('Tested!')

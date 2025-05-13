@@ -29,9 +29,9 @@ class ContextMutator:
 
         context.update({
             'license_title': license_tuple[0],
-            'license_title_pypi': license_tuple[1],
+            'license_ident': license_tuple[1],
             'python_version_major': context['python_version'].split('.')[0],
-            'module_name_capital': context['module_name'].capitalize(),
+            'package_name_capital': context['package_name'].capitalize(),
         })
 
         return context

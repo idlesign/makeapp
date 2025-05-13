@@ -40,5 +40,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.github_token }}
 {% endraw %}
       run: |
-        coverage run --source={{ module_name }} setup.py test
+        coverage run --source={{ package_name }} setup.py test
         coveralls --service=github

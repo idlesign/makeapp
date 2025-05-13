@@ -1,0 +1,6 @@
+{% extends parent_template %}
+
+
+{% block deps %}{{ super() }}
+    "click",
+{% endblock %}

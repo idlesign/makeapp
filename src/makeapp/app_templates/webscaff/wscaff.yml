@@ -2,7 +2,7 @@
 remotes: {{ webscaff_host }}
 
 project:
-    name: {{ module_name }}
+    name: {{ package_name }}
     repo: {{ vcs_remote }}
 {% if webscaff_domain %}
     domain: {{ webscaff_domain }}
