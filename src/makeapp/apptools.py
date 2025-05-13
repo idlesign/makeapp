@@ -410,7 +410,7 @@ class Project:
 
         return next_version_str, version_summary
 
-    def release(self, next_version_str, version_summary):
+    def release(self, next_version_str: str, version_summary: str):
         """Makes application package release.
 
         * Bumps version number

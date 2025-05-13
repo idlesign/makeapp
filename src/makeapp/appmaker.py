@@ -51,7 +51,7 @@ class AppMaker:
     }
     default_license = LICENSE_BSD3CL
 
-    VCS = VcsHelper.get_backends()
+    VCS = VcsHelper.registry
 
     default_vcs = list(VCS.keys())[0]
 
@@ -417,7 +417,7 @@ class AppMaker:
                 ['    %s: %s' % (k, v) for k, v in sorted(self.settings.items(), key=lambda kv: kv[0])]
             ),
             f"Chosen license: {self.LICENSES[self.settings['license']][0]}",
-            f"Chosen VCS: {self.VCS[self.settings['vcs']].TITLE}",
+            f"Chosen VCS: {self.VCS[self.settings['vcs']].title}",
         ]
         return '\n'.join(lines)
 
@@ -541,7 +541,7 @@ class AppMaker:
 
         helper: VcsHelper = self.VCS[vcs]()
 
-        self.logger.info(f'Initializing {helper.TITLE} repository ...')
+        self.logger.info(f'Initializing {helper.title} repository ...')
 
         with chdir(dest):
             helper.init()

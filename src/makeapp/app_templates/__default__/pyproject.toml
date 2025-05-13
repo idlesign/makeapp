@@ -68,3 +68,6 @@ exclude_also = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
 ]
+
+{% block tools_ext %}
+{% endblock %}

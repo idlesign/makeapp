@@ -9,24 +9,23 @@ from ..utils import run_command
 class VcsHelper:
     """Base helper for VCS related actions."""
 
-    TITLE = None
-    MASTER = 'master'
-    UPSTREAM = 'origin'
-    COMMAND = None
+    title = None
+    alias = None
+    branch_master = 'master'
+    branch_upstream = 'origin'
+
+    registry: dict[str, type['VcsHelper']] = {}
+
+    def __init_subclass__(cls):
+        alias = cls.alias
+        assert alias
+
+        cls.registry[alias] = cls
+
+        super().__init_subclass__()
 
     def __init__(self):
         self.remote = None
-
-    @classmethod
-    def get_backends(cls) -> dict:
-        """Returns available backends."""
-
-        backends = {}
-
-        for backend in (GitHelper, MercurialHelper):
-            backends[backend.COMMAND] = backend
-
-        return backends
 
     @classmethod
     def get(cls, vcs_path: str | None = None) -> 'VcsHelper':
@@ -39,8 +38,8 @@ class VcsHelper:
 
         helper = None
 
-        for helper_cls in cls.get_backends().values():
-            if os.path.exists(os.path.join(vcs_path, f'.{helper_cls.COMMAND}')):
+        for helper_cls in cls.registry.values():
+            if os.path.exists(os.path.join(vcs_path, f'.{helper_cls.alias}')):
                 helper = helper_cls()
                 break
 
@@ -48,7 +47,7 @@ class VcsHelper:
 
     def run_command(self, command):
         """Basic command runner to implement."""
-        return run_command(f'{self.COMMAND} {command}')
+        return run_command(f'{self.alias} {command}')
 
     def init(self):
         """Initializes a repository."""
@@ -71,9 +70,9 @@ class VcsHelper:
         """Performs basic vcs check."""
         data = self.run_command('branch')
 
-        if f'* {self.MASTER}' not in ''.join(data):
+        if f'* {self.branch_master}' not in ''.join(data):
             raise ProjectorExeption(
-                f'VCS needs to be initialized and branch set to `{self.MASTER}`')
+                f'VCS needs to be initialized and branch set to `{self.branch_master}`')
 
     def add_tag(self, name: str, description: str, *, overwrite: bool = False):
         """Adds a tag.
@@ -85,11 +84,8 @@ class VcsHelper:
         """
         overwrite = '-f' if overwrite else ''
 
-        if isinstance(description, str):
-            description = description.encode('utf8')
-
         with NamedTemporaryFile() as f:
-            f.write(description)
+            f.write(description.encode())
             f.flush()
 
             self.run_command(f'tag {name} {overwrite} -F {f.name}')
@@ -149,9 +145,9 @@ class VcsHelper:
         if upstream:
 
             if upstream is True:
-                upstream = self.UPSTREAM
+                upstream = self.branch_upstream
 
-            self.run_command(f'push -u {upstream} {self.MASTER}')
+            self.run_command(f'push -u {upstream} {self.branch_master}')
 
         else:
             self.run_command('push')
@@ -162,8 +158,8 @@ class VcsHelper:
 class GitHelper(VcsHelper):
     """Encapsulates Git related commands."""
 
-    TITLE = 'Git'
-    COMMAND = 'git'
+    title = 'Git'
+    alias = 'git'
 
     def add_remote(self, address: str, *, alias: str = 'origin'):
         """Adds a remote repository.
@@ -185,25 +181,3 @@ class GitHelper(VcsHelper):
         filename = filename or '.'
 
         super().add(filename)
-
-
-class MercurialHelper(VcsHelper):
-    """Encapsulates Mercurial related commands."""
-
-    TITLE = 'Mercurial'
-    COMMAND = 'hg'
-
-    def get_remotes(self):
-        """Returns a list of remotes."""
-        return []
-
-    def push(self, *, upstream: bool | str = None):
-        """Pushes local changes and tags to remote.
-
-        :param upstream: Upstream URL. If True, remote URL is used.
-
-        """
-        if upstream is True and self.remote:
-            upstream = self.remote
-
-        super().push(upstream=upstream)
