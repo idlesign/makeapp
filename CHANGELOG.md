@@ -1,15 +1,13 @@
-makeapp changelog
-=================
+# makeapp changelog
 
 
-Unreleased
-----------
-+ Added virtual environment creation on project rollout.
-+ CLI. Added 'venv reset' command.
-+ CLI. Descriptions passed to 'change' command all go into a commit messages.
-* Added QA for Py 3.11, 3.12.
-* Dropped QA for Py 3.7, 3.8.
-* Fixed package name availability check.
+# Unreleased
+* ++ Added virtual environment creation on project rollout.
+* ++ CLI. Added 'venv reset' command.
+* ++ CLI. Descriptions passed to 'change' command all go into a commit messages.
+* ** Added QA for Py 3.11, 3.12.
+* ** Dropped QA for Py 3.7, 3.8.
+* ** Fixed package name availability check.
 
 
 v1.9.1 [2023-05-19]

@@ -21,7 +21,27 @@ Description
 Requirements
 ------------
 
-1. Python 3.9+
+1. Python 3.10+
+2. uv - https://docs.astral.sh/uv/getting-started/installation/
+
+
+Installation
+------------
+
+Use ``uv`` to install and upgrade ``makeapp``.
+https://docs.astral.sh/uv/getting-started/installation/
+
+## Install
+
+```bash
+uv tool install makeapp
+```
+
+## Upgrade
+
+```bash
+uv tool upgrade makeapp
+```
 
 
 Table of Contents

@@ -27,13 +27,12 @@ Scaffold a new application:
 makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
 ```
 
-This will create a decent application skeleton using the default skeleton template (``setup.py``, docs, tests, etc.)
+This will create a decent application skeleton using the default skeleton template (``pyproject.toml``, docs, tests, etc.)
 and initialize Git repository.
 
 ``makeapp`` also bundles templates for commonly used application types:
 
 * ``click`` powered app
-* ``pytest`` powered app
 * ``pytest`` plugin
 * ``Django`` app
 * ``webscaff`` project (https://github.com/idlesign/webscaff)
@@ -45,7 +44,7 @@ User-made templates are also supported.
 
 ## Application publishing
 
-When you're ready to publish issue the following command while in project directory (containing ``setup.py``):
+When you're ready to publish issue the following command while in project directory (containing ``pyproject.toml``):
 
 ``` bash
 makeapp release

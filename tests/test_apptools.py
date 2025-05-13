@@ -4,70 +4,71 @@ from makeapp.helpers.vcs import VcsHelper
 from makeapp.apptools import Project
 
 
-def test_git(tmpdir, get_appmaker, assert_content, monkeypatch):
+def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
 
-    with tmpdir.as_cwd():
+    get_appmaker()
 
-        get_appmaker()
+    vcs = VcsHelper.get()
+    vcs.commit('initial')
 
-        vcs = VcsHelper.get()
-        vcs.commit('initial')
+    project = Project()
+    project.add_change(['fix1', '* change', '! warn', '+ add'])
 
-        project = Project()
-        project.add_change(['fix1', '* change', '! warn', '+ add'])
+    assert_content(in_tmp_path / 'CHANGELOG.md', [
+        dedent('''
+        * !! warn.
+        * ++ add.
+        * ++ Basic functionality.
+        * ** change.
+        * ** fix1.
+        ''')
+    ])
 
-        assert_content(tmpdir, 'CHANGELOG', [
-            dedent('''
-            ! warn.
-            + add.
-            + Basic functionality.
-            * change.
-            * fix1.
-            ''')
-        ])
+    version, summary = project.get_release_info()
 
-        version, summary = project.get_release_info()
+    assert version == 'v0.1.0'
+    assert summary == (
+        '* ++ add.\n'
+        '* ++ Basic functionality.\n'
+        '* ** change.\n'
+        '* ** fix1.\n'
+        '* ++ Basic functionality.'
+    )
 
-        assert version == 'v0.1.0'
-        assert summary == '! warn.\n+ add.\n+ Basic functionality.\n* change.\n* fix1.'
+    project.release(version, summary)
 
-        project.release(version, summary)
+    issued_commands = []
 
-        issued_commands = []
+    def dummy_communicate(self, *args, **kwargs):
+        issued_commands.append(self.args)
+        return b'', b''
 
-        def dummy_communicate(self, *args, **kwargs):
-            issued_commands.append(self.args)
-            return b'', b''
+    monkeypatch.setattr('makeapp.utils.Popen.communicate', dummy_communicate)
+    project.publish()
 
-        monkeypatch.setattr('makeapp.utils.Popen.communicate', dummy_communicate)
-        project.publish()
-
-        assert issued_commands == [
-            'python3 -m wheel version',
-            'git push',
-            'git push --tags',
-            'python3 setup.py clean --all sdist bdist_wheel',
-            'twine upload dist/*'
-        ]
+    assert issued_commands == [
+        'git push',
+        'git push --tags',
+        'uv build',
+        'uv publish'
+    ]
 
 
-def test_venv(tmpdir, get_appmaker, assert_content):
+def test_venv(in_tmp_path, get_appmaker, assert_content):
 
-    with tmpdir.as_cwd():
+    get_appmaker()
 
-        get_appmaker()
+    vcs = VcsHelper.get()
+    vcs.commit('initial')
 
-        vcs = VcsHelper.get()
-        vcs.commit('initial')
+    project = Project()
 
-        project = Project()
+    project.venv_init()
+    assert_content(in_tmp_path / '.venv/pyvenv.cfg', [
+        'version_info ='
+    ])
 
-        project.venv_init()
-        assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
-            'version ='
-        ])
-
-        project.venv_init(reset=True)
-        assert_content(tmpdir / 'venv', 'pyvenv.cfg', [
-            'version ='
-        ])
+    project.venv_init(reset=True)
+    assert_content(in_tmp_path / '.venv/pyvenv.cfg', [
+        'version_info ='
+    ])

@@ -12,7 +12,7 @@ Scaffold a new application:
     $ makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
 
 
-This will create a decent application skeleton (setup.py, docs, tests, etc.) and initialize Git repository.
+This will create a decent application skeleton (``pyproject.toml``, docs, tests, etc.) and initialize Git repository.
 
 Get some help on command line switches:
 
@@ -53,7 +53,7 @@ You can also pass settings values via command line options. Use ``--no-prompt`` 
 Application publishing
 ----------------------
 
-When you're ready to publish issue the following command while in project directory (containing setup.py):
+When you're ready to publish issue the following command while in project directory (containing ``pyproject.toml``):
 
 .. code-block:: bash
 

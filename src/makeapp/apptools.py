@@ -174,7 +174,7 @@ class ChangelogData(DataContainer):
     
     """
 
-    FILENAME_CHANGELOG = 'CHANGELOG'
+    FILENAME_CHANGELOG = 'CHANGELOG.md'
     UNRELEASED_STR = 'Unreleased'
 
     @classmethod
@@ -190,14 +190,14 @@ class ChangelogData(DataContainer):
 
         changelog = FileHelper.read_file(filepath)
 
-        if not changelog[1].startswith('=='):
+        if not changelog[0].startswith('# '):
             raise ProjectorExeption('Unexpected changelog file format.')
 
         unreleased_str = cls.UNRELEASED_STR
         version_line_idx = None
 
         for supposed_line_idx in (3, 4, 5):
-            line = changelog[supposed_line_idx]
+            line = changelog[supposed_line_idx].lstrip('# ')
             unreleased_entry_exists = line == unreleased_str
 
             if unreleased_entry_exists or line.startswith('v'):
@@ -211,8 +211,7 @@ class ChangelogData(DataContainer):
         if not unreleased_entry_exists:
             # Add `Unreleased` entry.
             changelog[version_line_idx:version_line_idx] = [
-                unreleased_str,
-                '-' * len(unreleased_str),
+                f'## {unreleased_str}',
                 '', ''
             ]
 
@@ -249,7 +248,7 @@ class ChangelogData(DataContainer):
         supposed_chunk = 'patch'
 
         for change in self.get_changes():
-            if change.startswith('+'):
+            if change.startswith('* ++'):
                 supposed_chunk = 'minor'
                 break
         return supposed_chunk
@@ -268,7 +267,6 @@ class ChangelogData(DataContainer):
         replace = self.file_helper.line_replace
 
         replace(version_with_date)
-        replace('-' * len(version_with_date), offset=1)
 
         return version_str
 
@@ -281,8 +279,14 @@ class ChangelogData(DataContainer):
         if not description:
             return
 
-        if description[0] not in self.PREFIXES:
-            description = f'* {description}'
+        bullet = description[0]
+        prefixes = self.PREFIXES
+
+        if bullet not in prefixes:
+            bullet = '*'
+
+        description = description.lstrip(f' {prefixes}')
+        description = f'* {bullet * 2} {description}'
 
         self.file_helper.insert(description, offset=2)
 
@@ -309,13 +313,14 @@ class ChangelogData(DataContainer):
         """Sorts changes of latest version inplace."""
 
         priorities = {prefix: priority for priority, prefix in enumerate(self.PREFIXES)}
+        priority_default = 3
 
         def sorter(line):
             line = line.lower().replace('\'"`', '')
-            priority = priorities.get(line[0], 3)
+            priority = priorities.get(line[2], priority_default)
             return f'{priority} {line}'
 
-        for line_offset, change in enumerate(sorted(self.get_changes(), key=sorter), 2):
+        for line_offset, change in enumerate(sorted(self.get_changes(), key=sorter), 1):
             self.file_helper.line_replace(change, offset=line_offset)
 
     def write(self):
@@ -478,8 +483,6 @@ class Project:
     def publish(self):
         """Uploads project data to remote VCS and Python Package Index server."""
         LOG.info('Publishing application ...')
-
-        DistHelper.ensure()
 
         with chdir(self.project_path):
             self.vcs.push()

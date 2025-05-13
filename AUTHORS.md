@@ -1,10 +1,8 @@
-makeapp authors
-===============
+# makeapp authors
 
 Created by Igor `idle sign` Starikov.
 
 
-Contributors
-------------
+## Contributors
 
 Here could be your name.

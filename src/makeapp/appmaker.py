@@ -30,7 +30,7 @@ class AppMaker:
 
     """
     template_default_name = '__default__'
-    module_dir_marker = '__module_name__'
+    package_dir_marker = '__package_name__'
 
     LICENSE_NO = 'no'
     LICENSE_MIT = 'mit'

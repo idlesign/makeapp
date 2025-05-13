@@ -1,10 +1,19 @@
+import os
+from pathlib import Path
+
 import pytest
 
 
 @pytest.fixture
 def get_appmaker():
 
-    def get_appmaker_(app_name='dummy', templates=None, *, rollout=True, init_venv=False):
+    def get_appmaker_(
+            app_name: str = 'dummy',
+            *,
+            templates: list[str] = None,
+            rollout: bool = True,
+            init_venv: bool = False
+    ):
 
         from makeapp.appmaker import AppMaker
 
@@ -39,9 +48,9 @@ def get_appmaker():
 @pytest.fixture
 def assert_content():
 
-    def assert_content_(tmpdir, filename, lines):
+    def assert_content_(fpath: Path, lines):
 
-        contents = tmpdir.join(filename).read()
+        contents = fpath.read_text()
         for line in lines:
             assert line in contents
 
@@ -51,7 +60,17 @@ def assert_content():
 @pytest.fixture
 def assert_cleanup():
 
-    def assert_cleanup_(tmpdir, filename):
-        assert not tmpdir.join(filename).exists()
+    def assert_cleanup_(fpath):
+        assert not fpath.exists()
 
     return assert_cleanup_
+
+
+@pytest.fixture
+def in_tmp_path(tmp_path):
+    before = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        yield tmp_path
+    finally:
+        os.chdir(before)

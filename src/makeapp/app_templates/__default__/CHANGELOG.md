@@ -1,6 +1,6 @@
 # {{ app_name }} changelog
 
 
-Unreleased
-----------
-+ Basic functionality.
+### Unreleased
+
+* ++ Basic functionality.

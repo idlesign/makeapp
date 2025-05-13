@@ -10,8 +10,10 @@ LOG = logging.getLogger(__name__)
 class VenvHelper:
     """Encapsulates virtual environment related functions."""
 
+    dirname = '.venv'
+
     def __init__(self, project_path: str):
-        self.venv_path = Path(project_path) / 'venv'
+        self.venv_path = Path(project_path) / self.dirname
 
     def initialize(self, *, reset: bool = False):
         path = self.venv_path
@@ -20,5 +22,4 @@ class VenvHelper:
             LOG.debug(f'Remove {path} ...')
             rmtree(f'{path}', ignore_errors=True)
 
-        run_command('python3 -m venv venv')
-        run_command(f'{path}/bin/python -m pip install -e .')
+        run_command('uv sync')
