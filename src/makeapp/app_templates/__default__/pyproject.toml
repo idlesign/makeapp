@@ -40,15 +40,19 @@ Homepage = "{{ url }}"
 
 [dependency-groups]
 dev = [
-    "ruff",
-    "tox",
-    "tox-uv",
+    {include-group = "linters"},
+    {include-group = "tests"},
     {% block deps_dev %}
     {% endblock %}
+]
+linters = [
+    "ruff",
 ]
 tests = [
     {% block deps_tests %}
     "pytest",
+    "tox",
+    "tox-uv",
     {% endblock %}
 ]
 
@@ -94,7 +98,7 @@ deps = [
 {% endblock %}
 ]
 commands = [
-  ["pytest", { replace = "posargs", extend = true }],
+  ["pytest", { replace = "posargs", default = ["tests"], extend = true }],
 ]
 
 {% block tools_ext %}
