@@ -26,8 +26,13 @@ makeapp = "makeapp.cli:main"
 
 [dependency-groups]
 dev = [
+    {include-group = "docs"},
     {include-group = "linters"},
     {include-group = "tests"},
+]
+docs = [
+    "mkdocs-material",
+    "mkdocs-navsorted-plugin",
 ]
 linters = [
     "ruff",
