@@ -81,7 +81,7 @@ on `release` command:
 
 
 !!! note
-    `*` prefix is added by default if none of the above mentioned prefixes found.
+    `*` prefix is added by default if none of the above-mentioned prefixes found.
 
 
 ## Bash completion

@@ -70,23 +70,19 @@ makeapp change "+ New 'change' command implemented"
 
 This will also stage and commit all changed files.
 
-Supported message prefixes:
+Supported message prefixes and corresponding version number parts incremented 
+on `release` command:
 
-* ``+`` - New feature / addition.
+| symbol | meaning                          | version part increment |
+|--------|----------------------------------|------------------------|
+| `+`    | New feature / addition           | minor                  |
+| `!`    | Important change/improvement/fix | patch                  |
+| `-`    | Feature deprecation / removal    | patch                  |
+| `*`    | Minor change/improvement/fix     | patch                  |
 
-  Increments *minor* part of version number on ``release`` command.
 
-* ``!`` - Important change/improvement/fix.
-
-  Increment: *patch* part.
-
-* ``-`` - Feature deprecation / removal
-
-  Increment: *patch*.
-
-* ``*`` - Minor change/improvement/fix. ``*`` prefix is added by default if none of the above mentioned prefixes found.
-
-  Increment: *patch*.
+!!! note
+    `*` prefix is added by default if none of the above-mentioned prefixes found.
 
 
 ## Bash completion
