@@ -1,4 +1,0 @@
-# Don't forget to pin down these requirements to certain versions in your project.
-
-pytest>=6.2.4
-pytest-djangoapp>=0.15.1

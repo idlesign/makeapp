@@ -1,0 +1,105 @@
+[project]
+name = "{{ app_name }}"
+dynamic = ["version"]
+description = "{{ description }}"
+authors = [
+    { name = "{{ author }}", email = "{{ author_email }}" }
+]
+readme = "README.md"
+
+classifiers = [
+{% block classifiers %}
+    "Development Status :: 4 - Beta", #   3 - Alpha; 5 - Production/Stable
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: {{ python_version }}",
+{% endblock %}
+]
+
+license = "{{ license_ident }}"
+license-files = ["LICENSE"]
+
+requires-python = ">=3.10"
+dependencies = [
+{% block deps %}
+{% endblock %}
+]
+
+[project.urls]
+Homepage = "{{ url }}"
+
+[project.scripts]
+{% block scripts %}
+{% endblock %}
+
+{% block entry_points_custom %}{% endblock %}
+
+[project.optional-dependencies]
+{% block deps_opts %}
+{% endblock %}
+
+[dependency-groups]
+dev = [
+    {include-group = "linters"},
+    {include-group = "tests"},
+    {% block deps_dev %}
+    {% endblock %}
+]
+linters = [
+    "ruff",
+]
+tests = [
+    {% block deps_tests %}
+    "pytest",
+    "tox",
+    "tox-uv",
+    {% endblock %}
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/{{ package_name }}/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package_name }}"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.report]
+include = [
+    "src/*",
+]
+exclude_also = [
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+
+[tool.tox]
+skip_missing_interpreters = true
+env_list = [
+{% block tox_envlist %}
+  "py310",
+  "py311",
+  "py312",
+  "py313",
+{% endblock %}
+]
+
+[tool.tox.env_run_base]
+dependency_groups = ["tests"]
+deps = [
+{% block tox_deps %}
+{% endblock %}
+]
+commands = [
+  ["pytest", { replace = "posargs", default = ["tests"], extend = true }],
+]
+
+{% block tools_ext %}
+{% endblock %}

@@ -1,6 +1,0 @@
-{{ get_app_title_rst('changelog') }}
-
-
-Unreleased
-----------
-+ Basic functionality.

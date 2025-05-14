@@ -1,3 +1,4 @@
+{% block contents %}
 .project
 .pydevproject
 .idea
@@ -11,3 +12,4 @@ __pycache__
 .ruff_cache
 .pytest_cache
 .env
+{% endblock %}

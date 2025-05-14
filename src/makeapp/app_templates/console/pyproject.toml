@@ -1,0 +1,5 @@
+{% extends parent_template %}
+
+{% block scripts %}{{ super() }}
+{{ package_name }} = "{{ package_name }}.cli:main",
+{% endblock %}
