@@ -1,6 +1,6 @@
 from shutil import rmtree
 
-from ..utils import run_command, check_command, get_user_dir, read_ini
+from ..utils import run_command, check_command, get_user_dir, read_ini, LOG
 
 
 class DistHelper:
@@ -24,9 +24,13 @@ class DistHelper:
 
         if pypirc_file.exists():
             cfg = read_ini(pypirc_file)
-            env_vars = {
-                'UV_PUBLISH_TOKEN': cfg['pypi']['password']
-            }
+            if cfg.has_section('pypi') and (token := cfg.get('pypi', 'password')):
+                env_vars = {
+                    'UV_PUBLISH_TOKEN': token
+                }
+
+        if not env_vars:
+            LOG.warning(f'PyPI credentials not found in {pypirc_file}')
 
         cls.run_command_uv('build')
         cls.run_command_uv('publish', env=env_vars)
