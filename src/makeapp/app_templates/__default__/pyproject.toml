@@ -40,7 +40,14 @@ Homepage = "{{ url }}"
 
 [dependency-groups]
 dev = [
+    "ruff",
+    "tox",
+    "tox-uv",
     {% block deps_dev %}
+    {% endblock %}
+]
+tests = [
+    {% block deps_tests %}
     "pytest",
     {% endblock %}
 ]
@@ -67,6 +74,27 @@ include = [
 exclude_also = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
+]
+
+[tool.tox]
+skip_missing_interpreters = true
+env_list = [
+{% block tox_envlist %}
+  "py310",
+  "py311",
+  "py312",
+  "py313",
+{% endblock %}
+]
+
+[tool.tox.env_run_base]
+dependency_groups = ["tests"]
+deps = [
+{% block tox_deps %}
+{% endblock %}
+]
+commands = [
+  ["pytest", { replace = "posargs", extend = true }],
 ]
 
 {% block tools_ext %}

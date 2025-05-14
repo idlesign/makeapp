@@ -1,5 +1,15 @@
 {% extends parent_template %}
 
-{% block deps_dev %}{{ super() }}
+{% block deps_tests %}{{ super() }}
     "pytest-djangoapp>=1.0.0",
+{% endblock %}
+
+{% block tox_envlist %}
+    "py{310,311,312,313}-dj{42,51,52}",
+{% endblock %}
+
+{% block tox_deps %}{{ super() }}
+    "dj42: Django>=4.1,<4.2",
+    "dj51: Django>=5.1,<5.2",
+    "dj52: Django>=5.2,<5.3",
 {% endblock %}

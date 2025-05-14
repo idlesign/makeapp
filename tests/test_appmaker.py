@@ -19,7 +19,7 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
     ])
 
     assert_content(in_tmp_path / '.gitignore', [
-        'docs/_build/',
+        '__pycache__',
     ])
 
     assert_content(in_tmp_path / 'CHANGELOG.md', [
