@@ -2,11 +2,12 @@
 
 
 # Unreleased
+* !! Big rewrite. Now uses up-to-date technologies.
 * ++ Added virtual environment creation on project rollout.
 * ++ CLI. Added 'venv reset' command.
 * ++ CLI. Descriptions passed to 'change' command all go into a commit messages.
-* ** Added QA for Py 3.11, 3.12.
-* ** Dropped QA for Py 3.7, 3.8.
+* ** Added QA for Py 3.11, 3.12, 3.13.
+* ** Dropped QA for Py 3.7, 3.8, 3.9.
 * ** Fixed package name availability check.
 
 
