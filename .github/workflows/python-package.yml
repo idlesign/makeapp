@@ -37,4 +37,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.github_token }}
       run: |
         uv run coverage run --source=makeapp -m pytest
-        coveralls --service=github
+        uv run coveralls --service=github
