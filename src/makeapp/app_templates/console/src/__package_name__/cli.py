@@ -3,7 +3,7 @@
 {% block imports %}
 import sys
 import argparse
-from {{ package_name }} import VERSION_STR
+from {{ package_name }} import VERSION
 {% endblock %}
 
 
@@ -11,7 +11,7 @@ from {{ package_name }} import VERSION_STR
 def main():
 
     arg_parser = argparse.ArgumentParser(prog='{{ package_name }}', description='{{ description }}')
-    arg_parser.add_argument('--version', action='version', version=VERSION_STR)
+    arg_parser.add_argument('--version', action='version', version=VERSION)
 
     arg_parser.add_argument('arg1', help='arg1 help')
     arg_parser.add_argument('--opt', help='optional arg help', action='store_true', default=False)

@@ -42,7 +42,7 @@ class DataContainer:
 class PackageData(DataContainer):
     """Information gathered from application package."""
 
-    VERSION_STR = 'VERSION'
+    VERSION_ATTR = 'VERSION'
 
     def __init__(self, file_helper: FileHelper, version: tuple[int, ...]):
         """
@@ -84,10 +84,10 @@ class PackageData(DataContainer):
         path_init = package_path / '__init__.py'
         init_file = FileHelper.read_file(path_init)
 
-        version_str = cls.VERSION_STR
+        version_attr = cls.VERSION_ATTR
         version_line_idx = None
         for idx, line in enumerate(init_file):
-            if line.startswith(version_str):
+            if line.startswith(version_attr):
                 version_line_idx = idx
                 break
 
@@ -95,8 +95,8 @@ class PackageData(DataContainer):
             raise ProjectorExeption('Version line not found in init file.')
 
         version_line = init_file[version_line_idx]
-        version_str = version_line.partition('=')[-1].strip(' "\'').strip()
-        version = tuple(map(int, version_str.split('.')))
+        version_attr = version_line.partition('=')[-1].strip(' "\'').strip()
+        version = tuple(map(int, version_attr.split('.')))
 
         if len(version) < 3:
             raise ProjectorExeption(f'Unsupported version format: {version}.')
@@ -156,7 +156,7 @@ class PackageData(DataContainer):
         LOG.info(f'Version `{version_current}` bumped to `{version_new}`')
 
         version_new_str = '.'.join(map(str, version_new))
-        self.file_helper.line_replace(f"{self.VERSION_STR} = '{version_new_str}'")
+        self.file_helper.line_replace(f"{self.VERSION_ATTR} = '{version_new_str}'")
 
         return version_new
 
