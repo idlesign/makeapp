@@ -31,8 +31,8 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
         'email = "librarian@discworld.wrld"',
     ])
 
-    assert_content(in_tmp_path / 'docs/source/conf.py', [
-        'from dummy import VERSION_STR',
+    assert_content(in_tmp_path / 'docs/index.md', [
+        'will be an introductory',
     ])
 
     assert_content(in_tmp_path / '.venv/pyvenv.cfg', [

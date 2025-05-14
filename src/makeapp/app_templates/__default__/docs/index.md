@@ -1,6 +1,6 @@
-# Introduction to {{ app_name }}
+# Introduction
 
-{{ url }}
+<{{ url }}>
 
 
 ## Description
