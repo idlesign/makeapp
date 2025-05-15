@@ -32,5 +32,6 @@ class DistHelper:
         if not env_vars:
             LOG.warning(f'PyPI credentials not found in {pypirc_file}')
 
-        cls.run_command_uv('build')
+        cls.run_command_uv('build --wheel')
+        cls.run_command_uv('build --sdist')
         cls.run_command_uv('publish', env=env_vars)
