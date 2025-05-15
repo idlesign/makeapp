@@ -30,11 +30,11 @@ jobs:
       uses: astral-sh/setup-uv@v6
     - name: Install deps
       run: |
-        uv sync
-        uv pip install coverage coveralls
+        uv sync --only-group tests
+        uv pip install coveralls
     - name: Run tests
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
       run: |
-        uv run coverage run --source=makeapp -m pytest
+        uv run coverage run -m pytest
         uv run coveralls --service=github

@@ -38,8 +38,6 @@ linters = [
 ]
 tests = [
     "pytest",
-    "tox",
-    "tox-uv",
 ]
 
 [build-system]
