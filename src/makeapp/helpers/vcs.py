@@ -98,7 +98,7 @@ class VcsHelper:
         """
         filename = filename or []
         if isinstance(filename, list):
-            filename = ' '.join(filename)
+            filename = ' '.join(map(str, filename))
 
         filename = f'{filename}'.strip() or ''
 
@@ -172,7 +172,7 @@ class GitHelper(VcsHelper):
 
         self.run_command(f'remote add {alias} {address}')
 
-    def add(self, filename: str = None):
+    def add(self, filename: Path | str = None):
         """Adds a file into a changelist.
 
         :param filename: If not provided all files in working tree are added.

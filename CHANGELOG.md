@@ -1,8 +1,8 @@
 # makeapp changelog
 
 
-# Unreleased
-* !! Big rewrite. Now uses up-to-date technologies.
+### Unreleased
+* !! Big rewrite. Now uses up-to-date conventions and technologies.
 * ++ Added virtual environment creation on project rollout.
 * ++ CLI. Added 'venv reset' command.
 * ++ CLI. Descriptions passed to 'change' command all go into a commit messages.

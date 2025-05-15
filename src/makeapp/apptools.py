@@ -164,7 +164,7 @@ class PackageData(DataContainer):
 class ChangelogData(DataContainer):
     """Information gathered from changelog file."""
 
-    PREFIXES = '!+-*'
+    change_markers = '!+-*'
     """Line prefixes denoting change nature.
     
     ! Important change/improvement/fix
@@ -173,19 +173,24 @@ class ChangelogData(DataContainer):
     * Minor change/improvement/fix
     
     """
+    change_marker_default = '*'
 
-    FILENAME_CHANGELOG = 'CHANGELOG.md'
-    UNRELEASED_STR = 'Unreleased'
+    filename = 'CHANGELOG.md'
+    marker_unreleased = 'Unreleased'
+
+    _prefix_version = '### '
+    _prefix_change = '* '
+    _offset_change = 1
 
     @classmethod
     def get(cls) -> 'ChangelogData':
         """Gathers information from a changelog."""
 
-        filepath = cls.FILENAME_CHANGELOG
+        filepath = Path(cls.filename)
 
-        LOG.debug(f'Getting changelog from `{os.path.basename(filepath)}` ...')
+        LOG.debug(f'Getting changelog from: {filepath.name} ...')
 
-        if not os.path.isfile(filepath):
+        if not filepath.is_file():
             raise ProjectorExeption('Changelog file not found.')
 
         changelog = FileHelper.read_file(filepath)
@@ -193,16 +198,17 @@ class ChangelogData(DataContainer):
         if not changelog[0].startswith('# '):
             raise ProjectorExeption('Unexpected changelog file format.')
 
-        unreleased_str = cls.UNRELEASED_STR
+        unreleased_str = cls.marker_unreleased
+        prefix_version = cls._prefix_version
         version_line_idx = None
 
-        for supposed_line_idx in (3, 4, 5):
+        for supposed_line_idx in (2, 3, 4):
             line = changelog[supposed_line_idx].lstrip('# ')
             unreleased_entry_exists = line == unreleased_str
 
             if unreleased_entry_exists or line.startswith('v'):
                 version_line_idx = supposed_line_idx
-                LOG.info(f'Current version from changelog: `{line}`')
+                LOG.info(f'Current version from changelog: {line}.')
                 break
 
         if version_line_idx is None:
@@ -211,14 +217,9 @@ class ChangelogData(DataContainer):
         if not unreleased_entry_exists:
             # Add `Unreleased` entry.
             changelog[version_line_idx:version_line_idx] = [
-                f'## {unreleased_str}',
-                '', ''
+                f'{prefix_version}{unreleased_str}',
+                ''
             ]
-
-        # Normalize.
-        if version_line_idx == 3:
-            changelog.insert(3, '')
-            version_line_idx = 4
 
         result = ChangelogData(
             file_helper=FileHelper(
@@ -233,14 +234,14 @@ class ChangelogData(DataContainer):
     def deduce_version_increment(self) -> str:
         """Deduces version increment chunk from a changelog.
 
-        Changelog bullets:
+        Changelog markers:
             * changed/fixed
             + new/feature
             - removed
 
         Deduction rules:
             By default `patch` chunk is incremented.
-            If any + entries `minor` is incremented.
+            If any `+` entries, `minor` is incremented.
 
         Returns: major, minor, patch
 
@@ -248,7 +249,7 @@ class ChangelogData(DataContainer):
         supposed_chunk = 'patch'
 
         for change in self.get_changes():
-            if change.startswith('* ++'):
+            if change.startswith(f'{self._prefix_change}++'):
                 supposed_chunk = 'minor'
                 break
         return supposed_chunk
@@ -261,14 +262,14 @@ class ChangelogData(DataContainer):
         :param new_version:
 
         """
-        version_str = f"v{'.'.join(map(str, new_version))}"
-        version_with_date = f"{version_str} [{datetime.now().strftime('%Y-%m-%d')}]"
+        version_num = f"v{'.'.join(map(str, new_version))}"
+        version_with_date = f"{self._prefix_version}{version_num} [{datetime.now().strftime('%Y-%m-%d')}]"
 
         replace = self.file_helper.line_replace
 
         replace(version_with_date)
 
-        return version_str
+        return version_num
 
     def add_change(self, description: str):
         """Adds change into changelog.
@@ -279,23 +280,23 @@ class ChangelogData(DataContainer):
         if not description:
             return
 
-        bullet = description[0]
-        prefixes = self.PREFIXES
+        marker = description[0]
+        markers = self.change_markers
 
-        if bullet not in prefixes:
-            bullet = '*'
+        if marker not in markers:
+            marker = self.change_marker_default
 
-        description = description.lstrip(f' {prefixes}')
-        description = f'* {bullet * 2} {description}'
+        description = description.lstrip(f' {markers}')
+        description = f'{self._prefix_change}{marker * 2} {description}'
 
-        self.file_helper.insert(description, offset=2)
+        self.file_helper.insert(description, offset=self._offset_change)
 
     def get_changes(self) -> list[str]:
         """Returns a list of new version changes from a changelog."""
 
         changes = []
 
-        for line in self.file_helper.iter_after(offset=2):
+        for line in self.file_helper.iter_after(offset=self._offset_change):
 
             if not line.strip():
                 break
@@ -310,9 +311,9 @@ class ChangelogData(DataContainer):
         return '\n'.join(self.get_changes()).strip()
 
     def sort_version_changes(self):
-        """Sorts changes of latest version inplace."""
+        """Sorts changes of the latest version inplace."""
 
-        priorities = {prefix: priority for priority, prefix in enumerate(self.PREFIXES)}
+        priorities = {prefix: priority for priority, prefix in enumerate(self.change_markers)}
         priority_default = 3
 
         def sorter(line):
@@ -464,7 +465,7 @@ class Project:
 
             changelog.write()
 
-            commit_message = f'{changelog.FILENAME_CHANGELOG} updated'
+            commit_message = f'{changelog.filename} updated'
 
             files_to_stage = [changelog.filepath]
 
@@ -473,7 +474,7 @@ class Project:
 
                 # Set a description as a commit message.
                 commit_message = '\n'.join(
-                    description.strip(changelog.PREFIXES)
+                    description.strip(changelog.change_markers)
                     for description in descriptions
                 )
 

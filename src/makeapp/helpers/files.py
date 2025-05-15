@@ -9,7 +9,7 @@ LOG = logging.getLogger(__name__)
 class FileHelper:
     """Encapsulates file related functions."""
 
-    def __init__(self, filepath, line_idx, contents):
+    def __init__(self, filepath: Path | str, line_idx, contents):
         self.filepath = filepath
         self.line_idx = line_idx
         self.contents = contents
