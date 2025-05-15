@@ -60,15 +60,18 @@ testpaths = [
     "tests",
 ]
 
-[tool.coverage.report]
-include = [
-    "src/*",
+[tool.coverage.run]
+source = [
+    "src/",
 ]
 omit = [
     "*/app_templates/*",
     "*/license_templates/*",
     "*/cli.py",
 ]
+
+[tool.coverage.report]
+fail_under = 90.00
 exclude_also = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
