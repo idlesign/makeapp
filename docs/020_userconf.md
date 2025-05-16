@@ -36,12 +36,12 @@ year = 2010-2013
 Such configuration simplifies application rollouts by making redundant command lines switches joggling, so:
 
 ```bash
-makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." --author "The Librarian" --year "2010-2013"
+ma new app /home/librarian/dev/my_new_app_env/ -d "My application." --author "The Librarian" --year "2010-2013"
 ```
 
 could be
 ```
-makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -d "My application."
+ma new app /home/librarian/dev/my_new_app_env/ -d "My application."
 ```
 
 !!! note
@@ -69,7 +69,7 @@ Let's create a skeleton template named `cool`:
 Now you can use this skeleton template to rollout your application (`-t`):
 
 ```bash
-makeapp new my_new_app /home/librarian/dev/my_new_app_env/ -d "My application." -t cool
+ma new app /home/librarian/dev/my_new_app_env/ -d "My application." -t cool
 ```
 
 After such a call you'll have an application default structure provided by `makeapp` extended with files

@@ -1,10 +1,10 @@
 # Bundled application templates
 
-`Makeapp` comes with the following bundled application layout skeletons (templates):
+`makeapp` comes with the following bundled application layout skeletons (templates):
 
 !!! note
     You can mix application layout flavors with templates combinations.  
-    `-t` switch allows several comma-separated template names. Order matters.
+    `-t` (`template`) switch allows several comma-separated template names. Order matters.
 
 
 ## Python module (simple application)

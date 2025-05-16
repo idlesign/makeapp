@@ -5,6 +5,7 @@ https://github.com/idlesign/makeapp
 [![PyPI - Version](https://img.shields.io/pypi/v/makeapp)](https://pypi.python.org/pypi/makeapp)
 [![License](https://img.shields.io/pypi/l/makeapp)](https://pypi.python.org/pypi/makeapp)
 [![Coverage](https://img.shields.io/coverallsCoverage/github/idlesign/makeapp)](https://coveralls.io/r/idlesign/makeapp)
+[![Docs](https://img.shields.io/readthedocs/makeapp)](https://makeapp.readthedocs.io/)
 
 ## Description
 
@@ -24,32 +25,45 @@ https://github.com/idlesign/makeapp
 Scaffold a new application:
 
 ``` bash
-makeapp new my_new_app /home/librarian/mynewapp/ -d "My application." --author "The Librarian"
+ma new shiny_app /home/librarian/shiny/ --description "My app." --author "I am"
 ```
+
+!!! note
+    `ma` is a convenient alias for `makeapp` command.
 
 This will create a decent application skeleton using the default skeleton template (``pyproject.toml``, docs, tests, etc.)
 and initialize Git repository.
 
-``makeapp`` also bundles templates for commonly used application types:
+`makeapp` also bundles templates for commonly used application types:
 
-* ``click`` powered app
-* ``pytest`` plugin
-* ``Django`` app
-* ``webscaff`` project (https://github.com/idlesign/webscaff)
+* `click` powered app
+* `pytest` plugin
+* `Django` app
+* `webscaff` project [here](https://github.com/idlesign/webscaff)
 * etc.
 
 Multiple templates can be used together. Complete list of featured templates can be found in the documentation.
 User-made templates are also supported.
 
 
-## Application publishing
+## Adding changes
 
-When you're ready to publish issue the following command while in project directory (containing ``pyproject.toml``):
+When you're ready to add another entry to your changelog use `change` command:
 
 ``` bash
-makeapp release
+ma change "+ New 'change' command implemented"
+```
+
+This will also stage and commit all changed files.
+
+## Application publishing
+
+When you're ready to publish issue the following command:
+
+``` bash
+ma release
 ; Bump version number part manually: major, minor, patch
-makeapp release --increment major
+ma release --increment major
 ```
 
 This will automatically:
@@ -58,40 +72,6 @@ This will automatically:
 * tag version in VCS
 * push sources to remote repository
 * upload application package to PyPI
-
-
-## Adding changes
-
-When you're ready to add another entry to your changelog use ``change`` command:
-
-``` bash
-makeapp change "+ New 'change' command implemented"
-```
-
-This will also stage and commit all changed files.
-
-Supported message prefixes and corresponding version number parts incremented 
-on `release` command:
-
-| symbol | meaning                          | version part increment |
-|--------|----------------------------------|------------------------|
-| `+`    | New feature / addition           | minor                  |
-| `!`    | Important change/improvement/fix | patch                  |
-| `-`    | Feature deprecation / removal    | patch                  |
-| `*`    | Minor change/improvement/fix     | patch                  |
-
-
-!!! note
-    `*` prefix is added by default if none of the above-mentioned prefixes found.
-
-
-## Bash completion
-
-To enable bash completion for ``makeapp`` command append the following line into your ``.bashrc``:
-
-``` bash
-eval "$(_MAKEAPP_COMPLETE=source makeapp)"
-```
 
 ## Documentation
 
