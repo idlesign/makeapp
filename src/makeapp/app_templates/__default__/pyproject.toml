@@ -19,7 +19,7 @@ classifiers = [
 license = "{{ license_ident }}"
 license-files = ["LICENSE"]
 
-requires-python = ">=3.10"
+requires-python = ">={{ python_version }}"
 dependencies = [
 {% block deps %}
 {% endblock %}
