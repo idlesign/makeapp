@@ -43,8 +43,7 @@ def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
     assert issued_commands == [
         'git push',
         'git push --tags',
-        'uv build --wheel',
-        'uv build --sdist',
+        'uv build',
         'uv publish'
     ]
 
