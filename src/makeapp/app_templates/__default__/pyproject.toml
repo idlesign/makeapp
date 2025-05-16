@@ -63,9 +63,6 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 path = "src/{{ package_name }}/__init__.py"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/{{ package_name }}"]
-
 [tool.hatch.build.targets.sdist]
 packages = ["src/{{ package_name }}"]
 

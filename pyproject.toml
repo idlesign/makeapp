@@ -47,8 +47,6 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 path = "src/makeapp/__init__.py"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/makeapp"]
 
 [tool.hatch.build.targets.sdist]
 packages = ["src/makeapp"]
