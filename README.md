@@ -17,7 +17,7 @@ https://github.com/idlesign/makeapp
 * Customize new application layouts with skeleton templates.
 * Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
 * Easily add entries to your changelog.
-* Publish your application to remotes (VCS, PyPI) with single command.
+* Publish your application to remotes (VCS, PyPI) with a single command.
 
 
 ## Application scaffolding
