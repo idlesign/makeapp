@@ -51,7 +51,7 @@ path = "src/makeapp/__init__.py"
 packages = ["src/makeapp"]
 
 [tool.hatch.build.targets.sdist]
-packages = ["src/makeapp"]
+packages = ["src/"]
 
 [tool.pytest.ini_options]
 testpaths = [

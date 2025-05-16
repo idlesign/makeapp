@@ -67,7 +67,7 @@ path = "src/{{ package_name }}/__init__.py"
 packages = ["src/{{ package_name }}"]
 
 [tool.hatch.build.targets.sdist]
-packages = ["src/{{ package_name }}"]
+packages = ["src/"]
 
 [tool.pytest.ini_options]
 testpaths = [
