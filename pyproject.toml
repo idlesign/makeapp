@@ -22,6 +22,7 @@ Documentation = "https://makeapp.readthedocs.io/"
 
 [project.scripts]
 makeapp = "makeapp.cli:main"
+ma = "makeapp.cli:main"
 
 [dependency-groups]
 dev = [
