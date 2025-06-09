@@ -130,22 +130,14 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None) -> 
     if env:
         env = {**os.environ, **env}
 
-    LOG.debug(f'Run command: `{command}` ...')
+    LOG.debug(f'Run command: {command} ...')
 
     prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True, env=env)
 
-    data = []
     out, _ = prc.communicate()
-
     LOG.debug(indent(out, prefix="    "))
 
-    for item in out.splitlines():
-        item = item.strip()
-
-        if not item:
-            continue
-
-        data.append(item)
+    data = [stripped for item in out.splitlines() if (stripped := item.strip())]
 
     if prc.returncode:
         raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
