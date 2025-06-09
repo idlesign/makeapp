@@ -182,6 +182,21 @@ def release(increment, debug):
 
 
 @entry_point.command()
+@click.option(
+    '--debug',
+    help='Show debug messages while processing', is_flag=True
+)
+def publish(debug):
+    """Publishes current version to remotes."""
+    if debug:
+        configure_logging(logging.DEBUG)
+
+    project = Project()
+    project.pull()
+    project.publish()
+
+
+@entry_point.command()
 @click.argument('description', nargs=-1)
 def change(description):
     """Fixates a change adding a message to a changelog."""
