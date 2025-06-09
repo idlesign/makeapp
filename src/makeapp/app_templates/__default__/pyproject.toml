@@ -78,7 +78,10 @@ testpaths = [
 source = [
     "src/",
 ]
-omit = []
+omit = [
+{% block cov_omit %}
+{% endblock %}
+]
 
 [tool.coverage.report]
 fail_under = 90.00

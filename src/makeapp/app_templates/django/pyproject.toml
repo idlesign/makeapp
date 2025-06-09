@@ -4,6 +4,10 @@
     "pytest-djangoapp>=1.0.0",
 {% endblock %}
 
+{% block cov_omit %}{{ super() }}
+    "src/{{ package_name }}/migrations/*",
+{% endblock %}
+
 {% block tox_envlist %}
     "py{310,311,312,313}-dj{42,51,52}",
 {% endblock %}
