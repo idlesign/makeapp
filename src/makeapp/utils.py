@@ -112,7 +112,7 @@ def check_command(command: str, *, hint: str):
             f"Check {hint} is installed and available.")
 
 
-def run_command(command: str, *, err_msg: str = '', env: dict = None) -> list[str]:
+def run_command(command: str, *, err_msg: str = '', env: dict | None = None) -> list[str]:
     """Runs a command in a shell process.
 
     Returns a list of strings gathered from a command.
@@ -127,14 +127,16 @@ def run_command(command: str, *, err_msg: str = '', env: dict = None) -> list[st
 
     """
     if env:
-        env = dict(os.environ, **env)
-
-    prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True, env=env)
+        env = {**os.environ, **env}
 
     LOG.debug(f'Run command: `{command}` ...')
 
+    prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True, env=env)
+
     data = []
     out, _ = prc.communicate()
+
+    LOG.debug(f'Command output:\n`{out}`')
 
     for item in out.splitlines():
         item = item.strip()
@@ -145,6 +147,6 @@ def run_command(command: str, *, err_msg: str = '', env: dict = None) -> list[st
         data.append(item)
 
     if prc.returncode:
-        raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
+        raise CommandError(err_msg or f"Command '{command}' failed: {'\n'.join(data)}")
 
     return data
