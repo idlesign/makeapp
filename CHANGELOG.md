@@ -5,6 +5,7 @@
 * !! Big rewrite. Now uses up-to-date conventions and technologies.
 * ++ Add 'ma' alias for 'makeapp' command.
 * ++ Added virtual environment creation on project rollout.
+* ++ CLI. Add 'publish' command.
 * ++ CLI. Added 'venv reset' command.
 * ++ CLI. Descriptions passed to 'change' command all go into a commit messages.
 * ** Added QA for Py 3.11, 3.12, 3.13.

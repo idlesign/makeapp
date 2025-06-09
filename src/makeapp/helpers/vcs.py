@@ -45,7 +45,7 @@ class VcsHelper:
 
         return helper
 
-    def run_command(self, command):
+    def run_command(self, command: str):
         """Basic command runner to implement."""
         return run_command(f'{self.alias} {command}')
 
