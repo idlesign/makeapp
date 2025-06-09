@@ -29,7 +29,7 @@ def configure_logging(
     :param format:
 
     """
-    logging.basicConfig(format=format, level=level if logger else None)
+    logging.basicConfig(format=format, level=level if level else None)
     logger and logger.setLevel(level or logging.INFO)
 
 
