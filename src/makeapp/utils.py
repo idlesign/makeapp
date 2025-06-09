@@ -9,6 +9,7 @@ from configparser import ConfigParser
 from contextlib import contextmanager
 from pathlib import Path
 from subprocess import Popen, PIPE, STDOUT
+from textwrap import indent
 from typing import Generator
 
 from .exceptions import CommandError
@@ -136,7 +137,7 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None) -> 
     data = []
     out, _ = prc.communicate()
 
-    LOG.debug(f'Command output:\n`{out}`')
+    LOG.debug(indent(out, prefix="    "))
 
     for item in out.splitlines():
         item = item.strip()
