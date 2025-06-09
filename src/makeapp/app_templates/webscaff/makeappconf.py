@@ -3,7 +3,7 @@ import shutil
 from functools import partial
 
 from makeapp.appconfig import Config, ConfigSetting
-from makeapp.utils import temp_dir, replace_infile, run_command
+from makeapp.utils import replace_infile, run_command, temp_dir
 
 join = os.path.join  # Short alias
 

@@ -1,7 +1,6 @@
-import io
 import logging
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 LOG = logging.getLogger(__name__)
 
@@ -21,7 +20,7 @@ class FileHelper:
         :param fpath: File path
 
         """
-        with io.open(fpath, encoding='utf-8') as f:
+        with open(fpath) as f:
             data = f.read().splitlines()
 
         return data
@@ -31,7 +30,7 @@ class FileHelper:
 
         LOG.debug(f'Writing `{self.filepath}` ...')
 
-        with io.open(self.filepath, 'w', encoding='utf-8') as f:
+        with open(self.filepath, 'w') as f:
             f.write('\n'.join(self.contents))
 
     def line_replace(self, value: str, offset: int = 0):

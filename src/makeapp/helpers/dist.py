@@ -1,6 +1,6 @@
 from shutil import rmtree
 
-from ..utils import run_command, check_command, get_user_dir, read_ini, LOG
+from ..utils import LOG, check_command, get_user_dir, read_ini, run_command
 
 
 class DistHelper:

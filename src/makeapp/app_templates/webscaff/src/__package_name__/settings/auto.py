@@ -6,8 +6,7 @@ from env_X.py module appropriate for the current environment --
 for example for development environment it'll load symbols from `settings_development.py`.
 
 """
-from envbox import import_by_environment, get_environment
-
+from envbox import get_environment, import_by_environment
 
 current_env = import_by_environment(
     # For production one can place `/var/lib/{{ package_name }}/environ` file with `production` as it contents.

@@ -1,4 +1,3 @@
-import configparser
 import logging
 import os
 import re
@@ -8,12 +7,12 @@ from typing import Any
 
 import requests
 
-from .apptemplate import TemplateFile, AppTemplate
+from .apptemplate import AppTemplate, TemplateFile
 from .exceptions import AppMakerException
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
 from .rendering import Renderer
-from .utils import chdir, configure_logging, PYTHON_VERSION, get_user_dir, read_ini
+from .utils import PYTHON_VERSION, chdir, configure_logging, get_user_dir, read_ini
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 BASE_PATH = os.path.dirname(__file__)

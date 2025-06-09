@@ -5,12 +5,12 @@ import os
 import shutil
 import sys
 import tempfile
+from collections.abc import Generator
 from configparser import ConfigParser
 from contextlib import contextmanager
 from pathlib import Path
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import PIPE, STDOUT, Popen
 from textwrap import indent
-from typing import Generator
 
 from .exceptions import CommandError
 

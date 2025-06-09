@@ -1,6 +1,6 @@
 from textwrap import dedent
 
-from makeapp.apptools import Project, ChangelogData
+from makeapp.apptools import ChangelogData, Project
 from makeapp.helpers.vcs import VcsHelper
 
 

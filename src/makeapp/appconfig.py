@@ -1,7 +1,7 @@
 from pathlib import Path
 from shutil import rmtree
 from time import sleep
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import click
 

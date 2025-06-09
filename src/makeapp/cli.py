@@ -10,7 +10,7 @@ from .exceptions import MakeappException
 try:
     from . import VERSION
     from .appmaker import AppMaker
-    from .apptools import Project, VERSION_NUMBER_CHUNKS
+    from .apptools import VERSION_NUMBER_CHUNKS, Project
     from .utils import configure_logging
 
 except MakeappException as e:

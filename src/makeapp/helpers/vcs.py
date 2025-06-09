@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from ..exceptions import ProjectorExeption, CommandError
+from ..exceptions import CommandError, ProjectorExeption
 from ..utils import run_command
 
 

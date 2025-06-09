@@ -1,6 +1,6 @@
 import importlib.util
 import os
-from typing import Type, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from .appconfig import Config
 from .exceptions import AppMakerException
@@ -55,7 +55,7 @@ class AppTemplate:
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
-            config: Type[Config] = getattr(module, self.config_attr, None)
+            config: type[Config] = getattr(module, self.config_attr, None)
 
             if not issubclass(config, Config):
                 raise AppMakerException(
@@ -186,7 +186,7 @@ class AppTemplate:
 class TemplateFile:
     """Represents app template file info."""
 
-    __slots__ = ['template', 'path_full', 'path_rel']
+    __slots__ = ['path_full', 'path_rel', 'template']
 
     def __init__(self, template: AppTemplate, path_full: str, path_rel: str):
         """

@@ -32,7 +32,7 @@ class DataContainer:
 
     @classmethod
     def get(cls, *args, **kwargs):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def write(self):
         """Writes file changes to FS."""
