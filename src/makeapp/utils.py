@@ -147,6 +147,6 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None) -> 
         data.append(item)
 
     if prc.returncode:
-        raise CommandError(err_msg or f"Command '{command}' failed: {'\n'.join(data)}")
+        raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
 
     return data
