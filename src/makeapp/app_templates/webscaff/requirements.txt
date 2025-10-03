@@ -1,7 +1,7 @@
 # Don't forget to pin down these requirements to certain versions in your project.
 
-Django>=4.1.5
+Django>=5.2.7
 envbox>=1.3.0
-psycopg2>=2.9.5
-uwsgi>=2.0.21
-uwsgiconf[cli]>=1.0.0
+psycopg2>=2.9.10
+uwsgi>=2.0.30
+uwsgiconf[cli]>=2.2.1

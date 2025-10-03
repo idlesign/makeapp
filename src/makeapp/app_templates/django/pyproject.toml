@@ -1,7 +1,7 @@
 {% extends parent_template %}
 
 {% block deps_tests %}{{ super() }}
-    "pytest-djangoapp>=1.0.0",
+    "pytest-djangoapp>=1.6.0",
 {% endblock %}
 
 {% block cov_omit %}{{ super() }}
