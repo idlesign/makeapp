@@ -1,7 +1,7 @@
 [project]
 name = "makeapp"
 dynamic = ["version"]
-description = "Simplifies Python application rollout and publishing."
+description = "Simplifies routine Python application development processes."
 authors = [
     { name = "Igor Starikov", email = "idlesign@yandex.ru" }
 ]

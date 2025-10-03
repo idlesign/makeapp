@@ -195,16 +195,21 @@ def change(debug, description):
     click.secho('Done', fg='green')
 
 
-@entry_point.group()
-def venv():
-    """Virtual environment related commands."""
-
-
-@venv.command()
+@entry_point.command()
 @option_debug
-def reset(debug):
-    """Remove old virtual environment and generate a new one."""
-    Project(log_level=logging.DEBUG if debug else logging.INFO).venv_init(reset=True)
+@click.option(
+    '-t', '--tool',
+    help='Register application CLI as a tool', is_flag=True
+)
+@click.option(
+    '-r', '--reset',
+    help='Remove virtual environment files before bootstrap', is_flag=True
+)
+def up(debug, tool, reset):
+    """Bootstrap environment for development."""
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+    project.venv_init(reset=reset, register_tool=tool)
+    click.secho('Done', fg='green')
 
 
 def main():

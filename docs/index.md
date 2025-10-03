@@ -4,7 +4,7 @@
 
 ## Description
 
-*Simplifies Python application rollout and publishing.*
+*Simplifies routine Python application development processes.*
 
 * Make a skeleton for your new application with one console command.
 * Automatically create a VCS repository for your application.
@@ -13,6 +13,7 @@
 * Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
 * Easily add entries to your changelog.
 * Publish your application to remotes (VCS, PyPI) with single command.
+* Easily bootstrap your development environment.
 
 
 ## Requirements

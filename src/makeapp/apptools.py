@@ -501,10 +501,9 @@ class Project:
             self.vcs.push()
             DistHelper.upload()
 
-    def venv_init(self, *, reset: bool = False, register: bool = False):
-        LOG.info(f'Initializing virtual environment [{reset=}, {register=}] ...')
+    def venv_init(self, *, reset: bool = False, register_tool: bool = False):
+        LOG.info(f'Initializing virtual environment [{reset=}, {register_tool=}] ...')
 
         self.venv.initialize(reset=reset)
 
-        if register:
-            self.venv.register_tool()
+        register_tool and self.venv.register_tool()

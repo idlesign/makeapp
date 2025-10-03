@@ -9,7 +9,7 @@ https://github.com/idlesign/makeapp
 
 ## Description
 
-*Simplifies Python application rollout and publishing.*
+*Simplifies routine Python application development processes.*
 
 * Make a skeleton for your new application with one console command.
 * Automatically create a VCS repository for your application.
@@ -18,7 +18,7 @@ https://github.com/idlesign/makeapp
 * Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
 * Easily add entries to your changelog.
 * Publish your application to remotes (VCS, PyPI) with a single command.
-
+* Easily bootstrap your development environment.
 
 ## Application scaffolding
 
@@ -72,6 +72,17 @@ This will automatically:
 * tag version in VCS
 * push sources to remote repository
 * upload application package to PyPI
+
+
+## Dev environment bootstrap
+
+Or you just want to participate in the development of some other app.
+
+Use `up` initialize the environment to develop that application. 
+
+``` bash
+ma up
+```
 
 ## Documentation
 

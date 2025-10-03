@@ -6,7 +6,7 @@
 * ++ Add 'ma' alias for 'makeapp' command.
 * ++ Added virtual environment creation on project rollout.
 * ++ CLI. Add 'publish' command.
-* ++ CLI. Added 'venv reset' command.
+* ++ CLI. Added 'up' command.
 * ++ CLI. Descriptions passed to 'change' command all go into a commit messages.
 * ** Added QA for Py 3.11, 3.12, 3.13.
 * ** Dropped QA for Py 3.7, 3.8, 3.9.
