@@ -363,9 +363,6 @@ class Project:
         self.vcs = VcsHelper.get(project_path)
         self.venv = VenvHelper(project_path)
 
-        with chdir(self.project_path):
-            self._gather_data()
-
     def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
         """Switches on logging at a given level.
 
@@ -377,33 +374,38 @@ class Project:
 
     def _gather_data(self):
         """Gathers data relevant for project related functions."""
-        project_path = self.project_path
 
-        LOG.debug(f'Gathering info from `{project_path}` directory ...')
+        if self.package or self.changelog:
+            return
 
-        marker_file = 'pyproject.toml'
+        with chdir(self.project_path):
+            project_path = self.project_path
 
-        if not os.path.isfile(marker_file):
-            raise ProjectorExeption(f'No `{marker_file}` file found in the current directory.')
+            LOG.debug(f'Gathering info from `{project_path}` directory ...')
 
-        self.vcs.check()
+            marker_file = 'pyproject.toml'
 
-        parent_dirname = project_path.parent.name
+            if not os.path.isfile(marker_file):
+                raise ProjectorExeption(f'No `{marker_file}` file found in the current directory.')
 
-        packages = self.find_packages(project_path, prefer=parent_dirname)
-        if not packages:
-            # src layout
-            packages = self.find_packages(project_path / 'src', prefer=parent_dirname)
+            self.vcs.check()
 
-        LOG.debug(f'Found packages: {packages}')
+            parent_dirname = project_path.parent.name
 
-        if not packages:
-            raise ProjectorExeption('No package found.')
+            packages = self.find_packages(project_path, prefer=parent_dirname)
+            if not packages:
+                # src layout
+                packages = self.find_packages(project_path / 'src', prefer=parent_dirname)
 
-        package = packages[0]
+            LOG.debug(f'Found packages: {packages}')
 
-        self.package = PackageData.get(package_path=package)
-        self.changelog = ChangelogData.get()
+            if not packages:
+                raise ProjectorExeption('No package found.')
+
+            package = packages[0]
+
+            self.package = PackageData.get(package_path=package)
+            self.changelog = ChangelogData.get()
 
     def pull(self):
         """Pulls changes from a remote repository"""
@@ -417,6 +419,7 @@ class Project:
             If not set, will be deduced from changelog data.
 
         """
+        self._gather_data()
         changelog = self.changelog
 
         increment = increment or changelog.deduce_version_increment()
@@ -435,6 +438,7 @@ class Project:
         * Adds changelog info
         * Tags VCS
         """
+        self._gather_data()
         vcs = self.vcs
 
         with chdir(self.project_path):
@@ -458,6 +462,7 @@ class Project:
         :param stage_modified: Whether to stage modified files to commit.
 
         """
+        self._gather_data()
         LOG.debug('Adding change ...')
 
         with chdir(self.project_path):
@@ -502,8 +507,6 @@ class Project:
             DistHelper.upload()
 
     def venv_init(self, *, reset: bool = False, register_tool: bool = False):
-        LOG.info(f'Initializing virtual environment [{reset=}, {register_tool=}] ...')
-
         self.venv.initialize(reset=reset)
 
         register_tool and self.venv.register_tool()

@@ -16,6 +16,8 @@ class VenvHelper:
         self.venv_path = Path(project_path) / self.dirname
 
     def initialize(self, *, reset: bool = False):
+        LOG.info(f'Initializing virtual environment [{reset=}] ...')
+
         if reset:
             self.remove()
 
