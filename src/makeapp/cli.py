@@ -206,9 +206,22 @@ def change(debug, description):
     help='Remove virtual environment files before bootstrap', is_flag=True
 )
 def up(debug, tool, reset):
-    """Bootstrap environment for development."""
+    """Bootstrap environment for current project development."""
     project = Project(log_level=logging.DEBUG if debug else logging.INFO)
     project.venv_init(reset=reset, register_tool=tool)
+    click.secho('Done', fg='green')
+
+
+@entry_point.command()
+@option_debug
+@click.option(
+    '-u', '--upgrade',
+    help='Upgrade tools', is_flag=True
+)
+def tools(debug, upgrade):
+    """Bootstrap tools for projects development."""
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+    project.tools_init(upgrade=upgrade)
     click.secho('Done', fg='green')
 
 

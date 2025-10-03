@@ -8,7 +8,7 @@ from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
-from .utils import chdir, configure_logging
+from .utils import chdir, configure_logging, run_command, Uv
 
 LOG = logging.getLogger(__name__)
 
@@ -510,3 +510,25 @@ class Project:
         self.venv.initialize(reset=reset)
 
         register_tool and self.venv.register_tool()
+
+    def tools_init(self, upgrade: bool = False):
+        LOG.info(f'{"Upgrading" if upgrade else "Bootstrapping"} development tools ...')
+
+        tools_default = [
+            'tox',
+            'ruff==0.13.1',
+        ]
+
+        method = Uv.tool_upgrade if upgrade else Uv.tool_install
+
+        LOG.info(f'Processing uv ...')
+
+        if upgrade:
+            Uv.upgrade()
+        else:
+            Uv.install()
+
+        for tool in tools_default:
+            LOG.info(f'Processing {tool} ...')
+
+            method(tool.partition('=')[0])

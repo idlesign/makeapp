@@ -1,5 +1,15 @@
 # Quickstart
 
+## Before start
+
+Makeapp may install basic development tools (`uv`, `ruff`) for you:
+
+```bash
+ma tools
+
+; Upgrade with
+ma tools -u
+```
 
 ## Application scaffolding
 

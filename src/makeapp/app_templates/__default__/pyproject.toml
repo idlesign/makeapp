@@ -42,17 +42,16 @@ Homepage = "{{ url }}"
 dev = [
     {include-group = "linters"},
     {include-group = "tests"},
-    {% block deps_dev %}
-    {% endblock %}
+{% block deps_dev %}
+{% endblock %}
 ]
 linters = [
-    "ruff",
+{% block deps_linters %}
+{% endblock %}
 ]
 tests = [
     {% block deps_tests %}
     "pytest",
-    "tox",
-    "tox-uv",
     {% endblock %}
 ]
 

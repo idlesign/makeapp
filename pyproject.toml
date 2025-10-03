@@ -35,7 +35,6 @@ docs = [
     "mkdocs-navsorted-plugin",
 ]
 linters = [
-    "ruff",
 ]
 tests = [
     "pytest",

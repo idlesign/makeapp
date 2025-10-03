@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from shutil import rmtree
 
-from ..utils import run_command
+from ..utils import Uv
 
 LOG = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class VenvHelper:
         if reset:
             self.remove()
 
-        run_command('uv sync')
+        Uv.sync()
 
     def remove(self):
         path = self.venv_path
@@ -30,4 +30,4 @@ class VenvHelper:
 
     def register_tool(self):
         LOG.info(f'Registering application CLI as a tool ...')
-        run_command('uv tool install --force -e .')
+        Uv.tool_install('--force -e .')

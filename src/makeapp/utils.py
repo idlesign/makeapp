@@ -113,16 +113,15 @@ def check_command(command: str, *, hint: str):
             f"Check {hint} is installed and available.")
 
 
-def run_command(command: str, *, err_msg: str = '', env: dict | None = None) -> list[str]:
+def run_command(command: str, *, err_msg: str = '', env: dict | None = None, capture: bool = True) -> list[str]:
     """Runs a command in a shell process.
 
     Returns a list of strings gathered from a command.
 
     :param command:
-
     :param err_msg: Message to show on error.
-
     :param env: Environment variables to use.
+    :param capture: Capture stdout and stderr and return as lines.
 
     :raises: CommandError
 
@@ -131,15 +130,50 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None) -> 
         env = {**os.environ, **env}
 
     LOG.debug(f'Run command: {command} ...')
+    kwargs = {}
 
-    prc = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True, universal_newlines=True, env=env)
+    if capture:
+        kwargs = {'stdout': PIPE, 'stderr': STDOUT}
 
+    prc = Popen(command, shell=True, universal_newlines=True, env=env, **kwargs)
     out, _ = prc.communicate()
-    LOG.debug(indent(out, prefix="    "))
 
-    data = [stripped for item in out.splitlines() if (stripped := item.strip())]
+    if out:
+        LOG.debug(indent(out, prefix="    "))
+        data = [stripped for item in out.splitlines() if (stripped := item.strip())]
+
+    else:
+        data = []
 
     if prc.returncode:
         raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
 
     return data
+
+
+class Uv:
+    """Uv wrapper."""
+
+    @classmethod
+    def _run(cls, cmd: str) -> list[str]:
+        return run_command(f'uv {cmd}', capture=False)
+
+    @classmethod
+    def upgrade(cls) -> list[str]:
+        return cls._run('self update')
+
+    @classmethod
+    def tool_install(cls, name: str) -> list[str]:
+        return cls._run(f'tool install {name}')
+
+    @classmethod
+    def tool_upgrade(cls, name: str) -> list[str]:
+        return cls._run(f'tool upgrade {name} --reinstall')
+
+    @classmethod
+    def sync(cls) -> list[str]:
+        return cls._run('sync')
+
+    @classmethod
+    def install(cls):
+        return run_command('curl -LsSf https://astral.sh/uv/install.sh | sh', capture=False)
