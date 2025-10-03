@@ -18,6 +18,12 @@ except MakeappException as e:
     sys.exit()
 
 
+option_debug = click.option(
+    '--debug',
+    help='Show debug messages while processing', is_flag=True
+)
+
+
 @click.group()
 @click.version_option(version=VERSION)
 def entry_point():
@@ -33,9 +39,7 @@ def entry_point():
 )
 @click.argument('app_name')
 @click.argument('target_path')
-@click.option(
-    '--debug', is_flag=True,
-    help='Show debug messages while processing')
+@option_debug
 @click.option(
     '-d', '--description',
     help='Short application description')
@@ -90,11 +94,7 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
         'templates_to_use': (kwargs['templates_to_use'] or '').split(',') or None,
     }
 
-    log_level = None
-    if debug:
-        log_level = logging.DEBUG
-
-    app_maker = AppMaker(app_name, log_level=log_level, **app_maker_kwargs)
+    app_maker = AppMaker(app_name, log_level=logging.DEBUG if debug else None, **app_maker_kwargs)
 
     app_maker.update_settings_complex(
         config=configuration_file,
@@ -149,16 +149,10 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     '-i', '--increment',
     help='Version number chunk to increment', type=click.Choice(VERSION_NUMBER_CHUNKS)
 )
-@click.option(
-    '--debug',
-    help='Show debug messages while processing', is_flag=True
-)
+@option_debug
 def release(increment, debug):
     """Performs new application version release."""
-    if debug:
-        configure_logging(logging.DEBUG)
-
-    project = Project()
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
 
     project.pull()
 
@@ -182,25 +176,22 @@ def release(increment, debug):
 
 
 @entry_point.command()
-@click.option(
-    '--debug',
-    help='Show debug messages while processing', is_flag=True
-)
+@option_debug
 def publish(debug):
     """Publishes current version to remotes."""
-    if debug:
-        configure_logging(logging.DEBUG)
-
-    project = Project()
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
     project.pull()
     project.publish()
 
+    click.secho('Done', fg='green')
+
 
 @entry_point.command()
+@option_debug
 @click.argument('description', nargs=-1)
-def change(description):
+def change(debug, description):
     """Fixates a change adding a message to a changelog."""
-    Project().add_change(description)
+    Project(log_level=logging.DEBUG if debug else logging.INFO).add_change(description)
     click.secho('Done', fg='green')
 
 
@@ -210,9 +201,10 @@ def venv():
 
 
 @venv.command()
-def reset():
+@option_debug
+def reset(debug):
     """Remove old virtual environment and generate a new one."""
-    Project().venv_init(reset=True)
+    Project(log_level=logging.DEBUG if debug else logging.INFO).venv_init(reset=True)
 
 
 def main():
