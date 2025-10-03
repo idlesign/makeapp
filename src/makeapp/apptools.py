@@ -8,7 +8,7 @@ from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
-from .utils import chdir, configure_logging, run_command, Uv
+from .utils import chdir, configure_logging, Uv
 
 LOG = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ class PackageData(DataContainer):
         if len(version) < 3:
             raise ProjectorExeption(f'Unsupported version format: {version}.')
 
-        LOG.info(f'Current version from package: `{version}`')
+        LOG.info(f'Current version from package: `{".".join(map(str, version))}`')
 
         result = PackageData(
             version=version,

@@ -78,7 +78,7 @@ This will automatically:
 
 Or you just want to participate in the development of some other app.
 
-Use `up` initialize tools and the environment to develop that application. 
+Use `tools` and `up` commands to initialize tools and the environment to develop the application. 
 
 ``` bash
 ma tools
