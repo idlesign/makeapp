@@ -151,6 +151,18 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None, cap
     return data
 
 
+class Ruff:
+    """Ruff wrapper."""
+
+    @classmethod
+    def _run(cls, cmd: str) -> list[str]:
+        return run_command(f'ruff {cmd}', capture=False)
+
+    @classmethod
+    def check(cls, fix: bool = True) -> list[str]:
+        return cls._run(f'check{" --fix" if fix else ""}')
+
+
 class Uv:
     """Uv wrapper."""
 

@@ -8,7 +8,7 @@ from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
-from .utils import chdir, configure_logging, Uv
+from .utils import chdir, configure_logging, Uv, Ruff
 
 LOG = logging.getLogger(__name__)
 
@@ -505,6 +505,10 @@ class Project:
         with chdir(self.project_path):
             self.vcs.push()
             DistHelper.upload()
+
+    def style(self):
+        LOG.info('Styling ...')
+        Ruff.check()
 
     def venv_init(self, *, reset: bool = False, register_tool: bool = False):
         self.venv.initialize(reset=reset)

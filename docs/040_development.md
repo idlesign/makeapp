@@ -30,3 +30,11 @@ to drop the old one altogether and create a new one. Use the following command:
 ma up -r
 # or ma up --reset
 ```
+
+## Style code
+
+To style/lint your code use the following command: 
+
+```bash
+ma style
+```

@@ -225,6 +225,15 @@ def tools(debug, upgrade):
     click.secho('Done', fg='green')
 
 
+@entry_point.command()
+@option_debug
+def style(debug):
+    """Apply code style."""
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+    project.style()
+    click.secho('Done', fg='green')
+
+
 def main():
     try:
         entry_point(obj={})

@@ -6,6 +6,7 @@
 * ++ Add 'ma' alias for 'makeapp' command.
 * ++ Added virtual environment creation on project rollout.
 * ++ CLI. Add 'publish' command.
+* ++ CLI. Added 'style' command.
 * ++ CLI. Added 'tools' command.
 * ++ CLI. Added 'up' command.
 * ++ CLI. Descriptions passed to 'change' command all go into a commit messages.

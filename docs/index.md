@@ -14,6 +14,7 @@
 * Easily add entries to your changelog.
 * Publish your application to remotes (VCS, PyPI) with single command.
 * Easily bootstrap your development environment.
+* Run code styling/linting.
 
 
 ## Requirements

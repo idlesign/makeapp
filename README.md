@@ -19,6 +19,7 @@ https://github.com/idlesign/makeapp
 * Easily add entries to your changelog.
 * Publish your application to remotes (VCS, PyPI) with a single command.
 * Easily bootstrap your development environment.
+* Run code styling/linting.
 
 ## Application scaffolding
 
@@ -83,6 +84,14 @@ Use `tools` and `up` commands to initialize tools and the environment to develop
 ``` bash
 ma tools
 ma up
+```
+
+## Code style
+
+Apply code style with `style` command:
+
+``` bash
+ma style
 ```
 
 ## Documentation
