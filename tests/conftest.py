@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+os.environ['UV_NO_DEV'] = '1'  # disable dev packages in venv to speedup tests
 
 @pytest.fixture
 def get_appmaker():
