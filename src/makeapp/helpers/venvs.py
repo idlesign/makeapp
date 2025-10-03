@@ -16,10 +16,16 @@ class VenvHelper:
         self.venv_path = Path(project_path) / self.dirname
 
     def initialize(self, *, reset: bool = False):
-        path = self.venv_path
-
         if reset:
-            LOG.debug(f'Remove {path} ...')
-            rmtree(f'{path}', ignore_errors=True)
+            self.remove()
 
         run_command('uv sync')
+
+    def remove(self):
+        path = self.venv_path
+        LOG.info(f'Removing {path} ...')
+        rmtree(f'{path}', ignore_errors=True)
+
+    def register_tool(self):
+        LOG.info(f'Registering application CLI as a tool ...')
+        run_command('uv tool install --force -e .')
