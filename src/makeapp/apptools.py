@@ -8,7 +8,7 @@ from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
-from .utils import chdir
+from .utils import chdir, configure_logging
 
 LOG = logging.getLogger(__name__)
 
@@ -348,11 +348,14 @@ class Project:
 
         return packages_found
 
-    def __init__(self, project_path: Path = None):
+    def __init__(self, project_path: Path = None, *, log_level: int = None):
         """
         :param project_path: Application root (containing pyproject.toml) path.
+        :param log_level: Logging level
 
         """
+        self.configure_logging(log_level)
+
         project_path = project_path or os.getcwd()
         self.project_path = Path(project_path)
         self.package: PackageData | None = None
@@ -362,6 +365,15 @@ class Project:
 
         with chdir(self.project_path):
             self._gather_data()
+
+    def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
+        """Switches on logging at a given level.
+
+        :param verbosity_lvl:
+        :param format:
+
+        """
+        configure_logging(verbosity_lvl, logger=LOG, format=format)
 
     def _gather_data(self):
         """Gathers data relevant for project related functions."""

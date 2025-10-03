@@ -85,7 +85,7 @@ class AppMaker:
         :param app_name: Application name
         :param templates_to_use: Templates names or paths to use for skeleton creation
         :param templates_path: A path where application skeleton templates reside
-        :param log_level: Logging
+        :param log_level: Logging level
 
         """
         self.logger = logging.getLogger(self.__class__.__name__)
