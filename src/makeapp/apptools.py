@@ -496,7 +496,7 @@ class Project:
                 )
 
             self.vcs.add(files_to_stage)
-            self.vcs.commit(commit_message)
+            self.vcs.commit(commit_message.strip())
 
     def publish(self):
         """Uploads project data to remote VCS and Python Package Index server."""
