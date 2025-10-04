@@ -1,7 +1,7 @@
 # makeapp changelog
 
 
-### Unreleased
+### v2.0.0 [2025-10-04]
 * !! Big rewrite. Now uses up-to-date conventions and technologies.
 * ++ Add 'ma' alias for 'makeapp' command.
 * ++ Added virtual environment creation on project rollout.
