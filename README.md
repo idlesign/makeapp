@@ -19,6 +19,7 @@ https://github.com/idlesign/makeapp
 * Easily add entries to your changelog.
 * Publish your application to remotes (VCS, PyPI) with a single command.
 * Easily bootstrap your development environment.
+* Build and local serve the docs.
 * Run code styling/linting.
 
 ## Application scaffolding
@@ -92,6 +93,15 @@ Apply code style with `style` command:
 
 ``` bash
 ma style
+```
+
+
+## Build/serve docs
+
+Use `docs` command:
+
+``` bash
+ma docs
 ```
 
 ## Documentation

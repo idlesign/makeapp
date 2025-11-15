@@ -163,6 +163,22 @@ class Ruff:
         return cls._run(f'check{" --fix" if fix else ""}')
 
 
+class MkDocs:
+    """MkDocs wrapper."""
+
+    @classmethod
+    def _run(cls, cmd: str) -> list[str]:
+        return run_command(f'mkdocs {cmd}', capture=False)
+
+    @classmethod
+    def serve(cls) -> list[str]:
+        return cls._run('serve -o')
+
+    @classmethod
+    def build(cls) -> list[str]:
+        return cls._run('build')
+
+
 class Uv:
     """Uv wrapper."""
 

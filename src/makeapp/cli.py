@@ -234,6 +234,19 @@ def style(debug):
     click.secho('Done', fg='green')
 
 
+@entry_point.command()
+@option_debug
+@click.option(
+    '-b', '--build',
+    help='Build only. Do not serve', is_flag=True
+)
+def docs(debug, build):
+    """Build/serve documentation."""
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+    project.docs(serve=not build)
+    click.secho('Done', fg='green')
+
+
 def main():
     try:
         entry_point(obj={})

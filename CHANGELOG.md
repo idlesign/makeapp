@@ -1,6 +1,9 @@
 # makeapp changelog
 
 
+### Unreleased
+* ++ Add 'ma docs' command.
+
 ### v2.0.0 [2025-10-04]
 * !! Big rewrite. Now uses up-to-date conventions and technologies.
 * ++ Add 'ma' alias for 'makeapp' command.

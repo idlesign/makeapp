@@ -8,7 +8,7 @@ from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
-from .utils import chdir, configure_logging, Uv, Ruff
+from .utils import chdir, configure_logging, Uv, Ruff, MkDocs
 
 LOG = logging.getLogger(__name__)
 
@@ -509,6 +509,10 @@ class Project:
     def style(self):
         LOG.info('Styling ...')
         Ruff.check()
+
+    def docs(self, *, serve: bool = True):
+        LOG.info('Making docs ...')
+        MkDocs.serve() if serve else MkDocs.build()
 
     def venv_init(self, *, reset: bool = False, register_tool: bool = False):
         self.venv.initialize(reset=reset)

@@ -38,3 +38,11 @@ To style/lint your code use the following command:
 ```bash
 ma style
 ```
+
+## Build/serve docs
+
+Use `docs` command:
+
+``` bash
+ma docs
+```
