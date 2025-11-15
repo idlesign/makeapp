@@ -1,7 +1,7 @@
 # makeapp changelog
 
 
-### Unreleased
+### v2.1.0 [2025-11-15]
 * ++ Add 'ma docs' command.
 
 ### v2.0.0 [2025-10-04]
