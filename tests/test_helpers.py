@@ -14,7 +14,6 @@ class TestTestsHelper:
             {'django-version': 3.0, 'python-version': '3.10'},
             {'django-version': 4.0, 'python-version': '3.10'},
             {'django-version': 5.0, 'python-version': '3.10'},
-            {'django-version': 6.0, 'python-version': '3.10'},
             {'django-version': 2.0, 'python-version': 3.11},
             {'django-version': 3.0, 'python-version': 3.11},
             {'django-version': 4.0, 'python-version': 3.11},
