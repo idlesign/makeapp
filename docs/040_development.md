@@ -46,3 +46,12 @@ Use `docs` command:
 ``` bash
 ma docs
 ```
+
+
+## Run tests
+
+Use `tests` command:
+
+``` bash
+ma tests
+```

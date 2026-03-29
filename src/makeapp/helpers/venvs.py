@@ -29,5 +29,5 @@ class VenvHelper:
         rmtree(f'{path}', ignore_errors=True)
 
     def register_tool(self):
-        LOG.info(f'Registering application CLI as a tool ...')
+        LOG.info('Registering application CLI as a tool ...')
         Uv.tool_install('--force -e .')

@@ -1,10 +1,10 @@
 import os
+from contextlib import chdir
 from typing import TYPE_CHECKING
 
 from jinja2 import Environment, FileSystemLoader
 
 from .apptemplate import TemplateFile
-from .utils import chdir
 
 if TYPE_CHECKING:
     from .appmaker import AppMaker

@@ -1,6 +1,9 @@
 # makeapp changelog
 
 
+### Unreleased
+* ++ Add experimental 'tests' command (tox replacement).
+
 ### v2.1.0 [2025-11-15]
 * ++ Add 'ma docs' command.
 

@@ -13,15 +13,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.11, 3.12, 3.13, 3.14]
-        django-version: [4.2, 5.1, 5.2, 6.0]
+        python-version: ["3.10", 3.11, 3.12, 3.14]
+        django-version: [2.0, 3.0, 4.0, 5.0, 6.0]
 
         exclude:
+          - python-version: 3.14
+            django-version: 2.0
+          - python-version: 3.14
+            django-version: 3.0
+          - python-version: 3.14
+            django-version: 4.0
+
+          - python-version: 3.12
+            django-version: 2.0
+
           - python-version: 3.11
             django-version: 6.0
 
+          - python-version: 3.10
+            django-version: 6.0
+
     steps:
-{% raw %}
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }} & Django ${{ matrix.django-version }}
       uses: actions/setup-python@v5
@@ -32,15 +44,10 @@ jobs:
     - name: Install deps
       run: |
         uv sync --only-group tests
-        uv pip install coveralls "django~=${{ matrix.django-version }}.0"
-    - uses: astral-sh/ruff-action@v3
-      with:
-        version: 0.13.1
-        args: check
+        uv pip install coveralls "Django~=${{ matrix.django-version }}.0"
     - name: Run tests
       env:
         GITHUB_TOKEN: ${{ secrets.github_token }}
-{% endraw %}
       run: |
         uv run coverage run -m pytest
         uv run coveralls --service=github

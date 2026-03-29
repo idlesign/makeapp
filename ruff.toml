@@ -1,4 +1,4 @@
-target-version = "py310"
+target-version = "py311"
 line-length = 120
 exclude = [
     "**/*.toml",
@@ -44,4 +44,7 @@ ignore = []
 
 
 [lint.extend-per-file-ignores]
+"src/*" = [
+    "G004",
+]
 "tests/*" = []

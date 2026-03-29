@@ -50,23 +50,6 @@ def read_ini(fpath: Path) -> ConfigParser:
 
 
 @contextmanager
-def chdir(target_path):
-    """Context manager.
-     
-    Temporarily switches the current working directory.
-    
-    """
-    curr_dir = os.getcwd()
-    os.chdir(target_path)
-
-    try:
-        yield
-
-    finally:
-        os.chdir(curr_dir)
-
-
-@contextmanager
 def temp_dir() -> Generator[str, None, None]:
     """Context manager to temporarily create a directory."""
 
@@ -107,10 +90,10 @@ def check_command(command: str, *, hint: str):
     try:
         run_command(f'type {command}')
 
-    except CommandError:
+    except CommandError as e:
         raise CommandError(
             f"Failed to execute '{command}' command. "
-            f"Check {hint} is installed and available.")
+            f"Check {hint} is installed and available.") from e
 
 
 def run_command(command: str, *, err_msg: str = '', env: dict | None = None, capture: bool = True) -> list[str]:
@@ -159,7 +142,7 @@ class Ruff:
         return run_command(f'ruff {cmd}', capture=False)
 
     @classmethod
-    def check(cls, fix: bool = True) -> list[str]:
+    def check(cls, *, fix: bool = True) -> list[str]:
         return cls._run(f'check{" --fix" if fix else ""}')
 
 
@@ -183,24 +166,24 @@ class Uv:
     """Uv wrapper."""
 
     @classmethod
-    def _run(cls, cmd: str) -> list[str]:
-        return run_command(f'uv {cmd}', capture=False)
+    def exec(cls, cmd: str, env: dict | None = None) -> list[str]:
+        return run_command(f'uv {cmd}', env=env, capture=False)
 
     @classmethod
     def upgrade(cls) -> list[str]:
-        return cls._run('self update')
+        return cls.exec('self update')
 
     @classmethod
     def tool_install(cls, name: str) -> list[str]:
-        return cls._run(f'tool install {name}')
+        return cls.exec(f'tool install {name}')
 
     @classmethod
     def tool_upgrade(cls, name: str) -> list[str]:
-        return cls._run(f'tool upgrade {name} --reinstall')
+        return cls.exec(f'tool upgrade {name} --reinstall')
 
     @classmethod
     def sync(cls) -> list[str]:
-        return cls._run('sync')
+        return cls.exec('sync')
 
     @classmethod
     def install(cls):

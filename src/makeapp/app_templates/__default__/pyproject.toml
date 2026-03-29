@@ -89,25 +89,10 @@ exclude_also = [
     "if TYPE_CHECKING:",
 ]
 
-[tool.tox]
-skip_missing_interpreters = true
-env_list = [
-{% block tox_envlist %}
-  "py310",
-  "py311",
-  "py312",
-  "py313",
-{% endblock %}
-]
-
-[tool.tox.env_run_base]
-dependency_groups = ["tests"]
+[tool.makeapp.tests]
 deps = [
-{% block tox_deps %}
+{% block deps_matests %}
 {% endblock %}
-]
-commands = [
-  ["pytest", { replace = "posargs", default = ["tests"], extend = true }],
 ]
 
 {% block tools_ext %}

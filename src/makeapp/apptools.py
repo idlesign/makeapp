@@ -1,14 +1,17 @@
 import logging
 import os
+import tomllib
+from contextlib import chdir
 from datetime import datetime
 from pathlib import Path
 
 from .exceptions import ProjectorExeption
 from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
+from .helpers.tests import TestsHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
-from .utils import chdir, configure_logging, Uv, Ruff, MkDocs
+from .utils import MkDocs, Ruff, Uv, configure_logging
 
 LOG = logging.getLogger(__name__)
 
@@ -362,6 +365,7 @@ class Project:
         self.changelog: ChangelogData | None = None
         self.vcs = VcsHelper.get(project_path)
         self.venv = VenvHelper(project_path)
+        self._setting = {}
 
     def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
         """Switches on logging at a given level.
@@ -371,6 +375,25 @@ class Project:
 
         """
         configure_logging(verbosity_lvl, logger=LOG, format=format)
+
+    def get_settings(self) -> dict | None:
+        """Returns project settings from pyproject.toml (with default) or None if file not found."""
+
+        settings = self._setting
+
+        if not settings:
+
+            path = Path("pyproject.toml")
+            if not path.exists():
+                raise ProjectorExeption('No `pyproject.toml` file found in the current directory.')
+
+            with path.open("rb") as f:
+                data = tomllib.load(f)
+
+            settings = data.get("tool", {}).get("makeapp", {})
+            self._setting = settings
+
+        return settings
 
     def _gather_data(self):
         """Gathers data relevant for project related functions."""
@@ -383,11 +406,7 @@ class Project:
 
             LOG.debug(f'Gathering info from `{project_path}` directory ...')
 
-            marker_file = 'pyproject.toml'
-
-            if not os.path.isfile(marker_file):
-                raise ProjectorExeption(f'No `{marker_file}` file found in the current directory.')
-
+            self.get_settings()
             self.vcs.check()
 
             parent_dirname = project_path.parent.name
@@ -506,6 +525,11 @@ class Project:
             self.vcs.push()
             DistHelper.upload()
 
+    def run_tests(self, *, only: list[str] | None = None) -> dict[str, list[str]]:
+        LOG.info('Running tests ...')
+        helper = TestsHelper(settings=self.get_settings().get('tests', {}), only=only)
+        return helper.run_tests()
+
     def style(self):
         LOG.info('Styling ...')
         Ruff.check()
@@ -523,13 +547,12 @@ class Project:
         LOG.info(f'{"Upgrading" if upgrade else "Bootstrapping"} development tools ...')
 
         tools_default = [
-            'tox',
             'ruff==0.13.1',
         ]
 
         method = Uv.tool_upgrade if upgrade else Uv.tool_install
 
-        LOG.info(f'Processing uv ...')
+        LOG.info('Processing uv ...')
 
         if upgrade:
             Uv.upgrade()

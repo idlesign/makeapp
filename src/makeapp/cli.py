@@ -5,13 +5,14 @@ from pathlib import Path
 
 import click
 
+from makeapp.helpers.tests import TestsHelper
+
 from .exceptions import MakeappException
 
 try:
     from . import VERSION
     from .appmaker import AppMaker
     from .apptools import VERSION_NUMBER_CHUNKS, Project
-    from .utils import configure_logging
 
 except MakeappException as e:
     click.secho(f'{e}', err=True, fg='red')
@@ -231,6 +232,25 @@ def style(debug):
     """Apply code style."""
     project = Project(log_level=logging.DEBUG if debug else logging.INFO)
     project.style()
+    click.secho('Done', fg='green')
+
+
+@entry_point.command()
+@option_debug
+@click.option('-o', '--only', multiple=True, help='Run only certain tests. E.g. -o "py314_django600"')
+def tests(debug, only):
+    """Run tests."""
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+    stats = project.run_tests(only=only)
+
+    key_ok = TestsHelper.KEY_OK
+    key_fail = TestsHelper.KEY_FAIL
+
+    for status, color, err in ((key_ok, 'green', False), (key_fail, 'red', True)):
+        if items := stats[status]:
+            items = "\n  ".join(items)
+            click.secho(f'Tests {status}:\n  {items}', err=err, fg=color)
+
     click.secho('Done', fg='green')
 
 

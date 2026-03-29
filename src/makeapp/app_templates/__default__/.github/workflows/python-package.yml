@@ -14,16 +14,11 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.11, 3.12, 3.13, 3.14]
-        django-version: [4.2, 5.1, 5.2, 6.0]
-
-        exclude:
-          - python-version: 3.11
-            django-version: 6.0
 
     steps:
 {% raw %}
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }} & Django ${{ matrix.django-version }}
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
@@ -32,7 +27,7 @@ jobs:
     - name: Install deps
       run: |
         uv sync --only-group tests
-        uv pip install coveralls "django~=${{ matrix.django-version }}.0"
+        uv pip install coveralls
     - uses: astral-sh/ruff-action@v3
       with:
         version: 0.13.1
