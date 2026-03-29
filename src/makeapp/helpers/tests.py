@@ -49,11 +49,17 @@ class TestsHelper:
         values = matrix.values()
         combinations = []
 
+        def norm(val) -> float | str:
+            try:
+                return float(val)
+            except (ValueError, TypeError):
+                return f'{val}'
+
         for combined in product(*values):
             combination = dict(zip(keys, combined, strict=False))
             is_excluded = False
             for exclusion in exclusions:
-                if all(f'{combination.get(key)}' == f'{val}' for key, val in exclusion.items()):
+                if all(f'{norm(combination.get(key))}' == f'{norm(val)}' for key, val in exclusion.items()):
                     is_excluded = True
                     break
 
