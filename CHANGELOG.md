@@ -1,7 +1,7 @@
 # makeapp changelog
 
 
-### Unreleased
+### v2.2.0 [2026-03-29]
 * ++ Add experimental 'tests' command (tox replacement).
 
 ### v2.1.0 [2025-11-15]
