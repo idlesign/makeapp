@@ -21,6 +21,7 @@ https://github.com/idlesign/makeapp
 * Easily bootstrap your development environment.
 * Build and local serve the docs.
 * Run code styling/linting.
+* Run tests in different environments.
 
 ## Application scaffolding
 
@@ -95,7 +96,6 @@ Apply code style with `style` command:
 ma style
 ```
 
-
 ## Build/serve docs
 
 Use `docs` command:
@@ -103,6 +103,16 @@ Use `docs` command:
 ``` bash
 ma docs
 ```
+
+
+## Run tests
+
+Use `tests` command:
+
+``` bash
+ma tests
+```
+
 
 ## Documentation
 

@@ -16,11 +16,12 @@
 * Easily bootstrap your development environment.
 * Build and local serve the docs.
 * Run code styling/linting.
+* Run tests in different environments.
 
 
 ## Requirements
 
-1. Python 3.10+
+1. Python 3.11+
 2. [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 
