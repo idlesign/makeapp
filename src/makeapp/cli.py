@@ -248,8 +248,9 @@ def tests(debug, only):
 
     for status, color, err in ((key_ok, 'green', False), (key_fail, 'red', True)):
         if items := stats[status]:
+            total_items = len(items)
             items = ' '.join(items)
-            click.secho(f'Tests {status} ({len(items)}):\n  {items}', err=err, fg=color)
+            click.secho(f'Tests {status} ({total_items}):\n  {items}', err=err, fg=color)
 
     click.secho('Done', fg='green')
 
