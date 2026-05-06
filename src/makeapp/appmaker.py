@@ -113,7 +113,7 @@ class AppMaker:
 
         # Support for user-supplied template directories.
         for template in templates_to_use or []:
-            if '/' in template:
+            if os.sep in template:
                 parent = str(Path(template).parent)
                 if parent not in search_paths:
                     search_paths.append(parent)
@@ -302,6 +302,7 @@ class AppMaker:
         :param remote_push: Whether to push to remote.
 
         """
+        dest = os.path.abspath(dest)
         self.logger.info(f'Application target path: {dest}')
 
         # Make remote available for hooks.

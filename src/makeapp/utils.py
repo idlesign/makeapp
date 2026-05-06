@@ -87,13 +87,10 @@ def check_command(command: str, *, hint: str):
     :param hint:
 
     """
-    try:
-        run_command(f'type {command}')
-
-    except CommandError as e:
+    if shutil.which(command) is None:
         raise CommandError(
             f"Failed to execute '{command}' command. "
-            f"Check {hint} is installed and available.") from e
+            f"Check {hint} is installed and available.")
 
 
 def run_command(command: str, *, err_msg: str = '', env: dict | None = None, capture: bool = True) -> list[str]:
@@ -187,4 +184,8 @@ class Uv:
 
     @classmethod
     def install(cls):
-        return run_command('curl -LsSf https://astral.sh/uv/install.sh | sh', capture=False)
+        if sys.platform == 'win32':
+            cmd = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
+        else:
+            cmd = 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+        return run_command(cmd, capture=False)
