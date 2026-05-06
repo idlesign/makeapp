@@ -5,4 +5,4 @@ Created by Igor `idle sign` Starikov.
 
 ## Contributors
 
-Here could be your name.
+* Maksim Efimov <https://github.com/mgefimov>
