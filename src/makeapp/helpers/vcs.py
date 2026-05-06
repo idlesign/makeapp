@@ -110,7 +110,11 @@ class VcsHelper:
         :param message: Commit description.
 
         """
-        self.run_command("commit -m '%s'" % message.replace("'", "''"))
+        with NamedTemporaryFile() as f:
+            f.write(message.encode())
+            f.flush()
+
+            self.run_command(f'commit -F "{f.name}"')
 
     def get_remotes(self):
         """Returns a list of remotes."""

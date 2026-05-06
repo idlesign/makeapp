@@ -120,12 +120,12 @@ class AppTemplate:
 
                 full_path = os.path.join(path, fname)
 
-                rel_path = full_path.replace(templates_path, '').lstrip('/')
+                rel_path = os.path.relpath(full_path, templates_path)
 
                 template_file = TemplateFile(
                     template=self,
                     path_full=full_path,
-                    path_rel=rel_path,
+                    path_rel=rel_path.replace(os.sep, '/'),
                 )
 
                 rel_path = rel_path.replace(maker.package_dir_marker, maker.settings['package_name'])
@@ -174,9 +174,9 @@ class AppTemplate:
 
         """
         for supposed_path in search_paths:
-            if '/' in supposed_path and os.path.exists(supposed_path):
+            if os.sep in supposed_path and os.path.exists(supposed_path):
                 path = str(os.path.abspath(supposed_path))
-                return path.split('/')[-1], path
+                return path.split(os.sep)[-1], path
 
         raise AppMakerException(
             f"Unable to find application template {name_or_path}. "
@@ -221,7 +221,7 @@ class TemplateFile:
 
             if os.path.exists(path_full):
                 # Check parent file exists in template.
-                paths.append(os.path.join(parent.name, path_rel))
+                paths.append(f'{parent.name}/{path_rel}')
 
             if parent.is_default:
                 break
