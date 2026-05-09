@@ -2,7 +2,8 @@
 
 
 ### Unreleased
-* ** Fix 'tests' command wotk for workflows messing floats and strings as version numbers.
+* ++ Add basic Windows support (closes #8).
+* ** Fix 'tests' command work for workflows messing floats and strings as version numbers.
 * ** Fixed total items count for 'tests' command.
 
 ### v2.2.0 [2026-03-29]
