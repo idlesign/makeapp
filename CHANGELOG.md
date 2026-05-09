@@ -1,7 +1,7 @@
 # makeapp changelog
 
 
-### Unreleased
+### v2.3.0 [2026-05-09]
 * ++ Add basic Windows support (closes #8).
 * ** Fix 'tests' command work for workflows messing floats and strings as version numbers.
 * ** Fixed total items count for 'tests' command.
