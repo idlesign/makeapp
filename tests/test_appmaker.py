@@ -1,4 +1,7 @@
 
+from makeapp.appmaker import AppMaker
+
+
 def test_default(in_tmp_path, get_appmaker, assert_content):
 
     assert not get_appmaker('django', rollout=False).check_app_name_is_available()
@@ -32,7 +35,13 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
     ])
 
     assert_content(in_tmp_path / 'docs/index.md', [
-        'will be an introductory',
+        '*testdummydescr*',
+        'uv add dummy',
+    ])
+
+    assert_content(in_tmp_path / 'pyproject.toml', [
+        '{include-group = "docs"}',
+        '"mkdocs-material"',
     ])
 
     assert_content(in_tmp_path / '.venv/pyvenv.cfg', [
@@ -55,3 +64,14 @@ def test_tpl_userdefined(in_tmp_path, tmp_path, get_appmaker, assert_content):
     assert_content(in_tmp_path / 'pyproject.toml', [
         '# some custom',
     ])
+
+
+def test_webscaff_uses_integrated_pytest_support(monkeypatch):
+    monkeypatch.setattr('makeapp.appconfig.sleep', lambda _: None)
+
+    app_maker = AppMaker('dummy', templates_to_use=['webscaff'])
+
+    assert [template.name for template in app_maker.app_templates] == [
+        '__default__',
+        'webscaff',
+    ]

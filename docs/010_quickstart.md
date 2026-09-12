@@ -1,110 +1,93 @@
 # Quickstart
 
-## Before start
+This tutorial creates a project, runs its checks, builds its documentation, and records a change.
 
-Makeapp may install basic development tools (`uv`, `ruff`) for you:
+## Install makeapp
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) first, then install `makeapp` as a tool:
+
+```bash
+uv tool install makeapp
+ma --version
+```
+
+`ma` is an alias for `makeapp`.
+
+## Create a project
+
+```bash
+ma new shiny_app ./shiny-app --description "My app" --author "I am" --no-prompt
+cd shiny-app
+```
+
+`--no-prompt` skips the standard confirmation questions. It still initializes a Git repository and runs `uv sync` to
+create `.venv`. Template-specific settings must be passed on the command line if a selected template requires them.
+
+Without `--no-prompt`, `makeapp` can also:
+
+- check whether the package name already exists on PyPI;
+- let you skip Git or virtual environment initialization;
+- configure a Git remote and optionally push the initial commit.
+
+The default scaffold contains:
+
+```text
+shiny-app/
+├── .github/workflows/python-package.yml
+├── docs/
+├── src/shiny_app/
+├── tests/
+├── CHANGELOG.md
+├── LICENSE
+├── README.md
+├── mkdocs.yml
+└── pyproject.toml
+```
+
+## Run the development workflow
+
+Synchronize the environment after changing dependencies:
+
+```bash
+ma up
+```
+
+Run lint checks, tests, and a documentation build:
 
 ```bash
 ma tools
-
-; Upgrade with
-ma tools -u
+ma style
+ma tests
+ma docs --build
 ```
 
-## Application scaffolding
+`ma tools` installs the external Ruff command used by `ma style`. `ma docs --build` writes the site to `site/`; use
+`ma docs` to start the local MkDocs server instead.
 
-Scaffold a new application:
+## Record a change
 
 ```bash
-ma new shiny_app /home/librarian/shiny/ --description "My app." --author "I am"
+ma change "+ Add the first feature"
 ```
 
-!!! note
-    `ma` is a convenient alias for `makeapp` command.
+The command adds an entry under `Unreleased` in `CHANGELOG.md`, stages modified tracked files together with the
+changelog, and creates a Git commit. See [Publishing](045_publishing.md) for change markers and the release workflow.
 
-This will create a decent application skeleton (`pyproject.toml`, docs, tests, etc.) and initialize Git repository.
+## Choose a template
 
-Get some help on command line switches:
+Pass a comma-separated list to `-t` to extend the default scaffold:
 
 ```bash
-ma --help
+ma new shiny_cli ./shiny-cli -t click --no-prompt
 ```
 
-### Settings in config
+Later templates override files contributed by earlier templates. See [Bundled templates](030_skeletons.md) and
+[Template authoring](025_template_authoring.md) for details.
 
-Put some default settings into a config (not to mess with command line switches anymore):
+## Shell completion
 
-1. Create `.makeapp` (dot is required) directory in your HOME directory;
-2. In `.makeapp` directory create `makeapp.conf` configuration file with a similar contents:
-
-    ```ini
-    [settings]
-    author = The Librarian
-    author_email = librarian@discworld.wrld
-    license = bsd3cl
-    url = https://github.discworld.wrld/librarian/{{ app_name }}
-    vcs = git
-    ```
-
-### Settings in command line
-
-You can also pass settings values via command line options. Use `--no-prompt` switch to automate scaffolding:
+For Bash, add this line to `~/.bashrc`:
 
 ```bash
-ma new tiny_app -t webscaff --no-prompt --webscaff_domain "example.com" --webscaff_email "me@example.com" --webscaff_host "93.184.216.34" --vcs_remote "git@example.com:me/my_new_app.git"
-```
-
-## Adding changes
-
-When you're ready to add another entry to your changelog use `change` command 
-(project directory containing `pyproject.toml`):
-
-```bash
-ma change "+ New 'change' command implemented"
-```
-
-This will also stage and commit all changed files.
-
-Supported message prefixes and corresponding version number parts incremented 
-on `release` command:
-
-| symbol | meaning                          | version part increment |
-|--------|----------------------------------|------------------------|
-| `+`    | New feature / addition           | minor                  |
-| `!`    | Important change/improvement/fix | patch                  |
-| `-`    | Feature deprecation / removal    | patch                  |
-| `*`    | Minor change/improvement/fix     | patch                  |
-
-
-!!! note
-    `*` prefix is added by default if none of the above-mentioned prefixes found.
-
-
-## Application publishing
-
-When you're ready to publish issue the following command
-(project directory containing `pyproject.toml`):
-
-```bash
-ma release
-; Bump version number part manually: major, minor, patch
-ma release --increment major
-; or 
-ma release -i major
-```
-
-This will automatically:
-
-  * bump up application version number
-  * tag version in VCS
-  * push sources to remote repository
-  * upload application package to PyPI
-
-
-## Bash completion
-
-To enable bash completion for `ma` (or `makeapp`) command append the following line into your ``.bashrc``:
-
-``` bash
-eval "$(_MAKEAPP_COMPLETE=source makeapp)"
+eval "$(_MAKEAPP_COMPLETE=bash_source makeapp)"
 ```

@@ -1,119 +1,68 @@
 # makeapp
 
-https://github.com/idlesign/makeapp
-
-[![PyPI - Version](https://img.shields.io/pypi/v/makeapp)](https://pypi.python.org/pypi/makeapp)
-[![License](https://img.shields.io/pypi/l/makeapp)](https://pypi.python.org/pypi/makeapp)
-[![Coverage](https://img.shields.io/coverallsCoverage/github/idlesign/makeapp)](https://coveralls.io/r/idlesign/makeapp)
+[![PyPI - Version](https://img.shields.io/pypi/v/makeapp)](https://pypi.org/project/makeapp/)
+[![License](https://img.shields.io/pypi/l/makeapp)](https://pypi.org/project/makeapp/)
+[![Coverage](https://img.shields.io/coverallsCoverage/github/idlesign/makeapp)](https://coveralls.io/github/idlesign/makeapp)
 [![Docs](https://img.shields.io/readthedocs/makeapp)](https://makeapp.readthedocs.io/)
 
-## Description
+`makeapp` scaffolds Python projects and provides one CLI for their common development tasks. It can create a project
+from composable templates, initialize Git and a virtual environment, run a GitHub Actions test matrix locally, maintain
+a changelog, and publish releases.
 
-*Simplifies routine Python application development processes.*
+## Install
 
-* Make a skeleton for your new application with one console command.
-* Automatically create a VCS repository for your application.
-* Automatically check whether the chosen application name is not already in use.
-* Customize new application layouts with skeleton templates.
-* Put some skeleton default settings into a configuration file not to mess with command line switches anymore.
-* Easily add entries to your changelog.
-* Publish your application to remotes (VCS, PyPI) with a single command.
-* Easily bootstrap your development environment.
-* Build and local serve the docs.
-* Run code styling/linting.
-* Run tests in different environments.
+Python 3.11 or newer and [uv](https://docs.astral.sh/uv/getting-started/installation/) are required.
 
-## Application scaffolding
-
-Scaffold a new application:
-
-``` bash
-ma new shiny_app /home/librarian/shiny/ --description "My app." --author "I am"
+```bash
+uv tool install makeapp
 ```
 
-!!! note
-    `ma` is a convenient alias for `makeapp` command.
+Both `makeapp` and its short alias `ma` invoke the same command.
 
-This will create a decent application skeleton using the default skeleton template (``pyproject.toml``, docs, tests, etc.)
-and initialize Git repository.
+## Quick start
 
-`makeapp` also bundles templates for commonly used application types:
-
-* `click` powered app
-* `pytest` plugin
-* `Django` app
-* `webscaff` project [here](https://github.com/idlesign/webscaff)
-* etc.
-
-Multiple templates can be used together. Complete list of featured templates can be found in the documentation.
-User-made templates are also supported.
-
-
-## Adding changes
-
-When you're ready to add another entry to your changelog use `change` command:
-
-``` bash
-ma change "+ New 'change' command implemented"
-```
-
-This will also stage and commit all changed files.
-
-## Application publishing
-
-When you're ready to publish issue the following command:
-
-``` bash
-ma release
-; Bump version number part manually: major, minor, patch
-ma release --increment major
-```
-
-This will automatically:
-
-* bump up application version number
-* tag version in VCS
-* push sources to remote repository
-* upload application package to PyPI
-
-
-## Dev environment bootstrap
-
-Or you just want to participate in the development of some other app.
-
-Use `tools` and `up` commands to initialize tools and the environment to develop the application. 
-
-``` bash
-ma tools
-ma up
-```
-
-## Code style
-
-Apply code style with `style` command:
-
-``` bash
-ma style
-```
-
-## Build/serve docs
-
-Use `docs` command:
-
-``` bash
-ma docs
-```
-
-
-## Run tests
-
-Use `tests` command:
-
-``` bash
+```bash
+ma new shiny_app ./shiny-app --description "My app" --author "I am" --no-prompt
+cd shiny-app
 ma tests
 ```
 
+The default scaffold contains a `src`-layout package, tests, project metadata, a changelog, and MkDocs documentation.
+The non-interactive command also initializes Git and runs `uv sync` to create `.venv`.
+
+Bundled templates can extend the default scaffold:
+
+- `console` for an `argparse` command-line application;
+- `click` for a Click command-line application;
+- `django` for a reusable Django application;
+- `pytestplugin` for a pytest plugin;
+- `webscaff` for a Linux-hosted Django/Webscaff project.
+
+For example:
+
+```bash
+ma new shiny_cli ./shiny-cli -t click --no-prompt
+```
+
+## Project workflow
+
+```bash
+ma up              # Synchronize the development environment.
+ma style           # Run Ruff checks and apply safe fixes.
+ma tests           # Run the configured test matrix.
+ma docs --build    # Build documentation without starting a server.
+ma change "+ Add a feature"  # Update the changelog and commit modified files.
+ma release         # Prepare a release and optionally publish it.
+```
+
+Review changes before running `ma change`: it stages and commits modified tracked files together with the changelog.
 
 ## Documentation
 
-https://makeapp.readthedocs.io/
+The full user and extension documentation is available at <https://makeapp.readthedocs.io/>.
+
+- [Quickstart](https://makeapp.readthedocs.io/en/latest/quickstart/)
+- [CLI reference](https://makeapp.readthedocs.io/en/latest/cli_reference/)
+- [Template authoring](https://makeapp.readthedocs.io/en/latest/template_authoring/)
+- [Publishing](https://makeapp.readthedocs.io/en/latest/publishing/)
+Issues and feature requests are welcome in the [GitHub issue tracker](https://github.com/idlesign/makeapp/issues).

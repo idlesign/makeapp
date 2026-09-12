@@ -1,57 +1,76 @@
 # Developer tools
 
-Makeapp gives you some tools to further facilitate the development process.
+Project commands expect to run from the directory containing `pyproject.toml`. Use `--debug` on any command to display
+the underlying external commands and additional diagnostic messages.
 
-## Bootstrap virtual environment
-
-When you've got an app sources and want to initialize the environment to develop the app 
-use `up` command (inside the directory with `pyproject.toml`).
+## Synchronize the environment
 
 ```bash
 ma up
 ```
 
-## Register the CLI application as a tool
+This runs `uv sync` and uses `.venv` as the project environment.
 
-If your application has a CLI (e.g. exposes `project.scripts`) you can register
-it as a tool. So that the command issued in terminal will invoke just the code you develop.
-
-```bash
-ma up -t
-# or ma up --tool
-```
-
-## Regenerate the environment
-
-Sometimes something may go wrong with the virtual environment so that you may want 
-to drop the old one altogether and create a new one. Use the following command: 
+Use `--reset` to remove `.venv` before synchronization:
 
 ```bash
-ma up -r
-# or ma up --reset
+ma up --reset
 ```
 
-## Style code
+If the project exposes a command through `project.scripts`, install the working tree as an editable uv tool:
 
-To style/lint your code use the following command: 
+```bash
+ma up --tool
+```
+
+The options can be combined:
+
+```bash
+ma up --reset --tool
+```
+
+## Install development tools
+
+```bash
+ma tools
+```
+
+This installs the Ruff command used by `ma style`. Upgrade uv and reinstall the configured tools with:
+
+```bash
+ma tools --upgrade
+```
+
+## Run Ruff
 
 ```bash
 ma style
 ```
 
-## Build/serve docs
+The command runs `ruff check --fix`. It performs lint checks and applies available fixes; it does not run
+`ruff format`.
 
-Use `docs` command:
+## Build or serve documentation
 
-``` bash
+Start the MkDocs development server and open it in a browser:
+
+```bash
 ma docs
 ```
 
+Build the site into `site/` without starting a server:
+
+```bash
+ma docs --build
+```
+
+MkDocs and the configured theme must be present in the project environment. Projects created by the current default
+template include them in the `docs` dependency group.
 
 ## Run tests
 
-Use `tests` command:
-
-``` bash
+```bash
 ma tests
 ```
+
+See [Local testing](050_tests.md) for matrix configuration and environment selection.

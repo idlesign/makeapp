@@ -10,8 +10,6 @@ join = os.path.join  # Short alias
 
 class WebscaffConfig(Config):
 
-    parent_template = ['pytest']
-
     domain = ConfigSetting(title='Domain Name', default='')
     email = ConfigSetting(title='Admin E-mail')
     host = ConfigSetting(title='Remote Host IP')

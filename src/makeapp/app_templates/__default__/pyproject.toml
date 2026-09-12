@@ -40,10 +40,14 @@ Homepage = "{{ url }}"
 
 [dependency-groups]
 dev = [
+    {include-group = "docs"},
     {include-group = "linters"},
     {include-group = "tests"},
 {% block deps_dev %}
 {% endblock %}
+]
+docs = [
+    "mkdocs-material",
 ]
 linters = [
 {% block deps_linters %}

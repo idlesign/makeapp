@@ -1,24 +1,35 @@
-# {{ app_name }} installation
+# Installing {{ app_name }}
 
-
-Python ``pip`` package is required to install ``{{ app_name }}``.
-
-
-## From sources
-
-
-Use the following command line to install ``{{ app_name }}`` from sources directory (containing ``pyproject.toml``):
-
-    pip install .
-
+Python {{ python_version }} or newer and [uv](https://docs.astral.sh/uv/) are required.
 
 ## From PyPI
 
-Alternatively you can install ``{{ app_name }}`` from PyPI:
+Add the package to a project:
 
-    pip install {{ app_name }}
+```bash
+uv add {{ app_name }}
+```
 
+If the package exposes a command-line application, install it as an isolated tool:
 
-Use `-U` flag for upgrade:
+```bash
+uv tool install {{ app_name }}
+```
 
-    pip install -U {{ app_name }}
+Upgrade the tool with:
+
+```bash
+uv tool upgrade {{ app_name }}
+```
+
+## From source
+
+Clone the repository and synchronize its development environment:
+
+```bash
+git clone https://example.com/owner/repository.git {{ app_name }}
+cd {{ app_name }}
+uv sync
+```
+
+Replace the example repository URL with the source repository. Run commands in the project environment with `uv run`.

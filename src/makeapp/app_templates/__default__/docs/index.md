@@ -1,37 +1,21 @@
-# Introduction
-
-<{{ url }}>
-
-
-## Description
+# {{ app_name }}
 
 *{{ description }}*
 
-Here will be an introductory description.
-
-
 ## Requirements
 
-1. Python {{ python_version }}+
+- Python {{ python_version }} or newer
+- [uv](https://docs.astral.sh/uv/)
 
-## Installation
+## Install
 
-``` shell
-pip install {{ app_name }}
+```bash
+uv add {{ app_name }}
 ```
 
+Continue with the [quickstart](quickstart.md) to verify the installation and run the project checks.
 
-## Get involved into {{ app_name }}
+## Project links
 
-!!! success "Submit issues"
-    If you spotted something weird in application behavior or want to propose a feature you are welcome.
-
-!!! tip "Write code"
-    If you are eager to participate in application development, 
-    fork it, write 
-    your code, whether it should be a bugfix or a feature implementation,
-    and make a pull request right from the forked project page.
-
-!!! info "Spread the word"
-    If you have some tips and tricks or any other words in mind that 
-    you think might be of interest for the others --- publish it.
+- [Source and issue tracker]({{ url }})
+- [PyPI](https://pypi.org/project/{{ app_name }}/)

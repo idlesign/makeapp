@@ -1,5 +1,8 @@
 # makeapp changelog
 
+### Unreleased
+* ++ Expand user, CLI, template, publishing, and generated project documentation.
+* ** Remove the obsolete pytest parent from the Webscaff template.
 
 ### v2.3.0 [2026-05-09]
 * ++ Add basic Windows support (closes #8).
