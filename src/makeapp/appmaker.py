@@ -226,12 +226,23 @@ class AppMaker:
         name_available = True
 
         for label, url in sites_registry.items():
-            response = requests.get(url)
+            try:
+                response = requests.get(url, timeout=5)
+            except requests.RequestException as e:
+                raise AppMakerException(
+                    f'Unable to check application name at {label}: {e}.'
+                ) from e
 
             if response.status_code == 200:
                 self.logger.warning(f'Application name seems to be in use: {label} - {url}')
                 name_available = False
                 break
+
+            if response.status_code != 404:
+                raise AppMakerException(
+                    f'Unable to check application name at {label}: '
+                    f'HTTP {response.status_code}.'
+                )
 
         if name_available:
             self.logger.info(

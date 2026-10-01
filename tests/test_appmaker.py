@@ -1,14 +1,12 @@
 
 import pytest
+import requests
 
 from makeapp.appmaker import AppMaker
 from makeapp.exceptions import AppMakerException
 
 
 def test_default(in_tmp_path, get_appmaker, assert_content):
-
-    assert not get_appmaker('django', rollout=False).check_app_name_is_available()
-    assert get_appmaker('x7t8whatsthat', rollout=False).check_app_name_is_available()
 
     app_maker = get_appmaker(init_venv=True)
 
@@ -94,3 +92,45 @@ def test_template_target_must_stay_within_destination(tmp_path, monkeypatch):
         app_maker.rollout(tmp_path / 'target')
 
     assert not (tmp_path / 'outside').exists()
+
+
+def test_app_name_availability_uses_timeout(get_appmaker, monkeypatch):
+    calls = []
+
+    def get(url, *, timeout):
+        calls.append((url, timeout))
+        status_code = 200 if url.endswith('/django/') else 404
+        return type('Response', (), {'status_code': status_code})()
+
+    monkeypatch.setattr('makeapp.appmaker.requests.get', get)
+
+    assert not get_appmaker('django', rollout=False).check_app_name_is_available()
+    assert get_appmaker('available', rollout=False).check_app_name_is_available()
+    assert calls == [
+        ('https://pypi.org/simple/django/', 5),
+        ('https://pypi.org/simple/available/', 5),
+    ]
+
+
+@pytest.mark.parametrize('status_code', [403, 429, 500])
+def test_app_name_availability_rejects_unknown_status(
+        status_code, get_appmaker, monkeypatch
+):
+    response = type('Response', (), {'status_code': status_code})()
+    monkeypatch.setattr(
+        'makeapp.appmaker.requests.get',
+        lambda *args, **kwargs: response,
+    )
+
+    with pytest.raises(AppMakerException, match=f'HTTP {status_code}'):
+        get_appmaker('dummy', rollout=False).check_app_name_is_available()
+
+
+def test_app_name_availability_handles_network_error(get_appmaker, monkeypatch):
+    def fail(*args, **kwargs):
+        raise requests.Timeout('timed out')
+
+    monkeypatch.setattr('makeapp.appmaker.requests.get', fail)
+
+    with pytest.raises(AppMakerException, match='Unable to check application name'):
+        get_appmaker('dummy', rollout=False).check_app_name_is_available()
