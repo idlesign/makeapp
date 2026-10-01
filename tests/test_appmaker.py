@@ -1,5 +1,8 @@
 
+import pytest
+
 from makeapp.appmaker import AppMaker
+from makeapp.exceptions import AppMakerException
 
 
 def test_default(in_tmp_path, get_appmaker, assert_content):
@@ -75,3 +78,18 @@ def test_webscaff_uses_integrated_pytest_support(monkeypatch):
         '__default__',
         'webscaff',
     ]
+
+
+def test_invalid_package_name_is_rejected():
+    with pytest.raises(AppMakerException, match='Invalid Python package name'):
+        AppMaker('../../outside')
+
+
+def test_template_target_must_stay_within_destination(tmp_path, monkeypatch):
+    app_maker = AppMaker('dummy')
+    monkeypatch.setattr(app_maker, '_get_template_files', lambda: {'../outside': object()})
+
+    with pytest.raises(AppMakerException, match='escapes destination'):
+        app_maker.rollout(tmp_path / 'target')
+
+    assert not (tmp_path / 'outside').exists()

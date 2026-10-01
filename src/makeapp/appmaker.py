@@ -1,3 +1,4 @@
+import keyword
 import logging
 import os
 import re
@@ -330,8 +331,18 @@ class AppMaker:
             self._hook_run('rollout_pre')
 
         files = self._get_template_files()
+        dest_path = Path(dest).resolve()
         for target, template_file in files.items():
-            target = os.path.join(dest, target)
+            target_path = (dest_path / target).resolve()
+
+            try:
+                target_path.relative_to(dest_path)
+            except ValueError as e:
+                raise AppMakerException(
+                    f'Template target path escapes destination: {target}.'
+                ) from e
+
+            target = f'{target_path}'
 
             if not os.path.exists(target) or overwrite:
 
@@ -579,6 +590,12 @@ class AppMaker:
         settings_base.update(settings_new)
         for name, val in settings_base.items():
             settings_base[name] = self._replace_settings_markers(val, settings=settings_base)
+
+        package_name = settings_base['package_name']
+        if not package_name or not package_name.isidentifier() or keyword.iskeyword(package_name):
+            raise AppMakerException(
+                f'Invalid Python package name: `{package_name}`.'
+            )
 
         self._validate_setting('license', list(self.LICENSES), settings_base)
 
