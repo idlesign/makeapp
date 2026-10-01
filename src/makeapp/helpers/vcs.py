@@ -13,7 +13,6 @@ class VcsHelper:
 
     title = None
     alias = None
-    branch_master = 'master'
     branch_upstream = 'origin'
 
     registry: dict[str, type['VcsHelper']] = {}
@@ -70,13 +69,23 @@ class VcsHelper:
 
         return modified
 
-    def check(self):
-        """Performs basic vcs check."""
-        data = self.run_command(['branch'])
-
-        if f'* {self.branch_master}' not in ''.join(data):
+    def get_current_branch(self) -> str:
+        """Return the current branch, including an unborn branch."""
+        try:
+            data = self.run_command(['symbolic-ref', '--quiet', '--short', 'HEAD'])
+        except CommandError as e:
             raise ProjectorExeption(
-                f'VCS needs to be initialized and branch set to `{self.branch_master}`')
+                'VCS needs to be on a named branch.'
+            ) from e
+
+        if not data:
+            raise ProjectorExeption('Unable to determine the current VCS branch.')
+
+        return data[0]
+
+    def check(self):
+        """Perform a basic VCS check."""
+        self.get_current_branch()
 
     def add_tag(self, name: str, description: str, *, overwrite: bool = False):
         """Adds a tag.
@@ -156,7 +165,7 @@ class VcsHelper:
             if upstream is True:
                 upstream = self.branch_upstream
 
-            self.run_command(['push', '-u', upstream, self.branch_master])
+            self.run_command(['push', '-u', upstream, self.get_current_branch()])
 
         else:
             self.run_command(['push'])

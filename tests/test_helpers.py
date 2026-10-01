@@ -55,3 +55,32 @@ def test_git_remote_is_passed_as_single_argument(monkeypatch):
         'origin',
         'https://example.test/repo;echo-injected',
     ]]
+
+
+def test_git_accepts_unborn_main_branch(in_tmp_path):
+    run_command(['git', 'init', '-q', '-b', 'main'])
+
+    helper = GitHelper()
+
+    helper.check()
+    assert helper.get_current_branch() == 'main'
+
+
+def test_git_push_uses_current_branch(monkeypatch):
+    issued = []
+    helper = GitHelper()
+
+    def run(args):
+        if args[0] == 'symbolic-ref':
+            return ['feature']
+        issued.append(args)
+        return []
+
+    monkeypatch.setattr(helper, 'run_command', run)
+
+    helper.push(upstream=True)
+
+    assert issued == [
+        ['push', '-u', 'origin', 'feature'],
+        ['push', '--tags'],
+    ]

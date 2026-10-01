@@ -9,7 +9,7 @@ Before releasing, verify that:
 - the current directory contains `pyproject.toml` and `CHANGELOG.md`;
 - exactly one import package can be identified, normally under `src/`;
 - the package `__init__.py` contains a numeric `VERSION` with at least three components;
-- Git is on the `master` branch and has a clean, reviewed working tree;
+- Git is on a named branch and has a clean, reviewed working tree;
 - the configured remote is reachable;
 - tests and documentation pass;
 - PyPI credentials are available to `uv publish`.
