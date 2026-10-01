@@ -18,7 +18,7 @@ LOG = logging.getLogger(__name__)
 
 
 VERSION_NUMBER_CHUNKS = ('major', 'minor', 'patch')
-PUBLISH_PENDING_FILENAME = '.makeapp-publish-pending'
+RELEASE_STATE_FILENAME = '.ma-release'
 
 
 class DataContainer:
@@ -536,10 +536,10 @@ class Project:
         LOG.info('Publishing application ...')
 
         with chdir(self.project_path):
-            pending_path = Path(PUBLISH_PENDING_FILENAME)
+            pending_path = Path(RELEASE_STATE_FILENAME)
             if not pending_path.exists():
                 DistHelper.upload()
-                pending_path.write_text('PyPI upload completed; Git push pending.\n')
+                pending_path.write_text('{"step": "git-push"}\n')
 
             self.vcs.push()
             pending_path.unlink()

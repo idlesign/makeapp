@@ -3,7 +3,7 @@ from textwrap import dedent
 
 import pytest
 
-from makeapp.apptools import PUBLISH_PENDING_FILENAME, ChangelogData, Project
+from makeapp.apptools import RELEASE_STATE_FILENAME, ChangelogData, Project
 from makeapp.exceptions import ProjectorExeption
 from makeapp.helpers.vcs import VcsHelper
 
@@ -50,7 +50,7 @@ def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
         ['git', 'push'],
         ['git', 'push', '--tags'],
     ]
-    assert not (in_tmp_path / PUBLISH_PENDING_FILENAME).exists()
+    assert not (in_tmp_path / RELEASE_STATE_FILENAME).exists()
 
 
 def test_publish_does_not_push_after_upload_failure(in_tmp_path, get_appmaker, monkeypatch):
@@ -72,13 +72,13 @@ def test_publish_does_not_push_after_upload_failure(in_tmp_path, get_appmaker, m
         project.publish()
 
     assert not git_pushed
-    assert not (in_tmp_path / PUBLISH_PENDING_FILENAME).exists()
+    assert not (in_tmp_path / RELEASE_STATE_FILENAME).exists()
 
 
 def test_publish_retries_pending_git_push(in_tmp_path, get_appmaker, monkeypatch):
     get_appmaker()
     project = Project()
-    pending_path = in_tmp_path / PUBLISH_PENDING_FILENAME
+    pending_path = in_tmp_path / RELEASE_STATE_FILENAME
     calls = []
 
     monkeypatch.setattr(
@@ -96,7 +96,7 @@ def test_publish_retries_pending_git_push(in_tmp_path, get_appmaker, monkeypatch
         project.publish()
 
     assert calls == ['upload', 'push']
-    assert pending_path.is_file()
+    assert pending_path.read_text() == '{"step": "git-push"}\n'
 
     monkeypatch.setattr(project.vcs, 'push', lambda: calls.append('retry push'))
     project.publish()
