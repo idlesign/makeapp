@@ -370,10 +370,18 @@ class Project:
         self.project_path = Path(project_path).resolve()
         self.package: PackageData | None = None
         self.changelog: ChangelogData | None = None
-        self.vcs = VcsHelper.get(self.project_path)
+        self._vcs = VcsHelper.get(self.project_path)
         self.venv = VenvHelper(self.project_path)
         self._project_data: dict | None = None
         self._setting: dict | None = None
+
+    @property
+    def vcs(self) -> VcsHelper:
+        if self._vcs is None:
+            raise ProjectorExeption(
+                f'No supported VCS repository found in `{self.project_path}`.'
+            )
+        return self._vcs
 
     def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
         """Switches on logging at a given level.

@@ -29,7 +29,7 @@ class VcsHelper:
         self.remote = None
 
     @classmethod
-    def get(cls, vcs_path: str | None = None) -> 'VcsHelper':
+    def get(cls, vcs_path: str | None = None) -> 'VcsHelper | None':
         """Returns an appropriate VCS helper object.
         
         :param vcs_path: Repository dir

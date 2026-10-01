@@ -166,3 +166,11 @@ def test_release_package_rejects_ambiguous_candidates(tmp_path):
 
     with pytest.raises(ProjectorExeption, match='Unable to identify release package'):
         Project.find_release_package(tmp_path, 'unknown')
+
+
+def test_project_reports_missing_vcs(tmp_path):
+    (tmp_path / 'pyproject.toml').write_text('[project]\nname = "sample"\n')
+    project = Project(project_path=tmp_path)
+
+    with pytest.raises(ProjectorExeption, match='No supported VCS repository'):
+        project.pull()
