@@ -41,10 +41,10 @@ def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
     project.publish()
 
     assert issued_commands == [
-        'git push',
-        'git push --tags',
-        'uv build',
-        'uv publish'
+        ['git', 'push'],
+        ['git', 'push', '--tags'],
+        ['uv', 'build'],
+        ['uv', 'publish'],
     ]
 
 

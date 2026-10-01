@@ -49,21 +49,21 @@ class WebscaffConfig(Config):
 
         # Install into venv the package itself not to conflict
         # with Django's `startproject` command.
-        run_command('. venv/bin/activate && pip install -e .')
+        run_command(['venv/bin/pip', 'install', '-e', '.'])
 
         # Initialize local sqlite DB.
-        run_command(f'venv/bin/{package_name} makemigrations')
-        run_command(f'venv/bin/{package_name} migrate')
+        run_command([f'venv/bin/{package_name}', 'makemigrations'])
+        run_command([f'venv/bin/{package_name}', 'migrate'])
 
     def prepare_venv(self):
         self.logger.info('Bootstrapping virtual environment for project ...')
 
-        run_command('python3 -m venv venv/')
+        run_command(['python3', '-m', 'venv', 'venv/'])
 
-        cmd_install = '. venv/bin/activate && pip install -r '
+        cmd_install = ['venv/bin/pip', 'install', '-r']
 
-        run_command(cmd_install + 'requirements.txt')
-        run_command(cmd_install + 'tests/requirements.txt')
+        run_command([*cmd_install, 'requirements.txt'])
+        run_command([*cmd_install, 'tests/requirements.txt'])
 
     def prepare_django_settings_base(self, dir_tmp):
 
@@ -105,10 +105,10 @@ class WebscaffConfig(Config):
         dir_package = self.dir_package_root
         package_name = self.package_name
 
-        command_django_admin = './venv/bin/django-admin'
+        command_django_admin = 'venv/bin/django-admin'
 
         with temp_dir() as dir_tmp:
-            run_command(f'{command_django_admin} startproject {package_name} {dir_tmp}')
+            run_command([command_django_admin, 'startproject', package_name, dir_tmp])
 
             # We'd replace settings module paths.
             replace = partial(
@@ -129,7 +129,7 @@ class WebscaffConfig(Config):
 
         # Create basic app.
         dir_app = join(dir_package, 'core')
-        run_command(f'{command_django_admin} startapp core {dir_app}')
+        run_command([command_django_admin, 'startapp', 'core', dir_app])
         replace_infile(
             join(dir_app, 'apps.py'),
             {

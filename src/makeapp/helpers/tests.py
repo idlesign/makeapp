@@ -96,7 +96,7 @@ class TestsHelper:
             deps_resolved = []
             for dep in deps:
                 dep = apply_ctx(dep, combination)
-                deps_resolved.append(f'"{dep}"')
+                deps_resolved.append(dep)
                 ident_chunks.append(make_valid_ident(dep))
 
             ident = "_".join(ident_chunks)
@@ -112,12 +112,12 @@ class TestsHelper:
                 status = self.KEY_OK
 
                 try:
-                    execute(f'sync --only-group tests --python {python_version}')
+                    execute(['sync', '--only-group', 'tests', '--python', f'{python_version}'])
 
-                    if deps_resolved := ' '.join(deps_resolved):
-                        execute(f'pip install {deps_resolved} --python {venv_dir}')
+                    if deps_resolved:
+                        execute(['pip', 'install', *deps_resolved, '--python', venv_dir])
 
-                    execute('run pytest')
+                    execute(['run', 'pytest'])
 
                 except CommandError:
                     status = self.KEY_FAIL

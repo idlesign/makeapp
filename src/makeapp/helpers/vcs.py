@@ -1,4 +1,6 @@
 import os
+import shlex
+from collections.abc import Sequence
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -45,18 +47,20 @@ class VcsHelper:
 
         return helper
 
-    def run_command(self, command: str):
-        """Basic command runner to implement."""
-        return run_command(f'{self.alias} {command}')
+    def run_command(self, command: str | Sequence[str]):
+        """Run a VCS command without invoking a shell."""
+        if isinstance(command, str):
+            command = shlex.split(command)
+        return run_command([self.alias, *command])
 
     def init(self):
         """Initializes a repository."""
-        return self.run_command('init -q')
+        return self.run_command(['init', '-q'])
 
     def get_modified(self) -> list[str]:
         """Returns modified filepaths."""
 
-        lines = self.run_command('status -s')
+        lines = self.run_command(['status', '-s'])
         modified = []
 
         for line in lines:
@@ -68,7 +72,7 @@ class VcsHelper:
 
     def check(self):
         """Performs basic vcs check."""
-        data = self.run_command('branch')
+        data = self.run_command(['branch'])
 
         if f'* {self.branch_master}' not in ''.join(data):
             raise ProjectorExeption(
@@ -88,7 +92,7 @@ class VcsHelper:
             f.write(description.encode())
             f.flush()
 
-            self.run_command(f'tag {name} {overwrite} -F {f.name}')
+            self.run_command(['tag', name, *([overwrite] if overwrite else []), '-F', f.name])
 
     def add(self, filename: list[str] | str | list[Path] | Path = None):
         """Adds a file into a changelist.
@@ -96,13 +100,14 @@ class VcsHelper:
         :param filename: If not provided all files in working tree are added.
 
         """
-        filename = filename or []
-        if isinstance(filename, list):
-            filename = ' '.join(map(str, filename))
+        if filename is None:
+            filenames = []
+        elif isinstance(filename, (str, Path)):
+            filenames = [filename]
+        else:
+            filenames = filename
 
-        filename = f'{filename}'.strip() or ''
-
-        self.run_command(f'add {filename}')
+        self.run_command(['add', *map(str, filenames)])
 
     def commit(self, message: str):
         """Commits files added to changelist.
@@ -114,16 +119,16 @@ class VcsHelper:
             f.write(message.encode())
             f.flush()
 
-            self.run_command(f'commit -F "{f.name}"')
+            self.run_command(['commit', '-F', f.name])
 
     def get_remotes(self):
         """Returns a list of remotes."""
-        return self.run_command('remote')
+        return self.run_command(['remote'])
 
     def pull(self):
         """Pulls updates from remotes."""
         try:
-            self.run_command('pull')
+            self.run_command(['pull'])
 
         except CommandError:
             # Fail if no remotes is OK.
@@ -151,12 +156,12 @@ class VcsHelper:
             if upstream is True:
                 upstream = self.branch_upstream
 
-            self.run_command(f'push -u {upstream} {self.branch_master}')
+            self.run_command(['push', '-u', upstream, self.branch_master])
 
         else:
-            self.run_command('push')
+            self.run_command(['push'])
 
-        self.run_command('push --tags')
+        self.run_command(['push', '--tags'])
 
 
 class GitHelper(VcsHelper):
@@ -174,7 +179,7 @@ class GitHelper(VcsHelper):
         """
         super().add_remote(address, alias=alias)
 
-        self.run_command(f'remote add {alias} {address}')
+        self.run_command(['remote', 'add', alias, address])
 
     def add(self, filename: Path | str = None):
         """Adds a file into a changelist.

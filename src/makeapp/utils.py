@@ -2,10 +2,11 @@ import configparser
 import fileinput
 import logging
 import os
+import shlex
 import shutil
 import sys
 import tempfile
-from collections.abc import Generator
+from collections.abc import Generator, Sequence
 from configparser import ConfigParser
 from contextlib import contextmanager
 from pathlib import Path
@@ -93,12 +94,19 @@ def check_command(command: str, *, hint: str):
             f"Check {hint} is installed and available.")
 
 
-def run_command(command: str, *, err_msg: str = '', env: dict | None = None, capture: bool = True) -> list[str]:
-    """Runs a command in a shell process.
+def run_command(
+        command: str | Sequence[str | os.PathLike],
+        *,
+        err_msg: str = '',
+        env: dict | None = None,
+        capture: bool = True,
+) -> list[str]:
+    """Run a command without invoking a shell.
 
-    Returns a list of strings gathered from a command.
+    Returns stripped, non-empty output lines. String commands are split with
+    :func:`shlex.split` for backward compatibility; argument lists are preferred.
 
-    :param command:
+    :param command: Command arguments.
     :param err_msg: Message to show on error.
     :param env: Environment variables to use.
     :param capture: Capture stdout and stderr and return as lines.
@@ -106,16 +114,22 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None, cap
     :raises: CommandError
 
     """
+    if isinstance(command, str):
+        command = shlex.split(command)
+
+    args = [os.fspath(item) for item in command]
+    command_display = shlex.join(args)
+
     if env:
         env = {**os.environ, **env}
 
-    LOG.debug(f'Run command: {command} ...')
+    LOG.debug(f'Run command: {command_display} ...')
     kwargs = {}
 
     if capture:
         kwargs = {'stdout': PIPE, 'stderr': STDOUT}
 
-    prc = Popen(command, shell=True, universal_newlines=True, env=env, **kwargs)
+    prc = Popen(args, shell=False, universal_newlines=True, env=env, **kwargs)
     out, _ = prc.communicate()
 
     if out:
@@ -126,7 +140,7 @@ def run_command(command: str, *, err_msg: str = '', env: dict | None = None, cap
         data = []
 
     if prc.returncode:
-        raise CommandError(err_msg or f"Command `{command}` failed: %s" % '\n'.join(data))
+        raise CommandError(err_msg or f"Command `{command_display}` failed: %s" % '\n'.join(data))
 
     return data
 
@@ -135,57 +149,72 @@ class Ruff:
     """Ruff wrapper."""
 
     @classmethod
-    def _run(cls, cmd: str) -> list[str]:
-        return run_command(f'ruff {cmd}', capture=False)
+    def _run(cls, args: Sequence[str]) -> list[str]:
+        return run_command(['ruff', *args], capture=False)
 
     @classmethod
     def check(cls, *, fix: bool = True) -> list[str]:
-        return cls._run(f'check{" --fix" if fix else ""}')
+        return cls._run(['check', *(['--fix'] if fix else [])])
 
 
 class MkDocs:
     """MkDocs wrapper."""
 
     @classmethod
-    def _run(cls, cmd: str) -> list[str]:
-        return run_command(f'mkdocs {cmd}', capture=False)
+    def _run(cls, args: Sequence[str]) -> list[str]:
+        return run_command(['mkdocs', *args], capture=False)
 
     @classmethod
     def serve(cls) -> list[str]:
-        return cls._run('serve -o')
+        return cls._run(['serve', '-o'])
 
     @classmethod
     def build(cls) -> list[str]:
-        return cls._run('build')
+        return cls._run(['build'])
 
 
 class Uv:
     """Uv wrapper."""
 
     @classmethod
-    def exec(cls, cmd: str, env: dict | None = None) -> list[str]:
-        return run_command(f'uv {cmd}', env=env, capture=False)
+    def exec(cls, command: str | Sequence[str], env: dict | None = None) -> list[str]:
+        if isinstance(command, str):
+            command = shlex.split(command)
+        return run_command(['uv', *command], env=env, capture=False)
 
     @classmethod
     def upgrade(cls) -> list[str]:
-        return cls.exec('self update')
+        return cls.exec(['self', 'update'])
 
     @classmethod
     def tool_install(cls, name: str) -> list[str]:
-        return cls.exec(f'tool install {name}')
+        return cls.exec(['tool', 'install', name])
 
     @classmethod
     def tool_upgrade(cls, name: str) -> list[str]:
-        return cls.exec(f'tool upgrade {name} --reinstall')
+        return cls.exec(['tool', 'upgrade', name, '--reinstall'])
 
     @classmethod
     def sync(cls) -> list[str]:
-        return cls.exec('sync')
+        return cls.exec(['sync'])
 
     @classmethod
     def install(cls):
         if sys.platform == 'win32':
-            cmd = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'
-        else:
-            cmd = 'curl -LsSf https://astral.sh/uv/install.sh | sh'
-        return run_command(cmd, capture=False)
+            return run_command([
+                'powershell',
+                '-ExecutionPolicy',
+                'ByPass',
+                '-c',
+                'irm https://astral.sh/uv/install.ps1 | iex',
+            ], capture=False)
+
+        with tempfile.NamedTemporaryFile() as script:
+            run_command([
+                'curl',
+                '-LsSf',
+                'https://astral.sh/uv/install.sh',
+                '-o',
+                script.name,
+            ], capture=False)
+            return run_command(['sh', script.name], capture=False)

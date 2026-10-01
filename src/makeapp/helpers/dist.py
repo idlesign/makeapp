@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from shutil import rmtree
 
 from ..utils import LOG, check_command, get_user_dir, read_ini, run_command
@@ -9,9 +10,9 @@ class DistHelper:
     check_command('uv', hint='uv')
 
     @classmethod
-    def run_command_uv(cls, command: str, *, env: dict = None) -> list[str]:
+    def run_command_uv(cls, command: Sequence[str], *, env: dict = None) -> list[str]:
         """Basic command runner."""
-        return run_command(f'uv {command}', env=env)
+        return run_command(['uv', *command], env=env)
 
     @classmethod
     def upload(cls):
@@ -32,5 +33,5 @@ class DistHelper:
         if not env_vars:
             LOG.warning(f'PyPI credentials not found in {pypirc_file}')
 
-        cls.run_command_uv('build')
-        cls.run_command_uv('publish', env=env_vars)
+        cls.run_command_uv(['build'])
+        cls.run_command_uv(['publish'], env=env_vars)
