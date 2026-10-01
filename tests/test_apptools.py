@@ -1,3 +1,4 @@
+from pathlib import Path
 from textwrap import dedent
 
 from makeapp.apptools import ChangelogData, Project
@@ -108,3 +109,33 @@ def test_changelog(in_tmp_path):
     assert data.deduce_version_increment() == 'minor'
 
     assert data.get_version_summary() == '* ++ Some feature'
+
+
+def test_project_path_is_used_for_settings_and_commands(tmp_path, monkeypatch):
+    project_path = tmp_path / 'target'
+    project_path.mkdir()
+    (project_path / 'pyproject.toml').write_text(
+        '[tool.makeapp]\nmarker = "target"\n'
+    )
+    project = Project(project_path=project_path)
+    command_paths = []
+
+    def record_path(*args, **kwargs):
+        command_paths.append(Path.cwd())
+        return {
+            'OK': [],
+            'FAIL': [],
+        }
+
+    monkeypatch.setattr('makeapp.apptools.TestsHelper.run_tests', record_path)
+    monkeypatch.setattr('makeapp.apptools.Ruff.check', record_path)
+    monkeypatch.setattr('makeapp.apptools.MkDocs.build', record_path)
+    monkeypatch.setattr(project.venv, 'initialize', record_path)
+
+    assert project.get_settings() == {'marker': 'target'}
+    project.run_tests()
+    project.style()
+    project.docs(serve=False)
+    project.venv_init()
+
+    assert command_paths == [project_path] * 4

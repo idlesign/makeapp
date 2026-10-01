@@ -360,12 +360,12 @@ class Project:
         self.configure_logging(log_level)
 
         project_path = project_path or os.getcwd()
-        self.project_path = Path(project_path)
+        self.project_path = Path(project_path).resolve()
         self.package: PackageData | None = None
         self.changelog: ChangelogData | None = None
-        self.vcs = VcsHelper.get(project_path)
-        self.venv = VenvHelper(project_path)
-        self._setting = {}
+        self.vcs = VcsHelper.get(self.project_path)
+        self.venv = VenvHelper(self.project_path)
+        self._setting: dict | None = None
 
     def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
         """Switches on logging at a given level.
@@ -381,16 +381,17 @@ class Project:
 
         settings = self._setting
 
-        if not settings:
-
-            path = Path("pyproject.toml")
+        if settings is None:
+            path = self.project_path / 'pyproject.toml'
             if not path.exists():
-                raise ProjectorExeption('No `pyproject.toml` file found in the current directory.')
+                raise ProjectorExeption(
+                    f'No `pyproject.toml` file found in `{self.project_path}`.'
+                )
 
-            with path.open("rb") as f:
+            with path.open('rb') as f:
                 data = tomllib.load(f)
 
-            settings = data.get("tool", {}).get("makeapp", {})
+            settings = data.get('tool', {}).get('makeapp', {})
             self._setting = settings
 
         return settings
@@ -527,21 +528,25 @@ class Project:
 
     def run_tests(self, *, only: list[str] | None = None) -> dict[str, list[str]]:
         LOG.info('Running tests ...')
-        helper = TestsHelper(settings=self.get_settings().get('tests', {}), only=only)
-        return helper.run_tests()
+        with chdir(self.project_path):
+            helper = TestsHelper(settings=self.get_settings().get('tests', {}), only=only)
+            return helper.run_tests()
 
     def style(self):
         LOG.info('Styling ...')
-        Ruff.check()
+        with chdir(self.project_path):
+            Ruff.check()
 
     def docs(self, *, serve: bool = True):
         LOG.info('Making docs ...')
-        MkDocs.serve() if serve else MkDocs.build()
+        with chdir(self.project_path):
+            MkDocs.serve() if serve else MkDocs.build()
 
     def venv_init(self, *, reset: bool = False, register_tool: bool = False):
-        self.venv.initialize(reset=reset)
+        with chdir(self.project_path):
+            self.venv.initialize(reset=reset)
 
-        register_tool and self.venv.register_tool()
+            register_tool and self.venv.register_tool()
 
     def tools_init(self, upgrade: bool = False):
         LOG.info(f'{"Upgrading" if upgrade else "Bootstrapping"} development tools ...')
