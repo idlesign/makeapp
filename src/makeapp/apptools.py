@@ -205,16 +205,25 @@ class ChangelogData(DataContainer):
         unreleased_str = cls.marker_unreleased
         prefix_version = cls._prefix_version
         version_line_idx = None
+        first_version_idx = None
+        unreleased_entry_exists = False
+        in_fence = False
 
-        for supposed_line_idx in (2, 3, 4):
-            line = changelog[supposed_line_idx].lstrip('# ')
-            unreleased_entry_exists = line == unreleased_str
-
-            if unreleased_entry_exists or line.startswith('v'):
-                version_line_idx = supposed_line_idx
-                LOG.info(f'Current version from changelog: {line}.')
+        for line_idx, line in enumerate(changelog):
+            if line.lstrip().startswith('```'):
+                in_fence = not in_fence
+                continue
+            match = None if in_fence else re.match(r'^#{1,6}\s+(.+?)\s*$', line)
+            if not match:
+                continue
+            heading = match.group(1)
+            if heading == unreleased_str:
+                version_line_idx, unreleased_entry_exists = line_idx, True
                 break
+            if heading.startswith('v') and first_version_idx is None:
+                first_version_idx = line_idx
 
+        version_line_idx = version_line_idx if version_line_idx is not None else first_version_idx
         if version_line_idx is None:
             raise ProjectorExeption('Version line not found in the changelog.')
 

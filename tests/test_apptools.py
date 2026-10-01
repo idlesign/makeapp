@@ -174,3 +174,25 @@ def test_project_reports_missing_vcs(tmp_path):
 
     with pytest.raises(ProjectorExeption, match='No supported VCS repository'):
         project.pull()
+
+
+def test_changelog_finds_headings_after_preamble(in_tmp_path):
+    fchangelog = in_tmp_path / ChangelogData.filename
+    fchangelog.write_text(dedent('''
+        # Sample changelog
+
+        Project release history.
+
+        ```md
+        ### Unreleased
+        ```
+
+        ### v1.0.0 [2026-01-01]
+        * ** Existing change.
+    ''').lstrip())
+
+    data = ChangelogData.get()
+    line_idx = data.file_helper.line_idx
+
+    assert data.file_helper.contents[line_idx] == '### Unreleased'
+    assert data.file_helper.contents[line_idx + 2].startswith('### v1.0.0')
