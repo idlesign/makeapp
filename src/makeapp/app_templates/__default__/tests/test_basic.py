@@ -7,5 +7,5 @@ class TestApp:
 
         assert 1 == 1
 
-        with pytest.raises(Exception):
-            raise Exception('Tested!')
+        with pytest.raises(ValueError, match='Tested!'):
+            raise ValueError('Tested!')

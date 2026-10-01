@@ -53,6 +53,7 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
 
     assert_content(in_tmp_path / 'tests/test_basic.py', [
         'import pytest',
+        "pytest.raises(ValueError, match='Tested!')",
     ])
 
 
