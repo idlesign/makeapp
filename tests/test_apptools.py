@@ -1,7 +1,10 @@
 from pathlib import Path
 from textwrap import dedent
 
+import pytest
+
 from makeapp.apptools import ChangelogData, Project
+from makeapp.exceptions import ProjectorExeption
 from makeapp.helpers.vcs import VcsHelper
 
 
@@ -142,3 +145,24 @@ def test_project_path_is_used_for_settings_and_commands(tmp_path, monkeypatch):
     project.venv_init()
 
     assert command_paths == [project_path] * 4
+
+
+def test_release_package_prefers_normalized_project_name(tmp_path):
+    first = tmp_path / 'src' / 'first'
+    preferred = tmp_path / 'src' / 'sample_package'
+    first.mkdir(parents=True)
+    preferred.mkdir()
+    (first / '__init__.py').touch()
+    (preferred / '__init__.py').touch()
+
+    assert Project.find_release_package(tmp_path, 'sample-package') == preferred
+
+
+def test_release_package_rejects_ambiguous_candidates(tmp_path):
+    for name in ('first', 'second'):
+        package = tmp_path / 'src' / name
+        package.mkdir(parents=True, exist_ok=True)
+        (package / '__init__.py').touch()
+
+    with pytest.raises(ProjectorExeption, match='Unable to identify release package'):
+        Project.find_release_package(tmp_path, 'unknown')

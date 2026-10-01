@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import tomllib
 from contextlib import chdir
 from datetime import datetime
@@ -335,21 +336,27 @@ class ChangelogData(DataContainer):
 class Project:
     """Encapsulates application (project) related logic."""
 
-    @classmethod
-    def find_packages(cls, where: Path, *, prefer: str) -> list[Path]:
-
-        candidate = where / prefer / '__init__.py'
-
-        if candidate.exists():
-            return [candidate.parent]
-
-        packages_found = [
-            obj
-            for obj in where.iterdir()
-            if obj.is_dir() and (obj / '__init__.py').exists() and 'tests' not in obj.name
+    @staticmethod
+    def find_packages(where: Path) -> list[Path]:
+        if not where.is_dir():
+            return []
+        return [
+            obj for obj in where.iterdir()
+            if obj.is_dir() and (obj / '__init__.py').exists() and obj.name != 'tests'
         ]
 
-        return packages_found
+    @classmethod
+    def find_release_package(cls, project_path: Path, project_name: str) -> Path:
+        packages = cls.find_packages(project_path) + cls.find_packages(project_path / 'src')
+        preferred_name = re.sub(r'[-.]+', '_', project_name)
+        preferred = [package for package in packages if package.name == preferred_name]
+        candidates = preferred or packages
+
+        if len(candidates) != 1:
+            found = ', '.join(map(str, candidates)) or 'none'
+            raise ProjectorExeption(f'Unable to identify release package; candidates: {found}.')
+
+        return candidates[0]
 
     def __init__(self, project_path: Path = None, *, log_level: int = None):
         """
@@ -365,6 +372,7 @@ class Project:
         self.changelog: ChangelogData | None = None
         self.vcs = VcsHelper.get(self.project_path)
         self.venv = VenvHelper(self.project_path)
+        self._project_data: dict | None = None
         self._setting: dict | None = None
 
     def configure_logging(self, verbosity_lvl: int = None, format: str = '%(message)s'):
@@ -376,25 +384,22 @@ class Project:
         """
         configure_logging(verbosity_lvl, logger=LOG, format=format)
 
-    def get_settings(self) -> dict | None:
-        """Returns project settings from pyproject.toml (with default) or None if file not found."""
-
-        settings = self._setting
-
-        if settings is None:
+    def get_project_data(self) -> dict:
+        if self._project_data is None:
             path = self.project_path / 'pyproject.toml'
             if not path.exists():
                 raise ProjectorExeption(
                     f'No `pyproject.toml` file found in `{self.project_path}`.'
                 )
-
             with path.open('rb') as f:
-                data = tomllib.load(f)
+                self._project_data = tomllib.load(f)
+        return self._project_data
 
-            settings = data.get('tool', {}).get('makeapp', {})
-            self._setting = settings
-
-        return settings
+    def get_settings(self) -> dict:
+        """Return project settings from pyproject.toml, or an empty dictionary."""
+        if self._setting is None:
+            self._setting = self.get_project_data().get('tool', {}).get('makeapp', {})
+        return self._setting
 
     def _gather_data(self):
         """Gathers data relevant for project related functions."""
@@ -407,22 +412,12 @@ class Project:
 
             LOG.debug(f'Gathering info from `{project_path}` directory ...')
 
-            self.get_settings()
+            project_data = self.get_project_data()
             self.vcs.check()
 
-            parent_dirname = project_path.parent.name
-
-            packages = self.find_packages(project_path, prefer=parent_dirname)
-            if not packages:
-                # src layout
-                packages = self.find_packages(project_path / 'src', prefer=parent_dirname)
-
-            LOG.debug(f'Found packages: {packages}')
-
-            if not packages:
-                raise ProjectorExeption('No package found.')
-
-            package = packages[0]
+            project_name = project_data.get('project', {}).get('name', project_path.name)
+            package = self.find_release_package(project_path, project_name)
+            LOG.debug(f'Found release package: {package}')
 
             self.package = PackageData.get(package_path=package)
             self.changelog = ChangelogData.get()
