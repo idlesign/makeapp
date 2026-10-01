@@ -16,7 +16,7 @@ try:
 
 except MakeappException as e:
     click.secho(f'{e}', err=True, fg='red')
-    sys.exit()
+    sys.exit(1)
 
 
 option_debug = click.option(

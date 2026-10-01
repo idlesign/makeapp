@@ -1,7 +1,10 @@
+import pytest
+
+from makeapp.exceptions import CommandError
 from makeapp.helpers.dist import DistHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 from makeapp.helpers.vcs import GitHelper
-from makeapp.utils import run_command
+from makeapp.utils import Uv, run_command
 
 
 def test_disthelper():
@@ -84,3 +87,10 @@ def test_git_push_uses_current_branch(monkeypatch):
         ['push', '-u', 'origin', 'feature'],
         ['push', '--tags'],
     ]
+
+
+def test_uv_is_checked_when_used(monkeypatch):
+    monkeypatch.setattr('makeapp.utils.shutil.which', lambda command: None)
+
+    with pytest.raises(CommandError, match="Failed to execute 'uv'"):
+        Uv.sync()

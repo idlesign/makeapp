@@ -1,4 +1,7 @@
 import logging
+import os
+import subprocess
+import sys
 
 import pytest
 from click.testing import CliRunner
@@ -72,3 +75,33 @@ def test_main_returns_nonzero_on_domain_error(monkeypatch, capsys):
 
     assert exc_info.value.code == 1
     assert 'Failure' in capsys.readouterr().err
+
+
+def test_version_does_not_require_uv():
+    env = {**os.environ, 'PATH': ''}
+
+    result = subprocess.run(
+        [sys.executable, '-m', 'makeapp.cli', '--version'],
+        capture_output=True,
+        check=False,
+        env=env,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert ', version ' in result.stdout
+
+
+def test_uv_command_fails_when_uv_is_missing():
+    env = {**os.environ, 'PATH': ''}
+
+    result = subprocess.run(
+        [sys.executable, '-m', 'makeapp.cli', 'up'],
+        capture_output=True,
+        check=False,
+        env=env,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert "Failed to execute 'uv' command" in result.stderr

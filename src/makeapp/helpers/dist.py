@@ -7,11 +7,10 @@ from ..utils import LOG, check_command, get_user_dir, read_ini, run_command
 class DistHelper:
     """Encapsulates Python distribution related logic."""
 
-    check_command('uv', hint='uv')
-
     @classmethod
     def run_command_uv(cls, command: Sequence[str], *, env: dict = None) -> list[str]:
         """Basic command runner."""
+        check_command('uv', hint='uv')
         return run_command(['uv', *command], env=env)
 
     @classmethod

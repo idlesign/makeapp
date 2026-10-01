@@ -178,6 +178,7 @@ class Uv:
 
     @classmethod
     def exec(cls, command: str | Sequence[str], env: dict | None = None) -> list[str]:
+        check_command('uv', hint='uv')
         if isinstance(command, str):
             command = shlex.split(command)
         return run_command(['uv', *command], env=env, capture=False)
