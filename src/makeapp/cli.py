@@ -252,6 +252,12 @@ def tests(debug, only):
             items = ' '.join(items)
             click.secho(f'Tests {status} ({total_items}):\n  {items}', err=err, fg=color)
 
+    if stats[key_fail]:
+        raise click.exceptions.Exit(1)
+
+    if not stats[key_ok]:
+        raise click.ClickException('No test environments were run.')
+
     click.secho('Done', fg='green')
 
 
@@ -273,6 +279,7 @@ def main():
         entry_point(obj={})
     except MakeappException as e:
         click.secho(f'{e}', err=True, fg='red')
+        raise SystemExit(1) from e
 
 
 if __name__ == '__main__':
