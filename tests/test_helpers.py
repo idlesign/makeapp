@@ -1,6 +1,6 @@
 import pytest
 
-from makeapp.exceptions import CommandError
+from makeapp.exceptions import CommandError, ProjectorExeption
 from makeapp.helpers.dist import DistHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 from makeapp.helpers.vcs import GitHelper
@@ -37,6 +37,26 @@ class TestTestsHelper:
             'a${{django-version}}b && |${{ python }}|',
             {'django-version': 2.0, 'python': '3.10'}
         ) == 'a2.0b && |3.10|'
+
+    def test_get_matrix_prefers_conventional_test_job(self, tmp_path):
+        workflow = tmp_path / 'workflow.yml'
+        workflow.write_text(
+            'jobs:\n'
+            '  lint: {strategy: {matrix: {os: [linux]}}}\n'
+            '  build: {strategy: {matrix: {python-version: [3.11]}}}\n'
+            '  tests: {strategy: {matrix: {python-version: [3.12]}}}\n'
+        )
+
+        assert MatrixTestsHelper.get_matrix_github(workflow) == [
+            {'python-version': 3.12},
+        ]
+
+    def test_get_matrix_rejects_workflow_without_python_matrix(self, tmp_path):
+        workflow = tmp_path / 'workflow.yml'
+        workflow.write_text('jobs: {lint: {strategy: {matrix: {os: [linux]}}}}')
+
+        with pytest.raises(ProjectorExeption, match='No test matrix'):
+            MatrixTestsHelper.get_matrix_github(workflow)
 
 
 def test_run_command_does_not_interpret_shell_syntax():

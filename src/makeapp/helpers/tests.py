@@ -7,7 +7,7 @@ from sys import version_info
 
 import yaml
 
-from ..exceptions import CommandError
+from ..exceptions import CommandError, ProjectorExeption
 from ..utils import LOG, Uv
 
 
@@ -42,8 +42,20 @@ class TestsHelper:
             config = yaml.safe_load(f)
 
         jobs = config.get('jobs', {})
-        job_name = list(jobs.keys())[0]
-        matrix = jobs[job_name].get('strategy', {}).get('matrix', {})
+        candidates = [
+            (name, job.get('strategy', {}).get('matrix', {}))
+            for name, job in jobs.items()
+            if 'python-version' in job.get('strategy', {}).get('matrix', {})
+        ]
+        if not candidates:
+            raise ProjectorExeption('No test matrix with `python-version` found.')
+
+        by_name = dict(candidates)
+        job_name = next(
+            (name for name in ('tests', 'test', 'build') if name in by_name),
+            candidates[0][0],
+        )
+        matrix = dict(by_name[job_name])
         exclusions = matrix.pop('exclude', [])
         keys = matrix.keys()
         values = matrix.values()
