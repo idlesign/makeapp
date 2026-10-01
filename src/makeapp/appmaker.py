@@ -400,11 +400,7 @@ class AppMaker:
 
         """
         with open(path, 'w') as f:
-
-            f.write(contents)
-
-            if contents.endswith('\n'):
-                f.write('\n')
+            f.write(contents.rstrip('\n') + '\n')
 
     def _copy_file(self, src: TemplateFile, dest: str, prepend_data: str = None):
         """Copies a file from `src` to `dest` replacing settings markers

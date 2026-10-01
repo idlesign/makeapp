@@ -98,6 +98,9 @@ def test_changelog(in_tmp_path):
     assert data.version_bump((1, 2, 3)) == 'v1.2.3'
     assert '1.2.3' in contents[2]
     data.write()
+    changelog_bytes = fchangelog.read_bytes()
+    assert changelog_bytes.endswith(b'\n')
+    assert not changelog_bytes.endswith(b'\n\n')
 
     # another loop
     data, contents = load()

@@ -31,7 +31,7 @@ class FileHelper:
         LOG.debug(f'Writing `{self.filepath}` ...')
 
         with open(self.filepath, 'w') as f:
-            f.write('\n'.join(self.contents))
+            f.write('\n'.join(self.contents).rstrip('\n') + '\n')
 
     def line_replace(self, value: str, offset: int = 0):
         """Replaces a line in file.

@@ -54,6 +54,10 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
         "pytest.raises(ValueError, match='Tested!')",
     ])
 
+    readme = (in_tmp_path / 'README.md').read_bytes()
+    assert readme.endswith(b'\n')
+    assert not readme.endswith(b'\n\n')
+
 
 def test_tpl_userdefined(in_tmp_path, tmp_path, get_appmaker, assert_content):
 
