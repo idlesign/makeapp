@@ -81,5 +81,7 @@ release commit and tag so they can be reviewed before running `ma publish`.
 ma publish
 ```
 
-This command does not change the version or create a tag. It pulls the repository, pushes the current branch and tags,
-removes the existing `dist/` directory, runs `uv build`, and runs `uv publish`.
+This command does not change the version or create a tag. It pulls the repository, removes the existing `dist/`
+directory, runs `uv build` and `uv publish`, and then pushes the current branch and tags. If the Git push fails after a
+successful PyPI upload, makeapp leaves a `.makeapp-publish-pending` marker. The next `ma publish` retries only the Git
+push and removes the marker after it succeeds, avoiding a duplicate PyPI upload.

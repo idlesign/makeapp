@@ -3,7 +3,7 @@ from textwrap import dedent
 
 import pytest
 
-from makeapp.apptools import ChangelogData, Project
+from makeapp.apptools import PUBLISH_PENDING_FILENAME, ChangelogData, Project
 from makeapp.exceptions import ProjectorExeption
 from makeapp.helpers.vcs import VcsHelper
 
@@ -45,11 +45,64 @@ def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
     project.publish()
 
     assert issued_commands == [
-        ['git', 'push'],
-        ['git', 'push', '--tags'],
         ['uv', 'build'],
         ['uv', 'publish'],
+        ['git', 'push'],
+        ['git', 'push', '--tags'],
     ]
+    assert not (in_tmp_path / PUBLISH_PENDING_FILENAME).exists()
+
+
+def test_publish_does_not_push_after_upload_failure(in_tmp_path, get_appmaker, monkeypatch):
+    get_appmaker()
+    project = Project()
+    git_pushed = False
+
+    def fail_upload():
+        raise RuntimeError('upload failed')
+
+    def push():
+        nonlocal git_pushed
+        git_pushed = True
+
+    monkeypatch.setattr('makeapp.apptools.DistHelper.upload', fail_upload)
+    monkeypatch.setattr(project.vcs, 'push', push)
+
+    with pytest.raises(RuntimeError, match='upload failed'):
+        project.publish()
+
+    assert not git_pushed
+    assert not (in_tmp_path / PUBLISH_PENDING_FILENAME).exists()
+
+
+def test_publish_retries_pending_git_push(in_tmp_path, get_appmaker, monkeypatch):
+    get_appmaker()
+    project = Project()
+    pending_path = in_tmp_path / PUBLISH_PENDING_FILENAME
+    calls = []
+
+    monkeypatch.setattr(
+        'makeapp.apptools.DistHelper.upload',
+        lambda: calls.append('upload'),
+    )
+
+    def fail_push():
+        calls.append('push')
+        raise RuntimeError('push failed')
+
+    monkeypatch.setattr(project.vcs, 'push', fail_push)
+
+    with pytest.raises(RuntimeError, match='push failed'):
+        project.publish()
+
+    assert calls == ['upload', 'push']
+    assert pending_path.is_file()
+
+    monkeypatch.setattr(project.vcs, 'push', lambda: calls.append('retry push'))
+    project.publish()
+
+    assert calls == ['upload', 'push', 'retry push']
+    assert not pending_path.exists()
 
 
 def test_venv(in_tmp_path, get_appmaker, assert_content):

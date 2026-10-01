@@ -18,6 +18,7 @@ LOG = logging.getLogger(__name__)
 
 
 VERSION_NUMBER_CHUNKS = ('major', 'minor', 'patch')
+PUBLISH_PENDING_FILENAME = '.makeapp-publish-pending'
 
 
 class DataContainer:
@@ -535,8 +536,13 @@ class Project:
         LOG.info('Publishing application ...')
 
         with chdir(self.project_path):
+            pending_path = Path(PUBLISH_PENDING_FILENAME)
+            if not pending_path.exists():
+                DistHelper.upload()
+                pending_path.write_text('PyPI upload completed; Git push pending.\n')
+
             self.vcs.push()
-            DistHelper.upload()
+            pending_path.unlink()
 
     def run_tests(self, *, only: list[str] | None = None) -> dict[str, list[str]]:
         LOG.info('Running tests ...')

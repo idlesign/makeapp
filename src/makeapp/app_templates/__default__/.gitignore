@@ -11,5 +11,6 @@ __pycache__
 .mypy_cache
 .ruff_cache
 .pytest_cache
+.makeapp-publish-pending
 .env
 {% endblock %}
