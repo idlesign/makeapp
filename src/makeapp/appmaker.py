@@ -14,7 +14,7 @@ from .exceptions import AppMakerException
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
 from .rendering import Renderer
-from .utils import PYTHON_VERSION, configure_logging, get_user_dir, read_ini
+from .utils import PYTHON_MIN_VERSION, configure_logging, get_user_dir, read_ini
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
 BASE_PATH = os.path.dirname(__file__)
@@ -69,7 +69,7 @@ class AppMaker:
         'license_ident': LICENSES[default_license][1],
         'vcs': default_vcs,
         'vcs_remote': None,
-        'python_version': '.'.join(map(str, PYTHON_VERSION[:2])),
+        'python_version': '.'.join(map(str, PYTHON_MIN_VERSION)),
     }
 
     app_template_default: AppTemplate = None

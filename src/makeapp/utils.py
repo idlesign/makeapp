@@ -16,7 +16,7 @@ from textwrap import indent
 from .exceptions import CommandError
 
 LOG = logging.getLogger(__name__)
-PYTHON_VERSION = sys.version_info
+PYTHON_MIN_VERSION = (3, 11)
 
 
 def configure_logging(

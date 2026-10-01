@@ -52,7 +52,7 @@ Standard settings are:
 | `license` | License template alias | `bsd3cl` |
 | `vcs` | Version control system | `git` |
 | `vcs_remote` | Remote repository URL | Empty |
-| `python_version` | Minimum generated Python version | Current major/minor version |
+| `python_version` | Minimum generated Python version | `3.11` |
 
 Supported license aliases are `no`, `mit`, `apache2`, `gpl2`, `gpl3`, `bsd2cl`, and `bsd3cl`.
 

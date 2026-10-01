@@ -15,6 +15,7 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
     assert 'app_name: dummy' in settings_str
     assert 'Chosen VCS: Git' in settings_str
     assert 'vcs: git'
+    assert app_maker.settings['python_version'] == '3.11'
 
     assert_content(in_tmp_path / 'README.md', [
         '# dummy\n',
@@ -33,6 +34,7 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
     assert_content(in_tmp_path / 'pyproject.toml', [
         'name = "The Librarian"',
         'email = "librarian@discworld.wrld"',
+        'requires-python = ">=3.11"',
     ])
 
     assert_content(in_tmp_path / 'docs/index.md', [
