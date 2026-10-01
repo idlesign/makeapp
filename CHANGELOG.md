@@ -1,7 +1,17 @@
 # makeapp changelog
 
 ### Unreleased
+* !! Prevent shell command injection and keep rendered templates inside the target directory.
 * ++ Expand user, CLI, template, publishing, and generated project documentation.
+* ++ Resume pending Git pushes without publishing the same package twice.
+* ++ Reuse a compatible project virtual environment for a single selected local test environment.
+* ** Return non-zero CLI exit codes for command failures.
+* ** Support Git branches other than master and report missing repositories clearly.
+* ** Select release packages and GitHub Actions test jobs reliably.
+* ** Honor explicit project paths and harden PyPI name availability checks.
+* ** Find changelog headings regardless of their position in the file.
+* ** Generate Ruff-compatible tests, use a stable minimum Python version, and normalize file endings.
+* ** Check for uv only when a command needs it.
 * ** Remove the obsolete pytest parent from the Webscaff template.
 
 ### v2.3.0 [2026-05-09]

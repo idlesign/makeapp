@@ -15,6 +15,9 @@ class TestsHelper:
 
     _RE_VAR = re.compile(r'\$\{\{\s*([\w-]+)\s*\}\}')
     _RE_VALID_IDENT = re.compile(r'[^a-zA-Z0-9]')
+    _RE_PYTHON_VERSION = re.compile(
+        r'^\s*version(?:_info)?\s*=\s*(\d+)\.(\d+)'
+    )
 
     KEY_OK = 'OK'
     KEY_FAIL = 'FAIL'
@@ -80,6 +83,20 @@ class TestsHelper:
 
         return combinations
 
+    @classmethod
+    def is_venv_compatible(cls, venv_dir: Path, python_version: str) -> bool:
+        """Return whether a virtual environment uses the requested Python version."""
+        expected = re.match(r'^(\d+)\.(\d+)', python_version)
+        config_path = venv_dir / 'pyvenv.cfg'
+        if expected is None or not config_path.is_file():
+            return False
+
+        for line in config_path.read_text().splitlines():
+            if actual := cls._RE_PYTHON_VERSION.match(line):
+                return actual.groups() == expected.groups()
+
+        return False
+
     def run_tests(self) -> dict[str, list[str]]:
         settings = self._settings
 
@@ -96,14 +113,12 @@ class TestsHelper:
         matrix_lines = '\n  '.join(' '.join(f"{key}:{value}" for key, value in line.items()) for line in matrix)
         LOG.info(f'Test matrix:\n  {matrix_lines}')
 
-        stats = {
-            self.KEY_OK: [],
-            self.KEY_FAIL: [],
-        }
-
+        environments = []
         for combination in matrix:
-
-            python_version = combination.get('python-version') or f"{version_info.major}.{version_info.minor}"
+            python_version = combination.get('python-version')
+            if not python_version:
+                python_version = f'{version_info.major}.{version_info.minor}'
+            python_version = f'{python_version}'
             ident_chunks = [make_valid_ident(f'py{python_version}')]
             deps_resolved = []
             for dep in deps:
@@ -112,30 +127,51 @@ class TestsHelper:
                 ident_chunks.append(make_valid_ident(dep))
 
             ident = "_".join(ident_chunks)
-
             if not only or ident in only:
-                LOG.info(f'Running: {ident}: {combination} ...')
+                environments.append((ident, combination, python_version, deps_resolved))
 
-                venv_dir = f'.venv_ma/{ident}'
-                execute = partial(Uv.exec, env={
-                    'VIRTUAL_ENV': venv_dir,
-                    'UV_PROJECT_ENVIRONMENT': venv_dir,
-                })
-                status = self.KEY_OK
+        reuse_project_venv = (
+            len(environments) == 1
+            and self.is_venv_compatible(Path('.venv'), environments[0][2])
+        )
 
-                try:
-                    execute(['sync', '--only-group', 'tests', '--python', f'{python_version}'])
+        stats = {
+            self.KEY_OK: [],
+            self.KEY_FAIL: [],
+        }
+
+        for ident, combination, python_version, deps_resolved in environments:
+            LOG.info(f'Running: {ident}: {combination} ...')
+
+            venv_dir = '.venv' if reuse_project_venv else f'.venv_ma/{ident}'
+            if reuse_project_venv:
+                LOG.info(f'Reusing project virtual environment: {venv_dir}')
+            execute = partial(Uv.exec, env={
+                'VIRTUAL_ENV': venv_dir,
+                'UV_PROJECT_ENVIRONMENT': venv_dir,
+            })
+            status = self.KEY_OK
+
+            try:
+                if reuse_project_venv:
+                    command = ['run', '--group', 'tests', '--python', python_version]
+                    for dep in deps_resolved:
+                        command.extend(['--with', dep])
+                    execute([*command, 'pytest'])
+
+                else:
+                    execute(['sync', '--only-group', 'tests', '--python', python_version])
 
                     if deps_resolved:
                         execute(['pip', 'install', *deps_resolved, '--python', venv_dir])
 
                     execute(['run', 'pytest'])
 
-                except CommandError:
-                    status = self.KEY_FAIL
-                    continue
+            except CommandError:
+                status = self.KEY_FAIL
+                continue
 
-                finally:
-                    stats[status].append(ident)
+            finally:
+                stats[status].append(ident)
 
         return stats

@@ -58,6 +58,109 @@ class TestTestsHelper:
         with pytest.raises(ProjectorExeption, match='No test matrix'):
             MatrixTestsHelper.get_matrix_github(workflow)
 
+    def test_run_tests_reuses_matching_venv_with_matrix_deps(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        venv_path = tmp_path / '.venv'
+        venv_path.mkdir()
+        (venv_path / 'pyvenv.cfg').write_text('version_info = 3.14\n')
+
+        helper = MatrixTestsHelper(
+            settings={'deps': ['django~=${{ django-version }}']},
+        )
+        monkeypatch.setattr(helper, 'get_matrix_github', lambda path: [{
+            'python-version': 3.14,
+            'django-version': '6.0',
+        }])
+        issued = []
+        monkeypatch.setattr(
+            'makeapp.helpers.tests.Uv.exec',
+            lambda command, env=None: issued.append((command, env)),
+        )
+
+        assert helper.run_tests() == {
+            helper.KEY_OK: ['py314_django60'],
+            helper.KEY_FAIL: [],
+        }
+        assert issued == [(
+            [
+                'run',
+                '--group',
+                'tests',
+                '--python',
+                '3.14',
+                '--with',
+                'django~=6.0',
+                'pytest',
+            ],
+            {
+                'VIRTUAL_ENV': '.venv',
+                'UV_PROJECT_ENVIRONMENT': '.venv',
+            },
+        )]
+
+    def test_run_tests_reuses_matching_venv_after_only_filter(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        venv_path = tmp_path / '.venv'
+        venv_path.mkdir()
+        (venv_path / 'pyvenv.cfg').write_text('version = 3.14.3\n')
+
+        helper = MatrixTestsHelper(settings={}, only=['py314'])
+        monkeypatch.setattr(helper, 'get_matrix_github', lambda path: [
+            {'python-version': 3.13},
+            {'python-version': 3.14},
+        ])
+        issued = []
+        monkeypatch.setattr(
+            'makeapp.helpers.tests.Uv.exec',
+            lambda command, env=None: issued.append((command, env)),
+        )
+
+        assert helper.run_tests() == {
+            helper.KEY_OK: ['py314'],
+            helper.KEY_FAIL: [],
+        }
+        assert issued == [(
+            ['run', '--group', 'tests', '--python', '3.14', 'pytest'],
+            {
+                'VIRTUAL_ENV': '.venv',
+                'UV_PROJECT_ENVIRONMENT': '.venv',
+            },
+        )]
+
+    def test_run_tests_keeps_isolation_for_incompatible_venv(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        venv_path = tmp_path / '.venv'
+        venv_path.mkdir()
+        (venv_path / 'pyvenv.cfg').write_text('version_info = 3.13\n')
+
+        helper = MatrixTestsHelper(settings={})
+        monkeypatch.setattr(
+            helper,
+            'get_matrix_github',
+            lambda path: [{'python-version': 3.14}],
+        )
+        issued = []
+        monkeypatch.setattr(
+            'makeapp.helpers.tests.Uv.exec',
+            lambda command, env=None: issued.append((command, env)),
+        )
+
+        assert helper.run_tests() == {
+            helper.KEY_OK: ['py314'],
+            helper.KEY_FAIL: [],
+        }
+        environment = {
+            'VIRTUAL_ENV': '.venv_ma/py314',
+            'UV_PROJECT_ENVIRONMENT': '.venv_ma/py314',
+        }
+        assert issued == [
+            (
+                ['sync', '--only-group', 'tests', '--python', '3.14'],
+                environment,
+            ),
+            (['run', 'pytest'], environment),
+        ]
+
 
 def test_run_command_does_not_interpret_shell_syntax():
     marker = 'value; echo injected'

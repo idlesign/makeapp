@@ -33,8 +33,13 @@ An absolute or relative workflow path can also be supplied. A filename without d
 ma tests
 ```
 
-Before executing tests, makeapp prints all discovered matrix combinations. Each combination receives an environment
-under `.venv_ma/`, then runs:
+Before executing tests, makeapp prints all discovered matrix combinations. When exactly one combination remains after
+applying the optional `--only` filter, makeapp reuses the project `.venv` if its Python major and minor version match
+the combination's `python-version`. Static test dependencies are synchronized with `--group tests`, and resolved
+dynamic dependencies are temporarily added with `--with` in the same `uv run` invocation.
+
+When multiple combinations are selected, `.venv` is missing, or its Python version does not match, each combination
+receives an isolated environment under `.venv_ma/`, then runs:
 
 1. `uv sync --only-group tests --python <version>`;
 2. `uv pip install` for resolved dynamic dependencies, when configured;
