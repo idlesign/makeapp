@@ -2,6 +2,7 @@ import configparser
 import fileinput
 import logging
 import os
+import re
 import shlex
 import shutil
 import sys
@@ -153,8 +154,44 @@ class Ruff:
         return run_command(['ruff', *args], capture=False)
 
     @classmethod
-    def check(cls, *, fix: bool = True) -> list[str]:
-        return cls._run(['check', *(['--fix'] if fix else [])])
+    def check(
+            cls,
+            *,
+            fix: bool = True,
+            project_data: dict | None = None,
+    ) -> list[str]:
+        project_data = project_data or {}
+        args = ['check', *(['--fix'] if fix else [])]
+        project_options = cls._get_project_options(project_data)
+
+        if project_options is not None:
+            return Uv.exec(['run', *project_options, 'python', '-m', 'ruff', *args])
+
+        if required_version := project_data.get('tool', {}).get('ruff', {}).get('required-version'):
+            return Uv.exec(['tool', 'run', '--from', f'ruff{required_version}', 'ruff', *args])
+
+        return cls._run(args)
+
+    @staticmethod
+    def _get_project_options(project_data: dict) -> list[str] | None:
+        ruff_requirement = re.compile(r'^\s*ruff(?:$|[\s<>=!~;\[@])', re.IGNORECASE)
+
+        def contains_ruff(deps):
+            return any(isinstance(dep, str) and ruff_requirement.match(dep) for dep in deps)
+
+        project = project_data.get('project', {})
+        if contains_ruff(project.get('dependencies', [])):
+            return []
+
+        for option, groups in (
+                ('--group', project_data.get('dependency-groups', {})),
+                ('--extra', project.get('optional-dependencies', {})),
+        ):
+            for name, dependencies in groups.items():
+                if contains_ruff(dependencies):
+                    return [option, name]
+
+        return None
 
 
 class MkDocs:
@@ -188,8 +225,21 @@ class Uv:
         return cls.exec(['self', 'update'])
 
     @classmethod
-    def tool_install(cls, name: str) -> list[str]:
-        return cls.exec(['tool', 'install', name])
+    def tool_install(
+            cls,
+            name: str,
+            *,
+            upgrade: bool = False,
+            force: bool = False,
+            editable: bool = False,
+    ) -> list[str]:
+        return cls.exec([
+            'tool', 'install',
+            *(['--upgrade'] if upgrade else []),
+            *(['--force'] if force else []),
+            *(['--editable'] if editable else []),
+            name,
+        ])
 
     @classmethod
     def tool_upgrade(cls, name: str) -> list[str]:

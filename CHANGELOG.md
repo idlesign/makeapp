@@ -1,5 +1,11 @@
 # makeapp changelog
 
+### Unreleased
+
+* ++ Select project Ruff dependencies and cached versions from `pyproject.toml`.
+* ** Pass editable CLI tool installation options as separate uv arguments.
+* ** Upgrade shared Ruff independently of project version pins.
+
 ### v2.4.0 [2026-10-02]
 * !! Prevent shell command injection and keep rendered templates inside the target directory.
 * ++ Expand user, CLI, template, publishing, and generated project documentation.

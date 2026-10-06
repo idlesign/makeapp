@@ -94,11 +94,14 @@ Runs `uv sync` for the current project.
 ma tools [--upgrade]
 ```
 
-Installs Ruff. `-u` or `--upgrade` updates uv and reinstalls the configured tools.
+Installs shared Ruff. `-u` or `--upgrade` updates uv and shared Ruff without changing project-specific versions.
 
 ## `ma style`
 
 Runs `ruff check --fix`. This checks code and applies available fixes, but does not run `ruff format`.
+
+Uses the project's Ruff version from `pyproject.toml`, otherwise shared Ruff. See [Developer tools](040_development.md)
+for upgrading either version.
 
 ## `ma tests`
 

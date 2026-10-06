@@ -63,7 +63,7 @@ class PackageData(DataContainer):
     @classmethod
     def get_version_str(cls, version: tuple[int, ...]) -> str:
         """Return string representation for a given version.
-        
+
         :param version:
 
         """
@@ -171,12 +171,12 @@ class ChangelogData(DataContainer):
 
     change_markers = '!+-*'
     """Line prefixes denoting change nature.
-    
+
     ! Important change/improvement/fix
     + New feature / addition
     - Feature deprecation / removal
     * Minor change/improvement/fix
-    
+
     """
     change_marker_default = '*'
 
@@ -447,7 +447,7 @@ class Project:
 
     def get_release_info(self, increment: str | None = None) -> tuple[str, str]:
         """Returns release info tuple as part of release preparation.
-        
+
         :param increment: Version chunk to increment (major, minor, patch)
             If not set, will be deduced from changelog data.
 
@@ -553,7 +553,7 @@ class Project:
     def style(self):
         LOG.info('Styling ...')
         with chdir(self.project_path):
-            Ruff.check()
+            Ruff.check(project_data=self.get_project_data())
 
     def docs(self, *, serve: bool = True):
         LOG.info('Making docs ...')
@@ -570,10 +570,8 @@ class Project:
         LOG.info(f'{"Upgrading" if upgrade else "Bootstrapping"} development tools ...')
 
         tools_default = [
-            'ruff==0.13.1',
+            'ruff',
         ]
-
-        method = Uv.tool_upgrade if upgrade else Uv.tool_install
 
         LOG.info('Processing uv ...')
 
@@ -585,4 +583,4 @@ class Project:
         for tool in tools_default:
             LOG.info(f'Processing {tool} ...')
 
-            method(tool.partition('=')[0])
+            Uv.tool_install(tool, upgrade=upgrade)

@@ -35,11 +35,7 @@ ma up --reset --tool
 ma tools
 ```
 
-This installs the Ruff command used by `ma style`. Upgrade uv and reinstall the configured tools with:
-
-```bash
-ma tools --upgrade
-```
+This installs shared Ruff. `ma tools --upgrade` updates uv and shared Ruff without changing project-specific versions.
 
 ## Run Ruff
 
@@ -49,6 +45,9 @@ ma style
 
 The command runs `ruff check --fix`. It performs lint checks and applies available fixes; it does not run
 `ruff format`.
+
+If Ruff is a project dependency or `[tool.ruff].required-version` is set in `pyproject.toml`, `ma style` uses the
+project's version. To upgrade it, update the requirement and lockfile when used, then run `ma style`.
 
 ## Build or serve documentation
 

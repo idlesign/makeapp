@@ -4,6 +4,7 @@ from makeapp.exceptions import CommandError, ProjectorExeption
 from makeapp.helpers.dist import DistHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 from makeapp.helpers.vcs import GitHelper
+from makeapp.helpers.venvs import VenvHelper
 from makeapp.utils import Uv, run_command
 
 
@@ -217,3 +218,12 @@ def test_uv_is_checked_when_used(monkeypatch):
 
     with pytest.raises(CommandError, match="Failed to execute 'uv'"):
         Uv.sync()
+
+
+def test_venv_register_tool_passes_separate_arguments(tmp_path, monkeypatch):
+    issued = []
+    monkeypatch.setattr('makeapp.helpers.venvs.Uv.exec', issued.append)
+
+    VenvHelper(tmp_path).register_tool()
+
+    assert issued == [['tool', 'install', '--force', '--editable', '.']]

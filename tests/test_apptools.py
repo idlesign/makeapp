@@ -125,6 +125,96 @@ def test_venv(in_tmp_path, get_appmaker, assert_content):
     ])
 
 
+@pytest.mark.parametrize(('upgrade', 'command'), [
+    (False, ['tool', 'install', 'ruff']),
+    (True, ['tool', 'install', '--upgrade', 'ruff']),
+])
+def test_tools_init_uses_unpinned_global_ruff(tmp_path, monkeypatch, upgrade, command):
+    config = tmp_path / 'pyproject.toml'
+    config.write_text('[tool.ruff]\nrequired-version = "==0.13.1"\n')
+    before = config.read_bytes()
+    uv_actions = []
+    issued = []
+    monkeypatch.setattr('makeapp.apptools.Uv.install', lambda: uv_actions.append('install'))
+    monkeypatch.setattr('makeapp.apptools.Uv.upgrade', lambda: uv_actions.append('upgrade'))
+    monkeypatch.setattr('makeapp.apptools.Uv.exec', issued.append)
+
+    Project(project_path=tmp_path).tools_init(upgrade=upgrade)
+
+    assert uv_actions == ['upgrade' if upgrade else 'install']
+    assert issued == [command]
+    assert config.read_bytes() == before
+
+
+def test_style_uses_shared_ruff(tmp_path, monkeypatch):
+    (tmp_path / 'pyproject.toml').write_text('[project]\nname = "sample"\n')
+    issued = []
+    monkeypatch.setattr(
+        'makeapp.utils.Uv.exec',
+        lambda *args, **kwargs: pytest.fail('Unexpected project Ruff execution'),
+    )
+    monkeypatch.setattr(
+        'makeapp.utils.run_command',
+        lambda command, **kwargs: issued.append((command, Path.cwd())),
+    )
+
+    Project(project_path=tmp_path).style()
+
+    assert issued == [(['ruff', 'check', '--fix'], tmp_path)]
+
+
+def test_style_uses_project_ruff_version(tmp_path, monkeypatch):
+    config = tmp_path / 'pyproject.toml'
+    config.write_text('[tool.ruff]\nrequired-version = "==0.13.1"\n')
+    before = config.read_bytes()
+    issued = []
+    monkeypatch.setattr(
+        'makeapp.utils.run_command',
+        lambda *args, **kwargs: pytest.fail('Unexpected shared Ruff execution'),
+    )
+    monkeypatch.setattr(
+        'makeapp.utils.Uv.exec',
+        lambda command: issued.append((command, Path.cwd())),
+    )
+
+    project = Project(project_path=tmp_path)
+    project.get_project_data()
+    monkeypatch.setattr(
+        'makeapp.apptools.tomllib.load',
+        lambda *args, **kwargs: pytest.fail('Unexpected pyproject.toml reread'),
+    )
+    project.style()
+
+    assert issued == [(
+        ['tool', 'run', '--from', 'ruff==0.13.1', 'ruff', 'check', '--fix'],
+        tmp_path,
+    )]
+    assert config.read_bytes() == before
+    assert not (tmp_path / '.venv').exists()
+
+
+def test_style_uses_project_ruff_dependency(tmp_path, monkeypatch):
+    (tmp_path / 'pyproject.toml').write_text(
+        '[dependency-groups]\nlinters = ["ruff==0.12.0"]\n'
+    )
+    issued = []
+    monkeypatch.setattr(
+        'makeapp.utils.run_command',
+        lambda *args, **kwargs: pytest.fail('Unexpected shared Ruff execution'),
+    )
+    monkeypatch.setattr(
+        'makeapp.utils.Uv.exec',
+        lambda command: issued.append((command, Path.cwd())),
+    )
+
+    Project(project_path=tmp_path).style()
+
+    assert issued == [(
+        ['run', '--group', 'linters', 'python', '-m', 'ruff', 'check', '--fix'],
+        tmp_path,
+    )]
+
+
 def test_changelog(in_tmp_path):
 
     fchangelog = (in_tmp_path / ChangelogData.filename)

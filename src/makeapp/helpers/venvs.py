@@ -30,4 +30,4 @@ class VenvHelper:
 
     def register_tool(self):
         LOG.info('Registering application CLI as a tool ...')
-        Uv.tool_install('--force -e .')
+        Uv.tool_install('.', force=True, editable=True)
