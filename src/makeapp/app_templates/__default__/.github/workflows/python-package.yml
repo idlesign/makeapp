@@ -25,7 +25,7 @@ jobs:
     - name: Install deps
       run: |
         uv sync --only-group tests
-        uv pip install coveralls
+        uv pip install -e . coveralls
     - uses: astral-sh/ruff-action@v3
       with:
         version: 0.13.1
@@ -35,5 +35,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.github_token }}
 {% endraw %}
       run: |
-        uv run coverage run -m pytest
-        uv run coveralls --service=github
+        uv run --no-sync coverage run -m pytest
+        uv run --no-sync coveralls --service=github
