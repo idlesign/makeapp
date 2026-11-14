@@ -154,7 +154,7 @@ class TestsHelper:
 
             try:
                 if reuse_project_venv:
-                    command = ['run', '--group', 'tests', '--python', python_version]
+                    command = ['run', '--no-sync', '--group', 'tests', '--python', python_version]
                     for dep in deps_resolved:
                         command.extend(['--with', dep])
                     execute([*command, 'pytest'])
@@ -162,10 +162,14 @@ class TestsHelper:
                 else:
                     execute(['sync', '--only-group', 'tests', '--python', python_version])
 
+                    # Install the project itself, without its dependencies
+                    # (they might override pinned matrix deps).
+                    execute(['pip', 'install', '--no-deps', '-e', '.', '--python', venv_dir])
+
                     if deps_resolved:
                         execute(['pip', 'install', *deps_resolved, '--python', venv_dir])
 
-                    execute(['run', 'pytest'])
+                    execute(['run', '--no-sync', 'pytest'])
 
             except CommandError:
                 status = self.KEY_FAIL
