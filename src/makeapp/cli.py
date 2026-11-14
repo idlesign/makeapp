@@ -150,8 +150,11 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     '-i', '--increment',
     help='Version number chunk to increment', type=click.Choice(VERSION_NUMBER_CHUNKS)
 )
+@click.option(
+    '--no-prompt', is_flag=True,
+    help='Do not ask for confirmation (non-interactive mode, e.g. for automation).')
 @option_debug
-def release(increment, debug):
+def release(increment, no_prompt, debug):
     """Performs new application version release."""
     project = Project(log_level=logging.DEBUG if debug else logging.INFO)
 
@@ -167,10 +170,10 @@ def release(increment, debug):
     click.secho(f'Version next: {project.package.version_next_str}', fg='green')
     click.secho(version_summary)
 
-    if click.confirm('Commit changes?', default=True):
+    if no_prompt or click.confirm('Commit changes?', default=True):
         project.release(version_str, version_summary)
 
-        if click.confirm('Publish to remotes?', default=True):
+        if no_prompt or click.confirm('Publish to remotes?', default=True):
             project.publish()
 
     click.secho('Done', fg='green')

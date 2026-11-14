@@ -105,3 +105,22 @@ def test_uv_command_fails_when_uv_is_missing():
 
     assert result.returncode == 1
     assert "Failed to execute 'uv' command" in result.stderr
+
+
+def test_release_no_prompt_non_interactive(run_command, monkeypatch):
+    """`release --no-prompt` must not ask for confirmations."""
+
+    calls = []
+    project_mock = type("ProjectMock", (), {
+        "pull": lambda self: calls.append("pull"),
+        "get_release_info": lambda self, increment: ("1.0.1", "summary"),
+        "release": lambda self, version, summary: calls.append("release"),
+        "publish": lambda self: calls.append("publish"),
+        "package": type("P", (), {"version_current_str": "1.0.0", "version_next_str": "1.0.1"})(),
+    })
+    monkeypatch.setattr("makeapp.cli.Project", lambda **kwargs: project_mock())
+
+    result = run_command(["release", "--no-prompt"])
+
+    assert result.exit_code == 0
+    assert calls == ["pull", "release", "publish"]
