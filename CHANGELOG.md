@@ -4,6 +4,7 @@
 * ++ Added AGENTS.md and IDLE.md to the default app template; release command now supports --no-prompt for non-interactive runs; ruff pins in workflow templates are updated to 0.17.5.
 * ** Django application template test matrix covers Django 6.1 (5.1 dropped); the default template CONTRIBUTING.md refers to IDLE.md.
 * ** Fixed test matrix environments: the project sync during 'uv run' no longer overrides pinned matrix dependencies (e.g. a specific Django version).
+* ** Template INSTALL.md reworked: uv-first installation, plain pip mentioned as an alternative, no more tool-mode suggestion for libraries; console template extends it with the tool-mode installation; Project workflow in CONTRIBUTING.md now starts with makeapp installation.
 
 * ++ Select project Ruff dependencies and cached versions from `pyproject.toml`.
 * ** Pass editable CLI tool installation options as separate uv arguments.
