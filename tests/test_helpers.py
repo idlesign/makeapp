@@ -85,6 +85,7 @@ class TestTestsHelper:
         assert issued == [(
             [
                 'run',
+                '--no-sync',
                 '--group',
                 'tests',
                 '--python',
@@ -121,7 +122,7 @@ class TestTestsHelper:
             helper.KEY_FAIL: [],
         }
         assert issued == [(
-            ['run', '--group', 'tests', '--python', '3.14', 'pytest'],
+            ['run', '--no-sync', '--group', 'tests', '--python', '3.14', 'pytest'],
             {
                 'VIRTUAL_ENV': '.venv',
                 'UV_PROJECT_ENVIRONMENT': '.venv',
@@ -159,7 +160,11 @@ class TestTestsHelper:
                 ['sync', '--only-group', 'tests', '--python', '3.14'],
                 environment,
             ),
-            (['run', 'pytest'], environment),
+            (
+                ['pip', 'install', '-e', '.', '--python', '.venv_ma/py314'],
+                environment,
+            ),
+            (['run', '--no-sync', 'pytest'], environment),
         ]
 
 
