@@ -44,19 +44,6 @@ For example:
 ma new shiny_cli ./shiny-cli -t click --no-prompt
 ```
 
-## Project workflow
-
-```bash
-ma up              # Synchronize the development environment.
-ma style           # Run Ruff checks and apply safe fixes.
-ma tests           # Run the configured test matrix.
-ma docs --build    # Build documentation without starting a server.
-ma change "+ Add a feature"  # Update the changelog and commit modified files.
-ma release         # Prepare a release and optionally publish it.
-```
-
-Review changes before running `ma change`: it stages and commits modified tracked files together with the changelog.
-
 ## Documentation
 
 The full user and extension documentation is available at <https://makeapp.readthedocs.io/>.

@@ -11,6 +11,8 @@ If you spotted something weird in application behavior or want to propose a feat
 If you are eager to participate in application development and to work on an existing issue (whether it should
 be a bugfix or a feature implementation), fork, write code, and make a pull request right from the forked project page.
 
+When contributing code, follow the rules from IDLE.md shipped with the project.
+
 
 ## Spread the word
 
