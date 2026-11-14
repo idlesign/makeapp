@@ -162,9 +162,9 @@ class TestsHelper:
                 else:
                     execute(['sync', '--only-group', 'tests', '--python', python_version])
 
-                    # Install the project itself, without its dependencies
-                    # (they might override pinned matrix deps).
-                    execute(['pip', 'install', '--no-deps', '-e', '.', '--python', venv_dir])
+                    # Install the project itself before the matrix deps,
+                    # so that the pins applied next win over its loose requirements.
+                    execute(['pip', 'install', '-e', '.', '--python', venv_dir])
 
                     if deps_resolved:
                         execute(['pip', 'install', *deps_resolved, '--python', venv_dir])
