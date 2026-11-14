@@ -1,7 +1,8 @@
 # Installing {{ app_name }}
 
-Python {{ python_version }} or newer and [uv](https://docs.astral.sh/uv/) are required.
+[uv](https://docs.astral.sh/uv/) is recommended for installation, though plain `pip` works too.
 
+{% block pypi %}
 ## From PyPI
 
 Add the package to a project:
@@ -10,26 +11,21 @@ Add the package to a project:
 uv add {{ app_name }}
 ```
 
-If the package exposes a command-line application, install it as an isolated tool:
+or with pip:
 
 ```bash
-uv tool install {{ app_name }}
+pip install {{ app_name }}
 ```
-
-Upgrade the tool with:
-
-```bash
-uv tool upgrade {{ app_name }}
-```
+{% endblock %}
 
 ## From source
 
 Clone the repository and synchronize its development environment:
 
 ```bash
-git clone https://example.com/owner/repository.git {{ app_name }}
+git clone {{ url }} {{ app_name }}
 cd {{ app_name }}
 uv sync
 ```
 
-Replace the example repository URL with the source repository. Run commands in the project environment with `uv run`.
+Run commands in the project environment with `uv run`.

@@ -16,6 +16,14 @@ When contributing code, follow the rules from IDLE.md shipped with the project.
 
 ## Project workflow
 
+The development tasks are provided by [makeapp](https://pypi.org/project/makeapp/). Install or update it first:
+
+```bash
+uv tool install makeapp   # or: uv tool upgrade makeapp
+```
+
+Then, from the project directory:
+
 ```bash
 ma up              # Synchronize the development environment.
 ma style           # Run Ruff checks and apply safe fixes.
