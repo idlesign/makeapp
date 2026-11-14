@@ -1,6 +1,7 @@
 # makeapp changelog
 
 ### Unreleased
+* ++ Added AGENTS.md and IDLE.md to the default app template; release command now supports --no-prompt for non-interactive runs; ruff pins in workflow templates are updated to 0.17.5.
 * ** Fixed test matrix environments: the project sync during 'uv run' no longer overrides pinned matrix dependencies (e.g. a specific Django version).
 
 * ++ Select project Ruff dependencies and cached versions from `pyproject.toml`.
