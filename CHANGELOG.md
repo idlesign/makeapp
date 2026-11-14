@@ -1,6 +1,7 @@
 # makeapp changelog
 
 ### Unreleased
+* ** Fixed test matrix environments: the project sync during 'uv run' no longer overrides pinned matrix dependencies (e.g. a specific Django version).
 
 * ++ Select project Ruff dependencies and cached versions from `pyproject.toml`.
 * ** Pass editable CLI tool installation options as separate uv arguments.
