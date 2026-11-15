@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 from click.testing import CliRunner
 
-from makeapp.apptools import Project
+from makeapp.apptools import ChangelogData, Project
 from makeapp.cli import entry_point, main
 from makeapp.exceptions import AppMakerException
 from makeapp.helpers.github import GithubHelper
@@ -232,3 +232,35 @@ def test_check_gate(run_command, monkeypatch):
     result = run_command(['check'])
     assert result.exit_code == 1
     assert 'Tests failed' in result.output
+
+
+def test_change_interactive_prompt(in_tmp_path, get_appmaker, monkeypatch):
+    get_appmaker()
+
+    monkeypatch.setattr('makeapp.cli.is_interactive', lambda: True)
+
+    # Descriptions are read one by one until an empty line.
+    result = CliRunner().invoke(
+        entry_point, ['change'], obj={}, input='+ My feature\n* My fix\n\n')
+
+    assert result.exit_code == 0
+    assert 'Markers:' in result.output
+
+    changes = ChangelogData.get().get_changes()
+    assert '* ++ My feature.' in changes
+    assert '* ** My fix.' in changes
+
+    # An empty first line does nothing.
+    result = CliRunner().invoke(entry_point, ['change'], obj={}, input='\n')
+
+    assert result.exit_code == 0
+    assert 'No changes to add.' in result.output
+
+
+def test_change_no_descriptions_noninteractive(in_tmp_path, get_appmaker):
+    get_appmaker()
+
+    result = CliRunner().invoke(entry_point, ['change'], obj={})
+
+    assert result.exit_code == 0
+    assert 'No changes to add.' in result.output

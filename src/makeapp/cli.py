@@ -230,11 +230,56 @@ def publish(debug):
     click.secho('Done', fg='green')
 
 
+def is_interactive() -> bool:
+    """Returns whether the command runs in an interactive terminal."""
+    return sys.stdin.isatty()
+
+
+def echo_markers_hint():
+    """Prints a changelog markers hint with their version impact."""
+    hint = (
+        f'{ChangelogData.change_marker_feature * 2} feature (bumps minor); '
+        f'{ChangelogData.change_marker_minor * 2} minor change (bumps patch); '
+        f'{ChangelogData.change_marker_important * 2}/{ChangelogData.change_marker_removal * 2} breaking '
+        '(no auto-bump, use --increment major)'
+    )
+    click.secho(f'Markers: {hint}', fg='bright_black')
+
+
+def prompt_descriptions() -> tuple[str, ...]:
+    """Prompts for changelog entries until an empty line is entered."""
+    descriptions = []
+
+    while True:
+        answer = click.prompt('Enter change description (leave empty to finish)', default='', show_default=False)
+
+        if not answer:
+            break
+
+        descriptions.append(answer)
+
+    return tuple(descriptions)
+
+
 @entry_point.command()
 @option_debug
 @click.argument('description', nargs=-1)
 def change(debug, description):
-    """Fixates a change adding a message to a changelog."""
+    """Fixates a change adding a message to a changelog.
+
+    When run without DESCRIPTION in an interactive terminal,
+    prompts for descriptions one by one until an empty line is entered.
+    Without descriptions given, nothing is done.
+
+    """
+    if not description and is_interactive():
+        echo_markers_hint()
+        description = prompt_descriptions()
+
+    if not description:
+        click.secho('No changes to add.', fg='yellow')
+        return
+
     Project(log_level=logging.DEBUG if debug else logging.INFO).add_change(description)
     click.secho('Done', fg='green')
 
