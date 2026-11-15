@@ -134,5 +134,13 @@ Checks external links in Markdown files under `docs/`. Exits with a non-zero cod
 ma check
 ```
 
-Performs pre-release checks in one command: style, tests, documentation build, and documentation link check.
+Performs pre-release checks in one command:
+
+- code style;
+- test matrix;
+- documentation build;
+- external links in documentation;
+- URLs declared in `pyproject.toml` (`[project.urls]`);
+- the project virtual environment Python satisfies `requires-python`.
+
 Exits with a non-zero code if any check fails.
