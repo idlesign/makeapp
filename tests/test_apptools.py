@@ -4,7 +4,7 @@ from textwrap import dedent
 import pytest
 
 from makeapp.apptools import RELEASE_STATE_FILENAME, ChangelogData, Project
-from makeapp.exceptions import ProjectorExeption
+from makeapp.exceptions import ProjectorException
 from makeapp.helpers.vcs import VcsHelper
 
 
@@ -307,7 +307,7 @@ def test_release_package_rejects_ambiguous_candidates(tmp_path):
         package.mkdir(parents=True, exist_ok=True)
         (package / '__init__.py').touch()
 
-    with pytest.raises(ProjectorExeption, match='Unable to identify release package'):
+    with pytest.raises(ProjectorException, match='Unable to identify release package'):
         Project.find_release_package(tmp_path, 'unknown')
 
 
@@ -315,7 +315,7 @@ def test_project_reports_missing_vcs(tmp_path):
     (tmp_path / 'pyproject.toml').write_text('[project]\nname = "sample"\n')
     project = Project(project_path=tmp_path)
 
-    with pytest.raises(ProjectorExeption, match='No supported VCS repository'):
+    with pytest.raises(ProjectorException, match='No supported VCS repository'):
         project.pull()
 
 
@@ -339,3 +339,22 @@ def test_changelog_finds_headings_after_preamble(in_tmp_path):
 
     assert data.file_helper.contents[line_idx] == '### Unreleased'
     assert data.file_helper.contents[line_idx + 2].startswith('### v1.0.0')
+
+
+def test_changelog_add_change_dedup(in_tmp_path):
+    fchangelog = (in_tmp_path / ChangelogData.filename)
+    fchangelog.write_text(dedent("""    # dummy changelog
+
+    ### Unreleased
+    * ** Existing change.
+    """))
+
+    data = ChangelogData.get()
+    data.add_change('Existing change.')
+    data.add_change('Existing change.')
+    data.add_change('! Important')
+
+    assert data.get_changes() == [
+        '* !! Important',
+        '* ** Existing change.',
+    ]

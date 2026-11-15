@@ -7,7 +7,7 @@ from sys import version_info
 
 import yaml
 
-from ..exceptions import CommandError, ProjectorExeption
+from ..exceptions import CommandError, ProjectorException
 from ..utils import LOG, Uv
 
 
@@ -51,7 +51,7 @@ class TestsHelper:
             if 'python-version' in job.get('strategy', {}).get('matrix', {})
         ]
         if not candidates:
-            raise ProjectorExeption('No test matrix with `python-version` found.')
+            raise ProjectorException('No test matrix with `python-version` found.')
 
         by_name = dict(candidates)
         job_name = next(

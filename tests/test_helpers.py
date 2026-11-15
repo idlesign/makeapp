@@ -1,6 +1,6 @@
 import pytest
 
-from makeapp.exceptions import CommandError, ProjectorExeption
+from makeapp.exceptions import CommandError, ProjectorException
 from makeapp.helpers.dist import DistHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 from makeapp.helpers.vcs import GitHelper
@@ -56,7 +56,7 @@ class TestTestsHelper:
         workflow = tmp_path / 'workflow.yml'
         workflow.write_text('jobs: {lint: {strategy: {matrix: {os: [linux]}}}}')
 
-        with pytest.raises(ProjectorExeption, match='No test matrix'):
+        with pytest.raises(ProjectorException, match='No test matrix'):
             MatrixTestsHelper.get_matrix_github(workflow)
 
     def test_run_tests_reuses_matching_venv_with_matrix_deps(self, tmp_path, monkeypatch):
@@ -232,3 +232,56 @@ def test_venv_register_tool_passes_separate_arguments(tmp_path, monkeypatch):
     VenvHelper(tmp_path).register_tool()
 
     assert issued == [['tool', 'install', '--force', '--editable', '.']]
+
+
+class TestGitModified:
+
+    def test_get_modified(self, in_tmp_path):
+        helper = GitHelper()
+        run_command(['git', 'init', '-q'])
+
+        # Untracked files are not modifications.
+        (in_tmp_path / 'untracked.txt').write_text('1')
+        assert helper.get_modified() == []
+
+        tracked = in_tmp_path / 'tracked.txt'
+        tracked.write_text('1')
+        run_command(['git', 'add', '.'])
+        run_command(['git', 'commit', '-qm', 'initial'])
+
+        # Unstaged modification.
+        tracked.write_text('2')
+        assert helper.get_modified() == ['tracked.txt']
+
+        # Staged modification.
+        run_command(['git', 'add', 'tracked.txt'])
+        assert helper.get_modified() == ['tracked.txt']
+
+        # Deletion is not a modification.
+        tracked.unlink()
+        assert helper.get_modified() == []
+
+    def test_get_modified_path_with_spaces(self, in_tmp_path):
+        helper = GitHelper()
+        run_command(['git', 'init', '-q'])
+
+        tracked = in_tmp_path / 'my file.txt'
+        tracked.write_text('1')
+        run_command(['git', 'add', '.'])
+        run_command(['git', 'commit', '-qm', 'initial'])
+
+        tracked.write_text('2')
+        run_command(['git', 'add', 'my file.txt'])
+        assert helper.get_modified() == ['my file.txt']
+
+    def test_add_all(self, in_tmp_path):
+        helper = GitHelper()
+        run_command(['git', 'init', '-q'])
+
+        (in_tmp_path / 'some.txt').write_text('1')
+
+        from makeapp.helpers.vcs import VcsHelper
+        VcsHelper.add(helper)
+
+        assert 'some.txt' in helper.get_modified() or \
+            'A  some.txt' in run_command(['git', 'status', '-s'])

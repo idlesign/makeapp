@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from ..exceptions import CommandError, ProjectorExeption
+from ..exceptions import CommandError, ProjectorException
 from ..utils import run_command
 
 
@@ -59,27 +59,25 @@ class VcsHelper:
     def get_modified(self) -> list[str]:
         """Returns modified filepaths."""
 
-        lines = self.run_command(['status', '-s'])
-        modified = []
+        modified = self.run_command(['diff', '--name-only', '--diff-filter=M'])
+        modified += self.run_command(['diff', '--cached', '--name-only', '--diff-filter=M'])
 
-        for line in lines:
-            marker, filepath = line.split(' ', 1)
-            if 'M' in marker:
-                modified.append(filepath)
+        deleted = self.run_command(['diff', '--name-only', '--diff-filter=D'])
+        deleted += self.run_command(['diff', '--cached', '--name-only', '--diff-filter=D'])
 
-        return modified
+        return [path for path in dict.fromkeys(modified) if path not in set(deleted)]
 
     def get_current_branch(self) -> str:
         """Return the current branch, including an unborn branch."""
         try:
             data = self.run_command(['symbolic-ref', '--quiet', '--short', 'HEAD'])
         except CommandError as e:
-            raise ProjectorExeption(
+            raise ProjectorException(
                 'VCS needs to be on a named branch.'
             ) from e
 
         if not data:
-            raise ProjectorExeption('Unable to determine the current VCS branch.')
+            raise ProjectorException('Unable to determine the current VCS branch.')
 
         return data[0]
 
@@ -110,7 +108,7 @@ class VcsHelper:
 
         """
         if filename is None:
-            filenames = []
+            filenames = ['--all']
         elif isinstance(filename, (str, Path)):
             filenames = [filename]
         else:

@@ -6,7 +6,7 @@ from contextlib import chdir
 from datetime import datetime
 from pathlib import Path
 
-from .exceptions import ProjectorExeption
+from .exceptions import ProjectorException
 from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
 from .helpers.tests import TestsHelper
@@ -97,14 +97,14 @@ class PackageData(DataContainer):
                 break
 
         if version_line_idx is None:
-            raise ProjectorExeption('Version line not found in init file.')
+            raise ProjectorException('Version line not found in init file.')
 
         version_line = init_file[version_line_idx]
         version_attr = version_line.partition('=')[-1].strip(' "\'').strip()
         version = tuple(map(int, version_attr.split('.')))
 
         if len(version) < 3:
-            raise ProjectorExeption(f'Unsupported version format: {version}.')
+            raise ProjectorException(f'Unsupported version format: {version}.')
 
         LOG.info(f'Current version from package: `{".".join(map(str, version))}`')
 
@@ -125,7 +125,7 @@ class PackageData(DataContainer):
 
         if increment not in VERSION_NUMBER_CHUNKS:
 
-            raise ProjectorExeption(
+            raise ProjectorException(
                 f'Unsupported version chunk to increment: `{increment}`. '
                 f'Should be one of: {VERSION_NUMBER_CHUNKS}.')
 
@@ -196,12 +196,12 @@ class ChangelogData(DataContainer):
         LOG.debug(f'Getting changelog from: {filepath.name} ...')
 
         if not filepath.is_file():
-            raise ProjectorExeption('Changelog file not found.')
+            raise ProjectorException('Changelog file not found.')
 
         changelog = FileHelper.read_file(filepath)
 
         if not changelog[0].startswith('# '):
-            raise ProjectorExeption('Unexpected changelog file format.')
+            raise ProjectorException('Unexpected changelog file format.')
 
         unreleased_str = cls.marker_unreleased
         prefix_version = cls._prefix_version
@@ -226,7 +226,7 @@ class ChangelogData(DataContainer):
 
         version_line_idx = version_line_idx if version_line_idx is not None else first_version_idx
         if version_line_idx is None:
-            raise ProjectorExeption('Version line not found in the changelog.')
+            raise ProjectorException('Version line not found in the changelog.')
 
         if not unreleased_entry_exists:
             # Add `Unreleased` entry.
@@ -303,6 +303,10 @@ class ChangelogData(DataContainer):
         description = description.lstrip(f' {markers}')
         description = f'{self._prefix_change}{marker * 2} {description}'
 
+        if description in self.get_changes():
+            # Already registered, skip to prevent duplicates.
+            return
+
         self.file_helper.insert(description, offset=self._offset_change)
 
     def get_changes(self) -> list[str]:
@@ -364,7 +368,7 @@ class Project:
 
         if len(candidates) != 1:
             found = ', '.join(map(str, candidates)) or 'none'
-            raise ProjectorExeption(f'Unable to identify release package; candidates: {found}.')
+            raise ProjectorException(f'Unable to identify release package; candidates: {found}.')
 
         return candidates[0]
 
@@ -388,7 +392,7 @@ class Project:
     @property
     def vcs(self) -> VcsHelper:
         if self._vcs is None:
-            raise ProjectorExeption(
+            raise ProjectorException(
                 f'No supported VCS repository found in `{self.project_path}`.'
             )
         return self._vcs
@@ -406,7 +410,7 @@ class Project:
         if self._project_data is None:
             path = self.project_path / 'pyproject.toml'
             if not path.exists():
-                raise ProjectorExeption(
+                raise ProjectorException(
                     f'No `pyproject.toml` file found in `{self.project_path}`.'
                 )
             with path.open('rb') as f:

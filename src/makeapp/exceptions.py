@@ -8,8 +8,12 @@ class AppMakerException(MakeappException):
     """Basic AppMaker related exception."""
 
 
-class ProjectorExeption(MakeappException):
+class ProjectorException(MakeappException):
     """Basic Projector related exception."""
+
+
+ProjectorExeption = ProjectorException
+"""Deprecated alias for ProjectorException."""
 
 
 class CommandError(MakeappException):
