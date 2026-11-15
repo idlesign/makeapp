@@ -1,6 +1,6 @@
 # makeapp changelog
 
-### Unreleased
+### v2.6.0 [2026-11-15]
 * ++ Added Dependabot configuration for GitHub Actions updates to application templates.
 * ++ Added GitHub Releases creation on publish: a release is made from the version tag via gh CLI, with console indication if it was not created.
 * ++ Added ma check command performing pre-release checks (style, tests, documentation).
