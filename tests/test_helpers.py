@@ -2,6 +2,7 @@ import pytest
 
 from makeapp.exceptions import CommandError, ProjectorException
 from makeapp.helpers.dist import DistHelper
+from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 from makeapp.helpers.vcs import GitHelper, VcsHelper
 from makeapp.helpers.venvs import VenvHelper
@@ -284,3 +285,30 @@ class TestGitModified:
 
         assert 'some.txt' in helper.get_modified() or \
             'A  some.txt' in run_command(['git', 'status', '-s'])
+
+
+class TestGithubHelper:
+
+    def test_get_repo_slug(self, monkeypatch):
+        helper = GithubHelper(GitHelper())
+
+        monkeypatch.setattr(helper.vcs, 'run_command', lambda args: ['git@github.com:owner/repo.git'])
+        assert helper.get_repo_slug() == 'owner/repo'
+
+        monkeypatch.setattr(helper.vcs, 'run_command', lambda args: ['https://github.com/owner/repo.git'])
+        assert helper.get_repo_slug() == 'owner/repo'
+
+        monkeypatch.setattr(helper.vcs, 'run_command', lambda args: ['git@gitlab.com:owner/repo.git'])
+        assert helper.get_repo_slug() is None
+
+    def test_create_release(self, monkeypatch):
+        issued = []
+        monkeypatch.setattr(
+            'makeapp.helpers.github.run_command', lambda args: issued.append(args) or ['https://x'])
+        monkeypatch.setattr(GithubHelper, 'get_latest_tag', lambda self: 'v1.0.0')
+
+        helper = GithubHelper(GitHelper())
+        url = helper.create_release()
+
+        assert issued == [['gh', 'release', 'create', 'v1.0.0', '--title', 'v1.0.0', '--notes-from-tag']]
+        assert url == 'https://x'

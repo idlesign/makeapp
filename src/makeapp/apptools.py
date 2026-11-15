@@ -5,9 +5,10 @@ from contextlib import chdir
 from datetime import datetime
 from pathlib import Path
 
-from .exceptions import ProjectorException
+from .exceptions import CommandError, ProjectorException
 from .helpers.dist import DistHelper
 from .helpers.files import FileHelper
+from .helpers.github import GithubHelper
 from .helpers.tests import TestsHelper
 from .helpers.vcs import VcsHelper
 from .helpers.venvs import VenvHelper
@@ -551,7 +552,31 @@ class Project:
                 pending_path.write_text('{"step": "git-push"}\n')
 
             self.vcs.push()
+
+            self.publish_github_release()
+
             pending_path.unlink()
+
+    def publish_github_release(self):
+        """Creates a GitHub release for the latest tag, if possible."""
+        github = GithubHelper(self.vcs)
+
+        if not github.is_available():
+            LOG.warning('GitHub release was not created: `gh` CLI is not available.')
+            return
+
+        if not github.get_repo_slug():
+            LOG.warning('GitHub release was not created: origin remote does not point to GitHub.')
+            return
+
+        try:
+            url = github.create_release()
+
+        except CommandError as e:
+            LOG.warning(f'GitHub release was not created: {e}')
+
+        else:
+            LOG.info(f'GitHub release created: {url}')
 
     def run_tests(self, *, only: list[str] | None = None) -> dict[str, list[str]]:
         LOG.info('Running tests ...')

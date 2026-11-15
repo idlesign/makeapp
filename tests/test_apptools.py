@@ -6,6 +6,7 @@ import pytest
 
 from makeapp.apptools import RELEASE_STATE_FILENAME, ChangelogData, Project
 from makeapp.exceptions import ProjectorException
+from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.vcs import VcsHelper
 from makeapp.utils import run_command
 
@@ -51,6 +52,7 @@ def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
         ['uv', 'publish'],
         ['git', 'push'],
         ['git', 'push', '--follow-tags'],
+        ['git', 'remote', 'get-url', 'origin'],
     ]
     assert not (in_tmp_path / RELEASE_STATE_FILENAME).exists()
 
@@ -384,3 +386,50 @@ def test_add_change_commit_message_keeps_trailing_marker_chars(in_tmp_path, get_
 
     message = run_command(['git', 'log', '-1', '--pretty=%B'])
     assert message == ['Support of Python 3.12+']
+
+
+def test_publish_creates_github_release(in_tmp_path, get_appmaker, monkeypatch):
+    get_appmaker()
+
+    vcs = VcsHelper.get()
+    vcs.commit('initial')
+
+    project = Project()
+    project.add_change(['+ Some feature'])
+    version, summary = project.get_release_info()
+    project.release(version, summary)
+
+    monkeypatch.setattr(GithubHelper, 'is_available', lambda *args: True)
+    monkeypatch.setattr(GithubHelper, 'get_repo_slug', lambda self: 'owner/repo')
+    monkeypatch.setattr(GithubHelper, 'get_latest_tag', lambda self: version)
+
+    issued_commands = []
+
+    def dummy_communicate(self, *args, **kwargs):
+        issued_commands.append(self.args)
+        return b'', b''
+
+    monkeypatch.setattr('makeapp.utils.Popen.communicate', dummy_communicate)
+    project.publish()
+
+    assert ['gh', 'release', 'create', version, '--title', version, '--notes-from-tag'] in issued_commands
+
+
+def test_publish_indicates_missing_github_release(in_tmp_path, get_appmaker, monkeypatch, caplog):
+    get_appmaker()
+
+    vcs = VcsHelper.get()
+    vcs.commit('initial')
+
+    project = Project()
+    project.add_change(['+ Some feature'])
+    version, summary = project.get_release_info()
+    project.release(version, summary)
+
+    monkeypatch.setattr(GithubHelper, 'is_available', lambda *args: True)
+    monkeypatch.setattr(GithubHelper, 'get_repo_slug', lambda self: None)
+
+    monkeypatch.setattr('makeapp.utils.Popen.communicate', lambda self, *a, **k: (b'', b''))
+    project.publish()
+
+    assert 'GitHub release was not created' in caplog.text
