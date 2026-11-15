@@ -157,7 +157,14 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
 
     if github_repo:
         with chdir(target_path):
-            GithubHelper(VcsHelper.get()).create_repo(app_name, private=github_private)
+            github = GithubHelper(VcsHelper.get())
+
+            if github.repo_exists(app_name):
+                click.secho(f'GitHub repository `{app_name}` already exists. Linking to it ...', fg='yellow')
+                github.link_repo(app_name)
+
+            else:
+                github.create_repo(app_name, private=github_private)
 
     click.secho('Done', fg='green')
 

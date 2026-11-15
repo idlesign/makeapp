@@ -60,3 +60,34 @@ class GithubHelper:
         output = run_command(['gh', 'repo', 'create', name, visibility, '--source', '.', '--push'])
 
         return output[0] if output else ''
+
+    def repo_exists(self, name: str) -> bool:
+        """Returns whether a repository with the given name exists on GitHub.
+
+        :param name: Repository name.
+
+        """
+        try:
+            run_command(['gh', 'repo', 'view', name])
+
+        except CommandError:
+            return False
+
+        return True
+
+    def get_repo_url(self, name: str) -> str:
+        """Returns SSH URL of an existing repository.
+
+        :param name: Repository name.
+
+        """
+        return run_command(['gh', 'repo', 'view', name, '--json', 'sshUrl', '--jq', '.sshUrl'])[0]
+
+    def link_repo(self, name: str):
+        """Links an existing GitHub repository as origin and pushes to it.
+
+        :param name: Repository name.
+
+        """
+        self.vcs.add_remote(self.get_repo_url(name))
+        self.vcs.push(upstream=True)

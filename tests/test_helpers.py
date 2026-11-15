@@ -322,3 +322,35 @@ class TestGithubHelper:
 
         assert issued == [['gh', 'repo', 'create', 'myapp', '--public', '--source', '.', '--push']]
         assert url == 'https://x'
+
+    def test_repo_exists(self, monkeypatch):
+        helper = GithubHelper(GitHelper())
+
+        monkeypatch.setattr('makeapp.helpers.github.run_command', lambda args: ['ok'])
+        assert helper.repo_exists('myapp') is True
+
+        def fail(args):
+            raise CommandError('not found')
+
+        monkeypatch.setattr('makeapp.helpers.github.run_command', fail)
+        assert helper.repo_exists('myapp') is False
+
+    def test_link_repo(self, monkeypatch, in_tmp_path):
+        run_command(['git', 'init', '-q', '-b', 'main'])
+
+        monkeypatch.setattr(
+            'makeapp.helpers.github.run_command',
+            lambda args: ['git@github.com:owner/myapp.git'])
+
+        issued = []
+        helper = GithubHelper(GitHelper())
+        monkeypatch.setattr(helper.vcs, 'run_command', lambda args: issued.append(args) or ['main'])
+
+        helper.link_repo('myapp')
+
+        assert issued == [
+            ['remote', 'add', 'origin', 'git@github.com:owner/myapp.git'],
+            ['symbolic-ref', '--quiet', '--short', 'HEAD'],
+            ['push', '-u', 'origin', 'main'],
+            ['push', '--follow-tags'],
+        ]

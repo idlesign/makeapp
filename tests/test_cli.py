@@ -140,3 +140,20 @@ def test_new_github_repo_creation(in_tmp_path, monkeypatch):
 
     assert result.exit_code == 0
     assert created == [('someapp', False)]
+
+
+def test_new_github_repo_already_exists(in_tmp_path, monkeypatch):
+    linked = []
+    monkeypatch.setattr(GithubHelper, 'is_available', lambda *args: True)
+    monkeypatch.setattr(GithubHelper, 'repo_exists', lambda self, name: True)
+    monkeypatch.setattr(
+        GithubHelper, 'link_repo', lambda self, name: linked.append(name))
+    monkeypatch.setattr(
+        GithubHelper, 'create_repo',
+        lambda self, name, *, private: (_ for _ in ()).throw(AssertionError('should not create')))
+
+    result = CliRunner().invoke(entry_point, ['new', 'someapp', '.'], obj={}, input='\n\n\ny\n\n\n')
+
+    assert result.exit_code == 0
+    assert 'already exists' in result.output
+    assert linked == ['someapp']

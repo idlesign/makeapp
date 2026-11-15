@@ -3,6 +3,7 @@
 ### Unreleased
 * ++ Added Dependabot configuration for GitHub Actions updates to application templates.
 * ++ Added GitHub Releases creation on publish: a release is made from the version tag via gh CLI, with console indication if it was not created.
+* ++ GitHub repository creation on rollout now handles already existing repositories by linking and pushing to them.
 * ++ New application rollout can now create a GitHub repository via gh CLI (interactive prompt).
 * ** Changelog entries are now deduplicated on add.
 * ** Fixed commit message corruption for descriptions ending with marker characters.
