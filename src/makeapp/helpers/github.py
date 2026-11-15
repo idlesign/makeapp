@@ -9,7 +9,7 @@ RE_GITHUB_URL = re.compile(r'github\.com[:/](?P<slug>[^\s]+?)(?:\.git)?$')
 
 
 class GithubHelper:
-    """Encapsulates GitHub Releases related actions."""
+    """Encapsulates GitHub related actions: releases and repository management."""
 
     def __init__(self, vcs_helper: VcsHelper):
         self.vcs = vcs_helper
