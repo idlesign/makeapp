@@ -8,15 +8,13 @@ import yaml
 
 from ..exceptions import CommandError, ProjectorException
 from ..utils import LOG, Uv
+from .venvs import read_python_version
 
 
 class TestsHelper:
 
     _RE_VAR = re.compile(r'\$\{\{\s*([\w-]+)\s*\}\}')
     _RE_VALID_IDENT = re.compile(r'[^a-zA-Z0-9]')
-    _RE_PYTHON_VERSION = re.compile(
-        r'^\s*version(?:_info)?\s*=\s*(\d+)\.(\d+)'
-    )
 
     KEY_OK = 'OK'
     KEY_FAIL = 'FAIL'
@@ -86,15 +84,13 @@ class TestsHelper:
     def is_venv_compatible(cls, venv_dir: Path, python_version: str) -> bool:
         """Return whether a virtual environment uses the requested Python version."""
         expected = re.match(r'^(\d+)\.(\d+)', python_version)
-        config_path = venv_dir / 'pyvenv.cfg'
-        if expected is None or not config_path.is_file():
+
+        if expected is None:
             return False
 
-        for line in config_path.read_text().splitlines():
-            if actual := cls._RE_PYTHON_VERSION.match(line):
-                return actual.groups() == expected.groups()
+        expected_version = (int(expected.group(1)), int(expected.group(2)))
 
-        return False
+        return read_python_version(venv_dir) == expected_version
 
     def run_tests(self) -> dict[str, list[str]]:
         settings = self._settings
