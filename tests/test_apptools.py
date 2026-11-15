@@ -48,7 +48,7 @@ def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
         ['uv', 'build'],
         ['uv', 'publish'],
         ['git', 'push'],
-        ['git', 'push', '--tags'],
+        ['git', 'push', '--follow-tags'],
     ]
     assert not (in_tmp_path / RELEASE_STATE_FILENAME).exists()
 
@@ -358,3 +358,31 @@ def test_changelog_add_change_dedup(in_tmp_path):
         '* !! Important',
         '* ** Existing change.',
     ]
+
+
+def test_add_change_notifies_pre_staged(in_tmp_path, get_appmaker, caplog):
+    import logging
+
+    get_appmaker()
+
+    from makeapp.utils import run_command
+    (in_tmp_path / 'staged.txt').write_text('1')
+    run_command(['git', 'add', 'staged.txt'])
+
+    with caplog.at_level(logging.INFO):
+        Project().add_change('Some change')
+
+    assert 'Previously staged files will be included' in caplog.text
+    assert 'staged.txt' in caplog.text
+
+
+def test_add_change_commit_message_keeps_trailing_marker_chars(in_tmp_path, get_appmaker):
+    get_appmaker()
+
+    from makeapp.utils import run_command
+    VcsHelper.get().commit('initial')
+
+    Project().add_change(['+ Support of Python 3.12+'])
+
+    message = run_command(['git', 'log', '-1', '--pretty=%B'])
+    assert message == ['Support of Python 3.12+']

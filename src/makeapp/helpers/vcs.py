@@ -168,7 +168,8 @@ class VcsHelper:
         else:
             self.run_command(['push'])
 
-        self.run_command(['push', '--tags'])
+        # Follow annotated tags reachable from pushed commits instead of pushing all local tags.
+        self.run_command(['push', '--follow-tags'])
 
 
 class GitHelper(VcsHelper):

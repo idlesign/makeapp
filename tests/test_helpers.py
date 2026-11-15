@@ -214,7 +214,7 @@ def test_git_push_uses_current_branch(monkeypatch):
 
     assert issued == [
         ['push', '-u', 'origin', 'feature'],
-        ['push', '--tags'],
+        ['push', '--follow-tags'],
     ]
 
 

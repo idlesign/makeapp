@@ -523,12 +523,18 @@ class Project:
 
             files_to_stage = [changelog.filepath]
 
+            # Commit will include everything already present in the index.
+            pre_staged = self.vcs.run_command(['diff', '--cached', '--name-only'])
+
+            if pre_staged:
+                LOG.info('Previously staged files will be included: %s', ', '.join(pre_staged))
+
             if stage_modified:
                 files_to_stage.extend(self.vcs.get_modified())
 
                 # Set a description as a commit message.
                 commit_message = '\n'.join(
-                    description.strip(changelog.change_markers)
+                    description.lstrip(f' {changelog.change_markers}')
                     for description in descriptions
                 )
 

@@ -2,9 +2,12 @@
 
 ### Unreleased
 * ** Changelog entries are now deduplicated on add.
+* ** Fixed commit message corruption for descriptions ending with marker characters.
 * ** Fixed get_modified() failing on staged, renamed and deleted files.
 * ** Fixed VcsHelper.add() doing nothing when no filename is given.
+* ** Push now publishes only annotated tags reachable from pushed commits.
 * ** Renamed ProjectorExeption into ProjectorException, keeping the old name as a deprecated alias.
+* ** The change command now reports previously staged files included into a commit.
 
 ### v2.5.0 [2026-11-14]
 * ++ Added AGENTS.md and IDLE.md to the default app template; release command now supports --no-prompt for non-interactive runs; ruff pins in workflow templates are updated to 0.17.5.
