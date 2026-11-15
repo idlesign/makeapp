@@ -64,7 +64,7 @@ class TestTestsHelper:
 
     def test_run_tests_reuses_matching_venv_with_matrix_deps(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        monkeypatch.setattr('makeapp.helpers.tests.read_python_version', lambda venv_path: (3, 14))
+        monkeypatch.setattr(VenvHelper, 'read_python_version', staticmethod(lambda venv_path: (3, 14)))
 
         helper = MatrixTestsHelper(
             settings={'deps': ['django~=${{ django-version }}']},
@@ -103,7 +103,7 @@ class TestTestsHelper:
 
     def test_run_tests_reuses_matching_venv_after_only_filter(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        monkeypatch.setattr('makeapp.helpers.tests.read_python_version', lambda venv_path: (3, 14))
+        monkeypatch.setattr(VenvHelper, 'read_python_version', staticmethod(lambda venv_path: (3, 14)))
 
         helper = MatrixTestsHelper(settings={}, only=['py314'])
         monkeypatch.setattr(helper, 'get_matrix_github', lambda path: [
@@ -130,7 +130,7 @@ class TestTestsHelper:
 
     def test_run_tests_keeps_isolation_for_incompatible_venv(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        monkeypatch.setattr('makeapp.helpers.tests.read_python_version', lambda venv_path: (3, 13))
+        monkeypatch.setattr(VenvHelper, 'read_python_version', staticmethod(lambda venv_path: (3, 13)))
 
         helper = MatrixTestsHelper(settings={})
         monkeypatch.setattr(

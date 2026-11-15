@@ -8,7 +8,7 @@ import yaml
 
 from ..exceptions import CommandError, ProjectorException
 from ..utils import LOG, Uv
-from .venvs import read_python_version
+from .venvs import VenvHelper
 
 
 class TestsHelper:
@@ -90,7 +90,7 @@ class TestsHelper:
 
         expected_version = (int(expected.group(1)), int(expected.group(2)))
 
-        return read_python_version(venv_dir) == expected_version
+        return VenvHelper.read_python_version(venv_dir) == expected_version
 
     def run_tests(self) -> dict[str, list[str]]:
         settings = self._settings
