@@ -1,5 +1,6 @@
 import importlib.util
 import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .appconfig import Config
@@ -47,9 +48,9 @@ class AppTemplate:
         """
         module_fake_name = f'makeapp.config.{self.name}'
 
-        config_path = os.path.join(self.path, self.config_filename)
+        config_path = Path(self.path) / self.config_filename
 
-        if os.path.exists(config_path):
+        if config_path.exists():
 
             spec = importlib.util.spec_from_file_location(module_fake_name, config_path)
             module = importlib.util.module_from_spec(spec)
@@ -115,10 +116,10 @@ class AppTemplate:
 
             for fname in files:
 
-                if fname == '__pycache__' or os.path.splitext(fname)[-1] == '.pyc' or fname == config_filename:
+                if fname == '__pycache__' or Path(fname).suffix == '.pyc' or fname == config_filename:
                     continue
 
-                full_path = os.path.join(path, fname)
+                full_path = Path(path) / fname
 
                 rel_path = os.path.relpath(full_path, templates_path)
 
@@ -145,8 +146,8 @@ class AppTemplate:
             template,
             search_paths=(
                 template,
-                os.path.join(maker.path_templates_current, template),
-                os.path.join(maker.path_templates_builtin, template),
+                maker.path_templates_current / template,
+                maker.path_templates_builtin / template,
             )
         )
 
@@ -174,9 +175,9 @@ class AppTemplate:
 
         """
         for supposed_path in search_paths:
-            if os.sep in supposed_path and os.path.exists(supposed_path):
-                path = str(os.path.abspath(supposed_path))
-                return path.split(os.sep)[-1], path
+            if os.sep in f'{supposed_path}' and Path(supposed_path).exists():
+                path = Path(supposed_path).resolve()
+                return path.name, path
 
         raise AppMakerException(
             f"Unable to find application template {name_or_path}. "
@@ -217,9 +218,9 @@ class TemplateFile:
             if not parent:
                 break
 
-            path_full = os.path.join(parent.path, path_rel)
+            path_full = Path(parent.path) / path_rel
 
-            if os.path.exists(path_full):
+            if path_full.exists():
                 # Check parent file exists in template.
                 paths.append(f'{parent.name}/{path_rel}')
 

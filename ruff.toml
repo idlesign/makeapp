@@ -2,6 +2,7 @@ target-version = "py311"
 line-length = 120
 exclude = [
     "**/*.toml",
+    "src/makeapp/app_templates/",
 ]
 
 [format]
@@ -40,7 +41,17 @@ select = [
     "UP",  # py upgrade
 ]
 
-ignore = []
+ignore = [
+    "DTZ005",
+    "DTZ006",
+    "DTZ011",
+    "FBT001",
+    "FBT002",
+    "FBT003",
+    "RUF012",
+    "RUF013",
+    "UP031",
+]
 
 
 [lint.extend-per-file-ignores]

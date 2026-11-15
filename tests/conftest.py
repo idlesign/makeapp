@@ -16,12 +16,11 @@ def get_appmaker():
             init_venv: bool = False
     ):
 
-        from makeapp.appmaker import AppMaker
+        from makeapp.appmaker import AppMaker  # noqa: PLC0415
 
         app_maker = AppMaker(app_name, templates_to_use=templates)
 
         app_maker.update_settings_complex(
-            # config=configuration_file,
             dictionary={
                 'description': 'testdummydescr',
                 'author': 'The Librarian',
@@ -69,7 +68,7 @@ def assert_cleanup():
 
 @pytest.fixture
 def in_tmp_path(tmp_path):
-    before = os.getcwd()
+    before = Path.cwd()
     try:
         os.chdir(tmp_path)
         yield tmp_path

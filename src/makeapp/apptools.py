@@ -1,5 +1,4 @@
 import logging
-import os
 import re
 import tomllib
 from contextlib import chdir
@@ -380,7 +379,7 @@ class Project:
         """
         self.configure_logging(log_level)
 
-        project_path = project_path or os.getcwd()
+        project_path = project_path or Path.cwd()
         self.project_path = Path(project_path).resolve()
         self.package: PackageData | None = None
         self.changelog: ChangelogData | None = None

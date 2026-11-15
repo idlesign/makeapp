@@ -2,7 +2,6 @@ import re
 from functools import partial
 from itertools import product
 from pathlib import Path
-from pprint import pformat
 from sys import version_info
 
 import yaml

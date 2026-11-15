@@ -17,7 +17,7 @@ from .rendering import Renderer
 from .utils import PYTHON_MIN_VERSION, configure_logging, get_user_dir, read_ini
 
 RE_UNKNOWN_MARKER = re.compile(r'{{ [^}]+ }}')
-BASE_PATH = os.path.dirname(__file__)
+BASE_PATH = Path(__file__).parent
 
 
 class AppMaker:
@@ -54,7 +54,7 @@ class AppMaker:
 
     VCS = VcsHelper.registry
 
-    default_vcs = list(VCS.keys())[0]
+    default_vcs = next(iter(VCS.keys()))
 
     BASE_SETTINGS = {
         'app_name': None,
@@ -93,11 +93,11 @@ class AppMaker:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.configure_logging(log_level)
 
-        self.path_user_confs = os.path.join(get_user_dir(), '.makeapp')
-        self.path_templates_builtin = os.path.join(BASE_PATH, 'app_templates')
-        self.path_templates_license = os.path.join(BASE_PATH, 'license_templates')
+        self.path_user_confs = get_user_dir() / '.makeapp'
+        self.path_templates_builtin = BASE_PATH / 'app_templates'
+        self.path_templates_license = BASE_PATH / 'license_templates'
 
-        self.user_settings_config = os.path.join(self.path_user_confs, 'makeapp.conf')
+        self.user_settings_config = self.path_user_confs / 'makeapp.conf'
         self.path_templates_current = self._get_templates_path_current(templates_path)
 
         self.logger.debug(f'Templates path: {self.path_templates_current}')
@@ -148,12 +148,12 @@ class AppMaker:
         :param path:
 
         """
-        path_user_templates = os.path.join(self.path_user_confs, 'app_templates')
+        path_user_templates = self.path_user_confs / 'app_templates'
 
         if path is None:
-            path = path_user_templates if os.path.exists(path_user_templates) else self.path_templates_builtin
+            path = path_user_templates if path_user_templates.exists() else self.path_templates_builtin
 
-        if not os.path.exists(path):
+        if not Path(path).exists():
             raise AppMakerException(f"Templates path doesn't exist: {path}.")
 
         return path
@@ -314,28 +314,28 @@ class AppMaker:
         :param remote_push: Whether to push to remote.
 
         """
-        dest = os.path.abspath(dest)
+        dest = Path(dest).resolve()
         self.logger.info(f'Application target path: {dest}')
 
         # Make remote available for hooks.
         self.settings['vcs_remote'] = remote_address
 
         try:
-            os.makedirs(dest)
+            dest.mkdir(parents=True)
 
         except OSError:
             pass
 
-        if os.path.exists(dest) and overwrite:
+        if dest.exists() and overwrite:
             self.logger.warning(
                 f'Target path already exists: {dest}. '
                 f'Conflict files will be overwritten.')
 
         license_txt, license_src = self._get_license_data()
         license_src = self._comment_out(license_src)
-        license_dest = os.path.join(dest, 'LICENSE')
+        license_dest = dest / 'LICENSE'
 
-        if not os.path.exists(license_dest) or overwrite:
+        if not license_dest.exists() or overwrite:
             self._create_file(license_dest, license_txt)
 
         with chdir(dest):
@@ -353,17 +353,15 @@ class AppMaker:
                     f'Template target path escapes destination: {target}.'
                 ) from e
 
-            target = f'{target_path}'
-
-            if not os.path.exists(target) or overwrite:
+            if not target_path.exists() or overwrite:
 
                 prepend = None
 
-                if os.path.splitext(target)[1] == '.py':
+                if target_path.suffix == '.py':
                     # Prepend license text to source files if required.
                     prepend = license_src
 
-                self._copy_file(template_file, target, prepend)
+                self._copy_file(template_file, target_path, prepend)
 
         with chdir(dest):
             self._hook_run('rollout_post')
@@ -399,7 +397,7 @@ class AppMaker:
         :param contents:
 
         """
-        with open(path, 'w') as f:
+        with Path(path).open('w') as f:
             f.write(contents.rstrip('\n') + '\n')
 
     def _copy_file(self, src: TemplateFile, dest: str, prepend_data: str = None):
@@ -413,10 +411,10 @@ class AppMaker:
         """
         self.logger.info(f'Creating {dest} ...')
 
-        dirname = os.path.dirname(dest)
+        dirname = Path(dest).parent
 
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
+        if not dirname.exists():
+            dirname.mkdir(parents=True)
 
         data = self.renderer.render(src)
 
@@ -426,8 +424,8 @@ class AppMaker:
         self._create_file(dest, data)
 
         # Copy permissions.
-        mode = os.stat(src.path_full).st_mode
-        os.chmod(dest, mode)
+        mode = Path(src.path_full).stat().st_mode
+        Path(dest).chmod(mode)
 
     def get_settings_string(self):
         """Returns settings string."""
@@ -448,9 +446,9 @@ class AppMaker:
 
         """
         def render(filename):
-            path = os.path.join(self.path_templates_license, filename)
+            path = self.path_templates_license / filename
 
-            if os.path.exists(path):
+            if path.exists():
                 return self.renderer.render(path)
 
             return None
@@ -528,7 +526,7 @@ class AppMaker:
         if path is None:
             config_path = self.user_settings_config
 
-        config_exists = os.path.exists(config_path)
+        config_exists = Path(config_path).exists()
         if path is None and not config_exists:
             # There could be no default config file.
             return

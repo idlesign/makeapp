@@ -5,5 +5,5 @@
 {% endblock %}
 
 {% block deps_tests %}{{ super() }}
-    "pytest-djangoapp>=1.6.0",
+    "pytest-djangoapp>=1.8.0",
 {% endblock %}

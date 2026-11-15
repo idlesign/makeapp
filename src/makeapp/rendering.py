@@ -1,5 +1,5 @@
-import os
 from contextlib import chdir
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from jinja2 import Environment, FileSystemLoader
@@ -80,8 +80,8 @@ class Renderer:
             filename_ = f'{filename}'
 
             # Try to pick file by basename.
-            with chdir(os.path.dirname(filename_)):
-                template = self.env.get_template(os.path.basename(filename_))
+            with chdir(Path(filename_).parent):
+                template = self.env.get_template(Path(filename_).name)
 
         rendered = template.render(**context)
 
@@ -104,7 +104,7 @@ class DynamicParentTemplate:
 
         except IndexError:
             # Mostly for template inheritance debug purposes.
-            raise IndexError(f'No more parents to pop. Initial parents: {self.parents_initial}.')
+            raise IndexError(f'No more parents to pop. Initial parents: {self.parents_initial}.') from None
 
         return current
 
@@ -126,6 +126,7 @@ class DynamicParentLoader(FileSystemLoader):
 
         if is_dynamic:
             # Prevent `parent_template` context variable caching.
-            uptodate = lambda: False
+            def uptodate():
+                return False
 
         return source, filename, uptodate

@@ -63,7 +63,7 @@ def test_default(in_tmp_path, get_appmaker, assert_content):
 
 def test_tpl_userdefined(in_tmp_path, tmp_path, get_appmaker, assert_content):
 
-    with open(tmp_path / 'pyproject.toml', 'w') as f:
+    with (tmp_path / 'pyproject.toml').open('w') as f:
         f.write('{% extends parent_template %}\n'
             "{% block entry_points_custom %}{{ super() }}# some custom{% endblock %}")
 

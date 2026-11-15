@@ -1,4 +1,3 @@
-import os
 import shlex
 from collections.abc import Sequence
 from pathlib import Path
@@ -35,12 +34,12 @@ class VcsHelper:
         :param vcs_path: Repository dir
 
         """
-        vcs_path = vcs_path or os.getcwd()
+        vcs_path = Path(vcs_path or Path.cwd())
 
         helper = None
 
         for helper_cls in cls.registry.values():
-            if os.path.exists(os.path.join(vcs_path, f'.{helper_cls.alias}')):
+            if (vcs_path / f'.{helper_cls.alias}').exists():
                 helper = helper_cls()
                 break
 

@@ -20,7 +20,7 @@ class FileHelper:
         :param fpath: File path
 
         """
-        with open(fpath) as f:
+        with Path(fpath).open() as f:
             data = f.read().splitlines()
 
         return data
@@ -30,7 +30,7 @@ class FileHelper:
 
         LOG.debug(f'Writing `{self.filepath}` ...')
 
-        with open(self.filepath, 'w') as f:
+        with Path(self.filepath).open('w') as f:
             f.write('\n'.join(self.contents).rstrip('\n') + '\n')
 
     def line_replace(self, value: str, offset: int = 0):
@@ -65,5 +65,4 @@ class FileHelper:
         """
         target_idx = self.line_idx + offset
 
-        for line in self.contents[target_idx:]:
-            yield line
+        yield from self.contents[target_idx:]

@@ -32,13 +32,13 @@ def configure_logging(
     :param format:
 
     """
-    logging.basicConfig(format=format, level=level if level else None)
+    logging.basicConfig(format=format, level=level or None)
     logger and logger.setLevel(level or logging.INFO)
 
 
 def get_user_dir() -> Path:
     """Returns the user's home directory."""
-    return Path(os.path.expanduser('~'))
+    return Path('~').expanduser()
 
 
 def read_ini(fpath: Path) -> ConfigParser:

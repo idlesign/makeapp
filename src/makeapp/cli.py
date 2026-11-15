@@ -33,10 +33,10 @@ def entry_point():
 
 @entry_point.command(
     # Allow passing custom settings into app templates.
-    context_settings=dict(
-        ignore_unknown_options=True,
-        allow_extra_args=True,
-    )
+    context_settings={
+        'ignore_unknown_options': True,
+        'allow_extra_args': True,
+    }
 )
 @click.argument('app_name')
 @click.argument('target_path')
