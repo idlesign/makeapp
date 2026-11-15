@@ -6,6 +6,7 @@
 * ++ Added ma check command performing pre-release checks (style, tests, documentation).
 * ++ Added ma docs check subcommand verifying external links in documentation.
 * ++ GitHub repository creation on rollout now handles already existing repositories by linking and pushing to them.
+* ++ ma check now verifies that the project virtual environment satisfies requires-python and that project URLs from pyproject.toml are alive.
 * ++ New application rollout can now create a GitHub repository via gh CLI (interactive prompt).
 * ++ Publishing pipeline now tracks github-release as a pending step, so a failed GitHub release is retried on the next publish.
 * ++ Release now warns when breaking changelog entries (!!, --) get a non-major increment.
@@ -15,6 +16,7 @@
 * ** Fixed VcsHelper.add() doing nothing when no filename is given.
 * ** Push now publishes only annotated tags reachable from pushed commits.
 * ** Renamed ProjectorExeption into ProjectorException.
+* ** Test workflow templates now run coverage report so fail_under thresholds are enforced.
 * ** The change command now reports previously staged files included into a commit.
 * ** Updated Python, Django, GitHub Actions and pytest-djangoapp versions in application templates.
 

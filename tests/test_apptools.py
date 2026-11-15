@@ -8,6 +8,7 @@ from makeapp.apptools import RELEASE_STATE_FILENAME, ChangelogData, Project
 from makeapp.exceptions import CommandError, ProjectorException
 from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.vcs import VcsHelper
+from makeapp.helpers.venvs import VenvHelper
 from makeapp.utils import run_command
 
 
@@ -483,3 +484,47 @@ def test_publish_retries_pending_github_release(in_tmp_path, get_appmaker, monke
 ])
 def test_changelog_is_breaking_change(line, expected):
     assert ChangelogData.is_breaking_change(line) is expected
+
+
+class TestCheckPythonRequires:
+
+    def make_project(self, tmp_path, monkeypatch, requires_python=None, venv_python=None):
+        pyproject = '[project]\nname = "sample"\n'
+
+        if requires_python:
+            pyproject += f'requires-python = "{requires_python}"\n'
+
+        (tmp_path / 'pyproject.toml').write_text(pyproject)
+
+        if venv_python:
+            monkeypatch.setattr(VenvHelper, 'get_python_version', lambda self: venv_python)
+
+        return Project(project_path=tmp_path)
+
+    def test_fresh_floor_and_venv_drift(self, tmp_path, monkeypatch):
+        project = self.make_project(tmp_path, monkeypatch, requires_python='>=3.13', venv_python=(3, 11))
+
+        problems = project.check_python_requires()
+
+        assert problems == ['Virtual environment Python 3.11 does not satisfy requires-python (>=3.13).']
+
+    def test_no_spec(self, tmp_path, monkeypatch):
+        project = self.make_project(tmp_path, monkeypatch)
+
+        assert project.check_python_requires() == []
+
+
+class TestCheckProjectUrls:
+
+    def test_dead_urls(self, tmp_path, monkeypatch):
+        (tmp_path / 'pyproject.toml').write_text(
+            '[project]\nname = "sample"\n'
+            '[project.urls]\nHomepage = "https://ok.example/"\nDocs = "https://dead.example/"\n')
+
+        monkeypatch.setattr(
+            'makeapp.apptools.DocsHelper.is_url_alive',
+            lambda url: 'dead' not in url)
+
+        project = Project(project_path=tmp_path)
+
+        assert project.check_project_urls() == ['Project URL is dead: https://dead.example/']

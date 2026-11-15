@@ -622,6 +622,42 @@ class Project:
         """
         return DocsHelper.check_links(self.project_path / 'docs')
 
+    def get_python_requires(self) -> str | None:
+        """Returns requires-python specification from pyproject.toml."""
+        return self.get_project_data().get('project', {}).get('requires-python')
+
+    def check_python_requires(self) -> list[str]:
+        """Checks that the virtual environment Python satisfies requires-python.
+        Returns found problems.
+
+        """
+        problems = []
+        spec = self.get_python_requires()
+
+        if spec is None:
+            return problems
+
+        match = re.search(r'>=\s*(\d+)\.(\d+)', spec)
+
+        if not match:
+            return problems
+
+        floor = (int(match.group(1)), int(match.group(2)))
+        venv_version = self.venv.get_python_version()
+
+        if venv_version is not None and venv_version < floor:
+            venv_version_str = '.'.join(map(str, venv_version))
+            problems.append(
+                f'Virtual environment Python {venv_version_str} does not satisfy requires-python ({spec}).')
+
+        return problems
+
+    def check_project_urls(self) -> list[str]:
+        """Checks URLs declared in pyproject.toml [project.urls]. Returns found problems."""
+        urls = self.get_project_data().get('project', {}).get('urls', {})
+
+        return [f'Project URL is dead: {url}' for url in urls.values() if not DocsHelper.is_url_alive(url)]
+
     def check(self) -> list[str]:
         """Performs pre-release checks: style, tests, documentation build and links.
         Returns a list of found problems.
@@ -639,6 +675,8 @@ class Project:
         self.docs(serve=False)
 
         problems.extend(self.docs_check())
+        problems.extend(self.check_python_requires())
+        problems.extend(self.check_project_urls())
 
         return problems
 

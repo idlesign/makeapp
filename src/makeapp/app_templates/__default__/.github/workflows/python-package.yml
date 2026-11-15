@@ -36,4 +36,5 @@ jobs:
 {% endraw %}
       run: |
         uv run --no-sync coverage run -m pytest
+        uv run --no-sync coverage report
         uv run --no-sync coveralls --service=github
