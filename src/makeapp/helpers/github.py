@@ -46,3 +46,17 @@ class GithubHelper:
         output = run_command(['gh', 'release', 'create', tag, '--title', tag, '--notes-from-tag'])
 
         return output[0] if output else ''
+
+    def create_repo(self, name: str, *, private: bool = True) -> str:
+        """Creates a GitHub repository from the current directory and pushes it.
+        Returns the repository URL.
+
+        :param name: Repository name.
+        :param private: Whether the repository is private.
+
+        """
+        visibility = '--private' if private else '--public'
+
+        output = run_command(['gh', 'repo', 'create', name, visibility, '--source', '.', '--push'])
+
+        return output[0] if output else ''

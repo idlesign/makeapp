@@ -8,6 +8,7 @@ from click.testing import CliRunner
 
 from makeapp.cli import entry_point, main
 from makeapp.exceptions import AppMakerException
+from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 
 
@@ -124,3 +125,18 @@ def test_release_no_prompt_non_interactive(run_command, monkeypatch):
 
     assert result.exit_code == 0
     assert calls == ["pull", "release", "publish"]
+
+
+def test_new_github_repo_creation(in_tmp_path, monkeypatch):
+    created = []
+    monkeypatch.setattr(GithubHelper, 'is_available', lambda *args: True)
+    monkeypatch.setattr(
+        GithubHelper, 'create_repo',
+        lambda self, name, *, private: created.append((name, private)) or 'https://x')
+
+    # Prompts: skip name check, rollout, init repo, create GitHub repo (yes),
+    # make it public (yes), init venv (yes).
+    result = CliRunner().invoke(entry_point, ['new', 'someapp', '.'], obj={}, input='\n\n\ny\n\n\n')
+
+    assert result.exit_code == 0
+    assert created == [('someapp', False)]

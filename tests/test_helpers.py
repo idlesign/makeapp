@@ -312,3 +312,13 @@ class TestGithubHelper:
 
         assert issued == [['gh', 'release', 'create', 'v1.0.0', '--title', 'v1.0.0', '--notes-from-tag']]
         assert url == 'https://x'
+
+    def test_create_repo(self, monkeypatch):
+        issued = []
+        monkeypatch.setattr('makeapp.helpers.github.run_command', lambda args: issued.append(args) or ['https://x'])
+
+        helper = GithubHelper(GitHelper())
+        url = helper.create_repo('myapp', private=False)
+
+        assert issued == [['gh', 'repo', 'create', 'myapp', '--public', '--source', '.', '--push']]
+        assert url == 'https://x'

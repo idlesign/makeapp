@@ -1,7 +1,9 @@
 # makeapp changelog
 
 ### Unreleased
+* ++ Added Dependabot configuration for GitHub Actions updates to application templates.
 * ++ Added GitHub Releases creation on publish: a release is made from the version tag via gh CLI, with console indication if it was not created.
+* ++ New application rollout can now create a GitHub repository via gh CLI (interactive prompt).
 * ** Changelog entries are now deduplicated on add.
 * ** Fixed commit message corruption for descriptions ending with marker characters.
 * ** Fixed get_modified() failing on staged, renamed and deleted files.

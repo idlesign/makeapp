@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import logging
 import sys
+from contextlib import chdir
 from pathlib import Path
 
 import click
 
+from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.tests import TestsHelper
+from makeapp.helpers.vcs import VcsHelper
 
 from .exceptions import MakeappException
 
@@ -110,6 +113,8 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
     init_venv = True
     remote_address = app_maker.settings['vcs_remote'] or ''
     remote_push = False
+    github_repo = False
+    github_private = True
 
     if not no_prompt:
 
@@ -126,10 +131,17 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
             'Do you want to initialize a VCS repository in the application directory?', default=True)
 
         if init_repo:
-            remote_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
+            github_repo = GithubHelper.is_available() and click.confirm(
+                f'Do you want to create a GitHub repository `{app_name}`?', default=False)
 
-            if remote_address:
-                remote_push = click.confirm('Do you want to commit and push files to remote?', default=False)
+            if github_repo:
+                github_private = not click.confirm('Make it public?', default=True)
+
+            else:
+                remote_address = click.prompt('Remote repository address to link to (leave blank to skip)', default='')
+
+                if remote_address:
+                    remote_push = click.confirm('Do you want to commit and push files to remote?', default=False)
 
         init_venv = click.confirm(
             'Do you want to initialize a virtual environment in the application directory?', default=True)
@@ -142,6 +154,11 @@ def new(app_name, target_path, configuration_file, overwrite_on_conflict, debug,
         remote_address=remote_address,
         remote_push=remote_push,
     )
+
+    if github_repo:
+        with chdir(target_path):
+            GithubHelper(VcsHelper.get()).create_repo(app_name, private=github_private)
+
     click.secho('Done', fg='green')
 
 
