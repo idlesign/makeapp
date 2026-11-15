@@ -27,7 +27,9 @@ Without `--no-prompt`, `makeapp` can also:
 
 - check whether the package name already exists on PyPI;
 - let you skip Git or virtual environment initialization;
-- configure a Git remote and optionally push the initial commit.
+- configure a Git remote and optionally push the initial commit;
+- with GitHub CLI (`gh`) configured: create a GitHub repository and push to it,
+  or link and push to an existing one.
 
 The default scaffold contains:
 
