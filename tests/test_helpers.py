@@ -1,7 +1,9 @@
 import pytest
+import requests
 
 from makeapp.exceptions import CommandError, ProjectorException
 from makeapp.helpers.dist import DistHelper
+from makeapp.helpers.docs import DocsHelper
 from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
 from makeapp.helpers.vcs import GitHelper, VcsHelper
@@ -354,3 +356,56 @@ class TestGithubHelper:
             ['push', '-u', 'origin', 'main'],
             ['push', '--follow-tags'],
         ]
+
+
+class TestDocsHelper:
+
+    def test_check_links(self, tmp_path, monkeypatch):
+        docs = tmp_path / 'docs'
+        docs.mkdir()
+        (docs / 'page.md').write_text(
+            'See [good](https://good.example/) and <https://bad.example/page>.\n'
+            'Plain https://ok.example/path, mention.\n')
+
+        statuses = {
+            'https://good.example/': 200,
+            'https://ok.example/path': 200,
+            'https://bad.example/page': 404,
+        }
+
+        class FakeResponse:
+            def __init__(self, status_code):
+                self.status_code = status_code
+
+        monkeypatch.setattr(
+            'makeapp.helpers.docs.requests.head',
+            lambda url, **kwargs: FakeResponse(statuses[url]))
+
+        problems = DocsHelper.check_links(docs)
+
+        assert len(problems) == 1
+        assert 'https://bad.example/page' in problems[0]
+
+    def test_is_url_alive_fallback(self, monkeypatch):
+        calls = []
+
+        class FakeResponse:
+            status_code = 405
+
+        monkeypatch.setattr(
+            'makeapp.helpers.docs.requests.head',
+            lambda url, **kwargs: calls.append('head') or FakeResponse())
+        monkeypatch.setattr(
+            'makeapp.helpers.docs.requests.get',
+            lambda url, **kwargs: calls.append('get') or FakeResponse())
+
+        assert DocsHelper.is_url_alive('https://x.example/') is False
+        assert calls == ['head', 'get']
+
+    def test_is_url_alive_connection_error(self, monkeypatch):
+        def fail(url, **kwargs):
+            raise requests.ConnectionError('no route')
+
+        monkeypatch.setattr('makeapp.helpers.docs.requests.head', fail)
+
+        assert DocsHelper.is_url_alive('https://x.example/') is False

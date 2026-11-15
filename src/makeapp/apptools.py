@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 import tomllib
@@ -5,8 +6,9 @@ from contextlib import chdir
 from datetime import datetime
 from pathlib import Path
 
-from .exceptions import CommandError, ProjectorException
+from .exceptions import ProjectorException
 from .helpers.dist import DistHelper
+from .helpers.docs import DocsHelper
 from .helpers.files import FileHelper
 from .helpers.github import GithubHelper
 from .helpers.tests import TestsHelper
@@ -541,21 +543,34 @@ class Project:
             self.vcs.add(files_to_stage)
             self.vcs.commit(commit_message.strip())
 
+    @staticmethod
+    def _record_release_step(pending_path: Path, step: str) -> str:
+        """Records the given release step into the pending state file and returns it."""
+        pending_path.write_text(f'{{"step": "{step}"}}\n')
+        return step
+
     def publish(self):
         """Uploads project data to remote VCS and Python Package Index server."""
         LOG.info('Publishing application ...')
 
         with chdir(self.project_path):
             pending_path = Path(RELEASE_STATE_FILENAME)
-            if not pending_path.exists():
+            step = None
+
+            if pending_path.exists():
+                step = json.loads(pending_path.read_text())['step']
+
+            if step is None:
                 DistHelper.upload()
-                pending_path.write_text('{"step": "git-push"}\n')
+                step = self._record_release_step(pending_path, 'git-push')
 
-            self.vcs.push()
+            if step == 'git-push':
+                self.vcs.push()
+                step = self._record_release_step(pending_path, 'github-release')
 
-            self.publish_github_release()
-
-            pending_path.unlink()
+            if step == 'github-release':
+                self.publish_github_release()
+                pending_path.unlink()
 
     def publish_github_release(self):
         """Creates a GitHub release for the latest tag, if possible."""
@@ -569,20 +584,41 @@ class Project:
             LOG.warning('GitHub release was not created: origin remote does not point to GitHub.')
             return
 
-        try:
-            url = github.create_release()
-
-        except CommandError as e:
-            LOG.warning(f'GitHub release was not created: {e}')
-
-        else:
-            LOG.info(f'GitHub release created: {url}')
+        url = github.create_release()
+        LOG.info(f'GitHub release created: {url}')
 
     def run_tests(self, *, only: list[str] | None = None) -> dict[str, list[str]]:
         LOG.info('Running tests ...')
         with chdir(self.project_path):
             helper = TestsHelper(settings=self.get_settings().get('tests', {}), only=only)
             return helper.run_tests()
+
+    def docs_check(self) -> list[str]:
+        """Performs documentation checks (currently: external links).
+        Returns a list of found problems.
+
+        """
+        return DocsHelper.check_links(self.project_path / 'docs')
+
+    def check(self) -> list[str]:
+        """Performs pre-release checks: style, tests, documentation build and links.
+        Returns a list of found problems.
+
+        """
+        problems = []
+
+        self.style()
+
+        stats = self.run_tests()
+
+        if stats[TestsHelper.KEY_FAIL]:
+            problems.append(f"Tests failed: {' '.join(stats[TestsHelper.KEY_FAIL])}")
+
+        self.docs(serve=False)
+
+        problems.extend(self.docs_check())
+
+        return problems
 
     def style(self):
         LOG.info('Styling ...')

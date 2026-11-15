@@ -3,8 +3,12 @@
 ### Unreleased
 * ++ Added Dependabot configuration for GitHub Actions updates to application templates.
 * ++ Added GitHub Releases creation on publish: a release is made from the version tag via gh CLI, with console indication if it was not created.
+* ++ Added ma check command performing pre-release checks (style, tests, documentation).
+* ++ Added ma docs check subcommand verifying external links in documentation.
 * ++ GitHub repository creation on rollout now handles already existing repositories by linking and pushing to them.
 * ++ New application rollout can now create a GitHub repository via gh CLI (interactive prompt).
+* ++ Publishing pipeline now tracks github-release as a pending step, so a failed GitHub release is retried on the next publish.
+* ++ Release now warns when breaking changelog entries (!!, --) get a non-major increment.
 * ** Changelog entries are now deduplicated on add.
 * ** Fixed commit message corruption for descriptions ending with marker characters.
 * ** Fixed get_modified() failing on staged, renamed and deleted files.

@@ -2,10 +2,12 @@ import logging
 import os
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 from click.testing import CliRunner
 
+from makeapp.apptools import Project
 from makeapp.cli import entry_point, main
 from makeapp.exceptions import AppMakerException
 from makeapp.helpers.github import GithubHelper
@@ -157,3 +159,76 @@ def test_new_github_repo_already_exists(in_tmp_path, monkeypatch):
     assert result.exit_code == 0
     assert 'already exists' in result.output
     assert linked == ['someapp']
+
+
+def test_release_warns_on_breaking_with_nonmajor(run_command, monkeypatch):
+    def fake_gather(self):
+        self.package = SimpleNamespace(version_current_str='1.2.0', version_next_str='1.3.0')
+        self.changelog = SimpleNamespace(deduce_version_increment=lambda: 'minor')
+
+    monkeypatch.setattr(Project, '_gather_data', fake_gather)
+    monkeypatch.setattr(Project, 'pull', lambda self: None)
+    monkeypatch.setattr(
+        Project, 'get_release_info',
+        lambda self, increment=None: (self._gather_data() or ('v1.3.0', '* !! Breaking change.')))
+
+    released = []
+    monkeypatch.setattr(Project, 'release', lambda self, v, s: released.append(v))
+    monkeypatch.setattr(Project, 'publish', lambda self: None)
+
+    # Decline at the breaking warning prompt.
+    result = CliRunner().invoke(entry_point, ['release'], obj={}, input='n\n')
+    assert 'breaking changes are present' in result.output
+    assert not released
+
+    # Confirm at the warning, then proceed.
+    result = CliRunner().invoke(entry_point, ['release'], obj={}, input='y\ny\nn\n')
+    assert 'breaking changes are present' in result.output
+    assert released == ['v1.3.0']
+
+    # Non-interactive mode: warning shown, no prompt.
+    released.clear()
+    result = run_command(['release', '--no-prompt'])
+    assert 'breaking changes are present' in result.output
+    assert released == ['v1.3.0']
+
+
+def test_docs_group_serves_by_default(run_command, monkeypatch):
+    calls = []
+    monkeypatch.setattr(Project, 'docs', lambda self, serve: calls.append(serve))
+
+    result = run_command(['docs'])
+    assert result.exit_code == 0
+    assert calls == [True]
+
+    result = run_command(['docs', '-b'])
+    assert result.exit_code == 0
+    assert calls == [True, False]
+
+
+def test_docs_check_command(run_command, monkeypatch):
+    monkeypatch.setattr(Project, 'docs_check', lambda self: [])
+
+    result = run_command(['docs', 'check'])
+    assert result.exit_code == 0
+    assert 'Done' in result.output
+
+    monkeypatch.setattr(Project, 'docs_check', lambda self: ['docs/x.md:1: https://dead.example/'])
+
+    result = run_command(['docs', 'check'])
+    assert result.exit_code == 1
+    assert 'https://dead.example/' in result.output
+
+
+def test_check_gate(run_command, monkeypatch):
+    monkeypatch.setattr(Project, 'check', lambda self: [])
+
+    result = run_command(['check'])
+    assert result.exit_code == 0
+    assert 'Done' in result.output
+
+    monkeypatch.setattr(Project, 'check', lambda self: ['Tests failed: py314'])
+
+    result = run_command(['check'])
+    assert result.exit_code == 1
+    assert 'Tests failed' in result.output

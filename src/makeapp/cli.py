@@ -194,6 +194,22 @@ def release(increment, no_prompt, debug):
     click.secho(f'Version next: {project.package.version_next_str}', fg='green')
     click.secho(version_summary)
 
+    has_breaking = any(
+        line.startswith(('* !! ', '* -- '))
+        for line in version_summary.splitlines())
+
+    if has_breaking:
+        increment_effective = increment or project.changelog.deduce_version_increment()
+
+        if increment_effective != 'major':
+            click.secho(
+                f'Warning: breaking changes are present, but the increment is `{increment_effective}`. '
+                'Consider `--increment major`.',
+                fg='yellow')
+
+            if not no_prompt:
+                click.confirm('Proceed with the release anyway?', abort=True, default=False)
+
     if no_prompt or click.confirm('Commit changes?', default=True):
         project.release(version_str, version_summary)
 
@@ -288,16 +304,50 @@ def tests(debug, only):
     click.secho('Done', fg='green')
 
 
-@entry_point.command()
-@option_debug
+@entry_point.group(invoke_without_command=True)
 @click.option(
     '-b', '--build',
     help='Build only. Do not serve', is_flag=True
 )
-def docs(debug, build):
+@option_debug
+@click.pass_context
+def docs(ctx, debug, build):
     """Build/serve documentation."""
+    if ctx.invoked_subcommand is None:
+        project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+        project.docs(serve=not build)
+        click.secho('Done', fg='green')
+
+
+@docs.command('check')
+@option_debug
+def docs_check(debug):
+    """Performs documentation checks (currently: external links)."""
     project = Project(log_level=logging.DEBUG if debug else logging.INFO)
-    project.docs(serve=not build)
+    problems = project.docs_check()
+
+    for problem in problems:
+        click.secho(problem, fg='red', err=True)
+
+    if problems:
+        raise click.exceptions.Exit(1)
+
+    click.secho('Done', fg='green')
+
+
+@entry_point.command()
+@option_debug
+def check(debug):
+    """Performs pre-release checks: style, tests, documentation."""
+    project = Project(log_level=logging.DEBUG if debug else logging.INFO)
+    problems = project.check()
+
+    for problem in problems:
+        click.secho(problem, fg='red', err=True)
+
+    if problems:
+        raise click.exceptions.Exit(1)
+
     click.secho('Done', fg='green')
 
 

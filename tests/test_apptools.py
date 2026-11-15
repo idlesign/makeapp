@@ -5,7 +5,7 @@ from textwrap import dedent
 import pytest
 
 from makeapp.apptools import RELEASE_STATE_FILENAME, ChangelogData, Project
-from makeapp.exceptions import ProjectorException
+from makeapp.exceptions import CommandError, ProjectorException
 from makeapp.helpers.github import GithubHelper
 from makeapp.helpers.vcs import VcsHelper
 from makeapp.utils import run_command
@@ -433,3 +433,43 @@ def test_publish_indicates_missing_github_release(in_tmp_path, get_appmaker, mon
     project.publish()
 
     assert 'GitHub release was not created' in caplog.text
+
+
+def test_publish_retries_pending_github_release(in_tmp_path, get_appmaker, monkeypatch):
+    get_appmaker()
+
+    vcs = VcsHelper.get()
+    vcs.commit('initial')
+
+    project = Project()
+    project.add_change(['+ Some feature'])
+    version, summary = project.get_release_info()
+    project.release(version, summary)
+
+    pending_path = in_tmp_path / RELEASE_STATE_FILENAME
+    calls = []
+
+    monkeypatch.setattr('makeapp.apptools.DistHelper.upload', lambda: calls.append('upload'))
+    monkeypatch.setattr(project.vcs, 'push', lambda: calls.append('push'))
+    monkeypatch.setattr(GithubHelper, 'is_available', lambda *args: True)
+    monkeypatch.setattr(GithubHelper, 'get_repo_slug', lambda self: 'owner/repo')
+
+    def fail_release(self, tag=None):
+        calls.append('github-release')
+        raise CommandError('gh failed')
+
+    monkeypatch.setattr(GithubHelper, 'create_release', fail_release)
+
+    with pytest.raises(CommandError, match='gh failed'):
+        project.publish()
+
+    assert calls == ['upload', 'push', 'github-release']
+    assert pending_path.read_text() == '{"step": "github-release"}\n'
+
+    monkeypatch.setattr(
+        GithubHelper, 'create_release', lambda self, tag=None: calls.append('retry github-release') or 'url')
+
+    project.publish()
+
+    assert calls == ['upload', 'push', 'github-release', 'retry github-release']
+    assert not pending_path.exists()
