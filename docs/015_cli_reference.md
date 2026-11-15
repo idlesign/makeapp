@@ -68,6 +68,9 @@ Publishing then pushes commits and tags, builds distributions, and uploads them 
 
 Without `--increment`, a `++` changelog entry selects a minor release and all other entries select a patch release.
 
+If breaking changelog entries (`!!` or `--`) are present but the increment is not `major`, a warning is shown and
+confirmation is requested (in `--no-prompt` mode only the warning is printed).
+
 ## `ma publish`
 
 ```text
@@ -120,3 +123,16 @@ Starts `mkdocs serve -o` by default. Use `-b` or `--build` to run `mkdocs build`
 ```bash
 ma docs --build
 ```
+
+### `ma docs check`
+
+Checks external links in Markdown files under `docs/`. Exits with a non-zero code if dead links are found.
+
+## `ma check`
+
+```text
+ma check
+```
+
+Performs pre-release checks in one command: style, tests, documentation build, and documentation link check.
+Exits with a non-zero code if any check fails.

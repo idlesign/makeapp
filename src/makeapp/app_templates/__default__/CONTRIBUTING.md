@@ -26,14 +26,17 @@ Then, from the project directory:
 
 ```bash
 ma up              # Synchronize the development environment.
-ma style           # Run Ruff checks and apply safe fixes.
-ma tests           # Run the configured test matrix.
-ma docs --build    # Build documentation without starting a server.
+ma check           # Run pre-release checks: style, tests, documentation.
 ma change "+ Add a feature"  # Update the changelog and commit modified files.
-ma release         # Prepare a release and optionally publish it.
 ```
 
 Review changes before running `ma change`: it stages and commits modified tracked files together with the changelog.
+
+The following command is intended for the project maintainer:
+
+```bash
+ma release         # Prepare a release and optionally publish it.
+```
 
 
 ## Spread the word

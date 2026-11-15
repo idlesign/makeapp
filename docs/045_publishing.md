@@ -82,9 +82,12 @@ ma publish
 ```
 
 This command does not change the version or create a tag. It pulls the repository, removes the existing `dist/`
-directory, runs `uv build` and `uv publish`, and then pushes the current branch and tags. If the Git push fails after a
-successful PyPI upload, makeapp records `{"step": "git-push"}` in `.ma-release`. The next `ma publish` retries only
-the Git push and removes the state file after it succeeds, avoiding a duplicate PyPI upload.
+directory, runs `uv build` and `uv publish`, and then pushes the current branch and tags.
+
+Publishing is a three-step pipeline: PyPI upload, Git push, GitHub release. The current step is recorded in
+`.ma-release`, so if a step fails, the next `ma publish` retries only the remaining steps, avoiding duplicate uploads
+and pushes. A failed GitHub release is retried the same way; a missing `gh` CLI or a non-GitHub remote only produces
+a console warning and does not block publishing.
 
 ## GitHub Releases
 

@@ -473,3 +473,13 @@ def test_publish_retries_pending_github_release(in_tmp_path, get_appmaker, monke
 
     assert calls == ['upload', 'push', 'github-release', 'retry github-release']
     assert not pending_path.exists()
+
+
+@pytest.mark.parametrize(('line', 'expected'), [
+    ('* !! Removed something.', True),
+    ('* -- Dropped something.', True),
+    ('* ++ Added something.', False),
+    ('* ** Fixed something.', False),
+])
+def test_changelog_is_breaking_change(line, expected):
+    assert ChangelogData.is_breaking_change(line) is expected

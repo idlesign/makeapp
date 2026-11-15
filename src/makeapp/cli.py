@@ -15,7 +15,7 @@ from .exceptions import MakeappException
 try:
     from . import VERSION
     from .appmaker import AppMaker
-    from .apptools import VERSION_NUMBER_CHUNKS, Project
+    from .apptools import VERSION_NUMBER_CHUNKS, ChangelogData, Project
 
 except MakeappException as e:
     click.secho(f'{e}', err=True, fg='red')
@@ -195,7 +195,7 @@ def release(increment, no_prompt, debug):
     click.secho(version_summary)
 
     has_breaking = any(
-        line.startswith(('* !! ', '* -- '))
+        ChangelogData.is_breaking_change(line)
         for line in version_summary.splitlines())
 
     if has_breaking:

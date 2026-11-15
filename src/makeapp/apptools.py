@@ -171,16 +171,30 @@ class PackageData(DataContainer):
 class ChangelogData(DataContainer):
     """Information gathered from changelog file."""
 
-    change_markers = '!+-*'
-    """Line prefixes denoting change nature.
+    change_marker_important = '!'
+    """Important change/improvement/fix."""
 
-    ! Important change/improvement/fix
-    + New feature / addition
-    - Feature deprecation / removal
-    * Minor change/improvement/fix
+    change_marker_feature = '+'
+    """New feature / addition."""
 
-    """
-    change_marker_default = '*'
+    change_marker_removal = '-'
+    """Feature deprecation / removal."""
+
+    change_marker_minor = '*'
+    """Minor change/improvement/fix."""
+
+    change_markers = (
+        change_marker_important
+        + change_marker_feature
+        + change_marker_removal
+        + change_marker_minor
+    )
+    """All known line prefixes, in changelog sort order."""
+
+    change_marker_default = change_marker_minor
+
+    change_markers_breaking = change_marker_important + change_marker_removal
+    """Line prefixes denoting breaking changes."""
 
     filename = 'CHANGELOG.md'
     marker_unreleased = 'Unreleased'
@@ -188,6 +202,13 @@ class ChangelogData(DataContainer):
     _prefix_version = '### '
     _prefix_change = '* '
     _offset_change = 1
+
+    @classmethod
+    def is_breaking_change(cls, line: str) -> bool:
+        """Returns whether a changelog line denotes a breaking change."""
+        return any(
+            line.startswith(f'{cls._prefix_change}{marker * 2} ')
+            for marker in cls.change_markers_breaking)
 
     @classmethod
     def get(cls) -> 'ChangelogData':
@@ -263,9 +284,10 @@ class ChangelogData(DataContainer):
 
         """
         supposed_chunk = 'patch'
+        feature_prefix = f'{self._prefix_change}{self.change_marker_feature * 2}'
 
         for change in self.get_changes():
-            if change.startswith(f'{self._prefix_change}++'):
+            if change.startswith(feature_prefix):
                 supposed_chunk = 'minor'
                 break
         return supposed_chunk
