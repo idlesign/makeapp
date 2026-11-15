@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from textwrap import dedent
 
@@ -6,6 +7,7 @@ import pytest
 from makeapp.apptools import RELEASE_STATE_FILENAME, ChangelogData, Project
 from makeapp.exceptions import ProjectorException
 from makeapp.helpers.vcs import VcsHelper
+from makeapp.utils import run_command
 
 
 def test_git(in_tmp_path, get_appmaker, assert_content, monkeypatch):
@@ -361,11 +363,8 @@ def test_changelog_add_change_dedup(in_tmp_path):
 
 
 def test_add_change_notifies_pre_staged(in_tmp_path, get_appmaker, caplog):
-    import logging
-
     get_appmaker()
 
-    from makeapp.utils import run_command
     (in_tmp_path / 'staged.txt').write_text('1')
     run_command(['git', 'add', 'staged.txt'])
 
@@ -379,7 +378,6 @@ def test_add_change_notifies_pre_staged(in_tmp_path, get_appmaker, caplog):
 def test_add_change_commit_message_keeps_trailing_marker_chars(in_tmp_path, get_appmaker):
     get_appmaker()
 
-    from makeapp.utils import run_command
     VcsHelper.get().commit('initial')
 
     Project().add_change(['+ Support of Python 3.12+'])

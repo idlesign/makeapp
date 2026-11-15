@@ -3,7 +3,7 @@ import pytest
 from makeapp.exceptions import CommandError, ProjectorException
 from makeapp.helpers.dist import DistHelper
 from makeapp.helpers.tests import TestsHelper as MatrixTestsHelper
-from makeapp.helpers.vcs import GitHelper
+from makeapp.helpers.vcs import GitHelper, VcsHelper
 from makeapp.helpers.venvs import VenvHelper
 from makeapp.utils import Uv, run_command
 
@@ -280,7 +280,6 @@ class TestGitModified:
 
         (in_tmp_path / 'some.txt').write_text('1')
 
-        from makeapp.helpers.vcs import VcsHelper
         VcsHelper.add(helper)
 
         assert 'some.txt' in helper.get_modified() or \
